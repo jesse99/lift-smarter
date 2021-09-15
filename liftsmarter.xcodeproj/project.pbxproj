@@ -18,6 +18,7 @@
 		377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C726EEF06600EC5028 /* ArrayExtension.swift */; };
 		377791CC26F0367900EC5028 /* Exercises.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CB26F0367900EC5028 /* Exercises.swift */; };
 		377791CE26F0383300EC5028 /* Workouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CD26F0383300EC5028 /* Workouts.swift */; };
+		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
@@ -64,6 +65,7 @@
 		377791C726EEF06600EC5028 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		377791CB26F0367900EC5028 /* Exercises.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercises.swift; sourceTree = "<group>"; };
 		377791CD26F0383300EC5028 /* Workouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workouts.swift; sourceTree = "<group>"; };
+		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 				377791BC26EE7C2B00EC5028 /* ExerciseView.swift */,
 				37ECEA6B26ED5B1F00D0AD8E /* LogView.swift */,
 				377791B726ED98AA00EC5028 /* ProgramView.swift */,
+				37A6DC8826F1956800AC85DE /* TimerView.swift */,
 				377791BE26EE9AE700EC5028 /* WorkoutView.swift */,
 			);
 			path = Views;
@@ -356,6 +359,7 @@
 				37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */,
 				37ECEA5126EAD9F200D0AD8E /* Exercise.swift in Sources */,
 				37ECEA6C26ED5B1F00D0AD8E /* LogView.swift in Sources */,
+				37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */,
 				37ECEA5926EB0C3300D0AD8E /* Expected.swift in Sources */,
 				377791C426EEBDF000EC5028 /* Editing.swift in Sources */,
 				37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */,

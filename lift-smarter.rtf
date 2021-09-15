@@ -1,0 +1,106 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AndaleMono;\f2\fswiss\fcharset0 Helvetica-Bold;
+\f3\fswiss\fcharset0 Helvetica-Oblique;}
+{\colortbl;\red255\green255\blue255;\red2\green2\blue2;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgenericrgb\c784\c784\c784;\csgenericrgb\c0\c0\c0;}
+\deftab816
+\pard\tx816\pardeftab816\pardirnatural\partightenfactor0
+
+\f0\fs48 \cf2 \'95 Get durations view logic working\
+\'95 Flesh out the workout and program views\
+\'95 Get another exercise working\
+\'95 Check that we can switch exercise types\
+\'95 History should use ActualRep (more fleshed out version of ExpectedSets)\
+\'95 Should logic be in the model?\
+	- could use extensions to organize\
+	- often this is done with an interactor with facadable protocols\
+	-    these don\'92t return data\
+	-    instead they either modify the model or mutate a binding passed in\
+	-        by a view\
+	- this allows views to be unit tested\
+	- might even help here, especially when dealing with time\
+	- could even use a facade with the simulator to test time\
+\'95 Might want Screens and Components under Views\
+\'95 Can we stick persistence into extensions to get it tucked out of the way?\
+\'95 See if we can get exercise views working properly\
+	- potentially can use combine to sequence events like timer then state update\
+	- combine can also be useful for validation\
+\
+
+\f1\fs34 \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+
+\f2\b\fs48 \cf2 SwiftUI\
+
+\f0\b0 good summary of @State etc\
+	https://sarunw.com/posts/data-in-swiftui-3\
+	https://www.raywenderlich.com/11781349-understanding-data-flow-in-swiftui\
+view communication\
+	https://www.vadimbulavin.com/passing-data-between-swiftui-views\
+https://www.raywenderlich.com/4161005-mvvm-with-combine-tutorial-for-ios\
+https://spin.atomicobject.com/2020/08/28/ergonomic-struct-updates-in-swift\
+AppState, Inspector, etc\
+	https://nalexn.github.io/clean-architecture-swiftui/\
+
+\f2\b \
+MVVM\
+
+\f0\b0 View -> ViewModel -> Model\
+	references are all one way\
+\ul 	initing a view with the same args should always result in the same view\ulnone \
+	ViewModel has state associatd with the view\
+		eg state of UI controls, like what the selection is\
+		\
+
+\f2\b Combine\
+	
+\f0\b0 https://developer.apple.com/documentation/combine\
+	https://heckj.github.io/swiftui-notes/#when-to-use-combine\
+used for async events\
+note that user input can be thought of as an async event\
+can be useful for validation\
+	https://peterfriese.dev/swift-combine-love
+\f2\b \
+\
+\
+Edit Program\
+
+\f0\b0 \
+Name: [Covid]\
+Current Week: [1]\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+\cf2 \ul \ulc2 Workouts\ulnone \
+\ul Exercises\ulnone \
+\
+\ul Cancel\ulnone             \ul OK\ulnone \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+
+\f2\b \cf2 Edit Workouts\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+
+\f0\b0 \cf2 Cardio\
+Lower\
+Upper\
+\
+\ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
+\f3\i adds a new empty workout
+\f0\i0 \
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+
+\f2\b \cf2 Edit Exercises\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+
+\f0\b0 \cf2 Bench\
+OHP\
+Pull Ups\
+\
+\ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
+\f3\i adds a default exercise
+\f0\i0 \
+\
+}

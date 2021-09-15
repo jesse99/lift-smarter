@@ -7,6 +7,7 @@ struct DurationsView: View {
     @ObservedObject var instance: ExerciseInstance
     @State var underway: Bool
     @State var editModal = false
+    @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
 
     init(_ model: Model, _ workout: Workout, _ instance: ExerciseInstance) {
@@ -35,7 +36,7 @@ struct DurationsView: View {
 
                     Button("Start Timer", action: onStartTimer)
                         .font(.system(size: 20.0))
-//                        .sheet(isPresented: self.$durationModal) {TimerView(title: self.getTimerTitle(), duration: self.timerDuration())}
+                        .sheet(isPresented: self.$explicitTimerModal) {TimerView(title: getExplicitTimerTitle(self.exercise, self.instance), duration: explicitTimerDuration(self.exercise, self.instance))}
                     Spacer()
                     Text(self.getNoteLabel()).font(.callout)   // Same previous x3
                 }
@@ -78,8 +79,7 @@ struct DurationsView: View {
     }
     
     private func onStartTimer() {
-        self.model.log(.Error, "not implemented")
-//        self.durationModal = true
+        self.explicitTimerModal = true
     }
     
     private func onEdit() {
