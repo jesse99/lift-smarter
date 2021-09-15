@@ -22,8 +22,6 @@ struct EditDurationsView: View {
         self._durations = State(initialValue: strings.0)
         self._rest = State(initialValue: strings.1)
         self._target = State(initialValue: strings.2)
-
-        print("EditDurationsView.init")   // not using log here because we don't want to change the model within view init
     }
     
     var body: some View {

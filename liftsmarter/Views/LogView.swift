@@ -57,7 +57,6 @@ struct LogView: View {
     init(_ model: Model) {
         self.model = model
         self.logs = model.logs
-        print("LogView.init")   // not using log here because we don't want to change the model within view init
     }
     
     var body: some View {

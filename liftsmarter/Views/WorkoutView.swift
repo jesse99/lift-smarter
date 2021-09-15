@@ -11,7 +11,6 @@ struct WorkoutView: View {
         self.model = model
         self.program = model.program
         self.workout = workout
-        print("WorkoutView.init")   // not using log here because we don't want to change the model within view init
     }
 
     var body: some View {

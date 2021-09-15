@@ -13,7 +13,6 @@ struct ExerciseView: View {
         self.workout = workout
         self.exercise = model.program.exercises.first(where: {$0.name == instance.name})!
         self.instance = instance
-        print("ExerciseView.init")   // not using log here because we don't want to change the model within view init
     }
 
     var body: some View {

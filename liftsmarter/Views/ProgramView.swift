@@ -8,7 +8,6 @@ struct ProgramView: View {
     init(_ model: Model) {
         self.model = model
         self.program = model.program
-        print("ProgramView.init")   // not using log here because we don't want to change the model within view init
     }
     
     var body: some View {

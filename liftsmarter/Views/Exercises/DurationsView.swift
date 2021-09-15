@@ -14,7 +14,6 @@ struct DurationsView: View {
         self.exercise = model.program.exercises.first(where: {$0.name == instance.name})!
         self.instance = instance
         self._underway = State(initialValue: instance.current.setIndex > 0)
-        print("DurationsView.init")   // not using log here because we don't want to change the model within view init
     }
     
     var body: some View {
