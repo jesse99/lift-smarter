@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978426F65E0900351C5A /* TimeIntervalExtension.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -18,6 +19,7 @@
 		377791CC26F0367900EC5028 /* ExerciseVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CB26F0367900EC5028 /* ExerciseVM.swift */; };
 		377791CE26F0383300EC5028 /* Workouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CD26F0383300EC5028 /* Workouts.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
+		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
@@ -53,6 +55,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3718978426F65E0900351C5A /* TimeIntervalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntervalExtension.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -64,6 +67,7 @@
 		377791CB26F0367900EC5028 /* ExerciseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseVM.swift; sourceTree = "<group>"; };
 		377791CD26F0383300EC5028 /* Workouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workouts.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 				377791C526EEBE7B00EC5028 /* Either.swift */,
 				37ECEA5C26EB0CD700D0AD8E /* Extensions */,
 				37ECEA4726EAD73500D0AD8E /* Model */,
+				37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */,
 				37ECEA6A26ED5AF700D0AD8E /* Views */,
 				37ECEA6126ED24B300D0AD8E /* View Models */,
 				37ECEA2326EAD65300D0AD8E /* Preview Content */,
@@ -194,10 +199,11 @@
 		37ECEA5C26EB0CD700D0AD8E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				377791C726EEF06600EC5028 /* ArrayExtension.swift */,
 				37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */,
 				37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */,
+				3718978426F65E0900351C5A /* TimeIntervalExtension.swift */,
 				377791B426ED725D00EC5028 /* UIColorExtension.swift */,
-				377791C726EEF06600EC5028 /* ArrayExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -336,7 +342,9 @@
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
 				37ECEA5B26EB0C6700D0AD8E /* Current.swift in Sources */,
+				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
+				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
 				377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */,
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,

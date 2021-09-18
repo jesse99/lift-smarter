@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct DurationsView: View {
+    let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
     @ObservedObject var vm: ExerciseVM
     @State var editModal = false
     @State var implicitTimerModal = false
@@ -26,13 +27,12 @@ struct DurationsView: View {
                 Group {
                     Button(vm.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
-//                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {TimerView(title: "dummy title", duration: 120)}
                         .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {vm.implicitTimer()}
                     Spacer().frame(height: 50)
 
-//                    Button("Start Timer", action: onStartTimer)
-//                        .font(.system(size: 20.0))
-//                        .sheet(isPresented: self.$explicitTimerModal) {vm.explicitTimer()}
+                    Button("Start Timer", action: onStartTimer)
+                        .font(.system(size: 20.0))
+                        .sheet(isPresented: self.$explicitTimerModal) {vm.explicitTimer()}
                     Spacer()
                     Text(self.getNoteLabel()).font(.callout)   // Same previous x3
                 }
@@ -53,9 +53,9 @@ struct DurationsView: View {
                     .sheet(isPresented: self.$editModal) {EditDurationsView(self.vm)}
             }
             .padding()
-//            .onReceive(timer.timer) {_ in self.onTimer()} // TODO: implement
-            .onAppear {self.resetIfNeeded() /*self.timer.restart()*/}
-//            .onDisappear() {self.timer.stop()}
+            .onReceive(timer.timer) {_ in self.resetIfNeeded()}
+            .onAppear {self.resetIfNeeded(); self.timer.restart()}
+            .onDisappear() {self.timer.stop()}
         }
     }
 
