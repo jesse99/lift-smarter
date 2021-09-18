@@ -8,7 +8,6 @@ struct ExerciseView: View {
     @ObservedObject var instance: ExerciseInstance
 
     init(_ model: Model, _ workout: Workout, _ instance: ExerciseInstance) {
-        // TODO: we need to reset current if needed, in getView? or maybe in WorkoutView?
         self.model = model
         self.workout = workout
         self.exercise = model.program.exercises.first(where: {$0.name == instance.name})!
@@ -22,7 +21,8 @@ struct ExerciseView: View {
     private func getView() -> AnyView {
         switch exercise.modality.sets {
         case .durations(_, _):
-            return AnyView(DurationsView(model, workout, instance))
+            let logic = ExerciseVM(model, workout, exercise, instance)
+            return AnyView(DurationsView(logic))
 
         case .fixedReps(_):
             return AnyView(Text("not implemented"))

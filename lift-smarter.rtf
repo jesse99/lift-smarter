@@ -6,11 +6,19 @@
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs48 \cf2 \'95 Get durations view logic working\
+\f0\fs48 \cf2 \'95 Get the background timer working\
 \'95 Flesh out the workout and program views\
 \'95 Get another exercise working\
+	- should edit view onOK and onEdited be in vm? could pass error in as a binding\
+\'95 Might want Screens and Components under Views\
+	- could use a component for stuff like rest text boxes\
 \'95 Check that we can switch exercise types\
+\'95\'a0Get notes working\
+	- see if there are better markdown packages\
+\'95\'a0Get persistence working\
+	- probably want to put Model fields into separate stores\
 \'95 History should use ActualRep (more fleshed out version of ExpectedSets)\
+\'95\'a0Get previous labels working in exercise views\
 \'95 Should logic be in the model?\
 	- could use extensions to organize\
 	- often this is done with an interactor with facadable protocols\
@@ -20,7 +28,6 @@
 	- this allows views to be unit tested\
 	- might even help here, especially when dealing with time\
 	- could even use a facade with the simulator to test time\
-\'95 Might want Screens and Components under Views\
 \'95 Can we stick persistence into extensions to get it tucked out of the way?\
 \'95 See if we can get exercise views working properly\
 	- potentially can use combine to sequence events like timer then state update\

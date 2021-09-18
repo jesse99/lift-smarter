@@ -6,11 +6,11 @@ let RecentHours = 8.0
 /// An Exercise all the details for how to do a particular movement. It does not
 /// include history or achievement information.
 class Exercise: Identifiable, ObservableObject {
-    @Published var name: String            // "Heavy Bench"
-    @Published var formalName: String      // "Bench Press"
-    @Published var modality: Modality
-    @Published var expected: Expected
-    @Published var overridePercent: String // used to replace the normal weight percent label in exercise views with custom text
+    var name: String            // "Heavy Bench"
+    var formalName: String      // "Bench Press"
+    var modality: Modality
+    var expected: Expected
+    var overridePercent: String // used to replace the normal weight percent label in exercise views with custom text
 
     init(_ name: String, _ formalName: String, _ modality: Modality, _ expected: Expected, overridePercent: String = "") {
         ASSERT_EQ(modality.sets.caseIndex(), expected.sets.caseIndex())

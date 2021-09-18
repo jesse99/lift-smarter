@@ -4,8 +4,7 @@ import SwiftUI
 let restHelpText = "The amount of time to rest after each set. Time units may be omitted so '1.5m 60s 30 0' is a minute and a half, 60 seconds, 30 seconds, and no rest time."
 
 struct EditDurationsView: View {
-    let model: Model
-    var exercise: Exercise
+    let vm: ExerciseVM
     @State var durations: String
     @State var target: String
     @State var rest: String
@@ -14,19 +13,18 @@ struct EditDurationsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ model: Model, _ exercise: Exercise) {
-        self.model = model
-        self.exercise = exercise
+    init(_ vm: ExerciseVM) {
+        self.vm = vm
 
-        let strings = renderDurations(exercise.modality.sets)
-        self._durations = State(initialValue: strings.0)
-        self._rest = State(initialValue: strings.1)
-        self._target = State(initialValue: strings.2)
+        let table = vm.render()
+        self._durations = State(initialValue: table["durations"]!)
+        self._rest = State(initialValue: table["rest"]!)
+        self._target = State(initialValue: table["target"]!)
     }
     
     var body: some View {
         VStack() {
-            Text("Edit " + self.exercise.name).font(.largeTitle)
+            Text("Edit " + self.vm.name).font(.largeTitle)
 
             VStack(alignment: .leading) {
                 HStack {
@@ -82,10 +80,10 @@ struct EditDurationsView: View {
     }
 
     func onOK() {
-        switch parseDurations(durations: self.durations, rest: self.rest, target: self.target) {
+        let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
+        switch vm.parse(table) {
         case .right(let sets):
-            self.model.program.objectWillChange.send()
-            self.exercise.modality.sets = sets
+            self.vm.setSets(sets)
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
@@ -94,7 +92,8 @@ struct EditDurationsView: View {
     }
 
     private func onEditedSets(_ text: String) {
-        switch parseDurations(durations: self.durations, rest: self.rest, target: self.target) {
+        let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
+        switch vm.parse(table) {
         case .right(_):
             self.error = ""
         case .left(let err):
@@ -116,15 +115,16 @@ struct EditDurationsView: View {
         self.helpText = "Optional goal time for each set. Often when reaching the target a harder variation of the exercise is used."
         self.showHelp = true
     }
-
-    // TODO: reset expected?
 }
 
 struct EditDurationsView_Previews: PreviewProvider {
     static let model = mockModel()
+    static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
+    static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
+    static let vm = ExerciseVM(model, workout, exercise, instance)
 
     static var previews: some View {
-        EditDurationsView(model, exercise)
+        EditDurationsView(vm)
     }
 }

@@ -2,41 +2,37 @@
 import SwiftUI
 
 struct DurationsView: View {
-    let model: Model
-    @ObservedObject var exercise: Exercise
-    @ObservedObject var instance: ExerciseInstance
-    @State var underway: Bool
+    @ObservedObject var vm: ExerciseVM
     @State var editModal = false
+    @State var implicitTimerModal = false
     @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
 
-    init(_ model: Model, _ workout: Workout, _ instance: ExerciseInstance) {
-        self.model = model
-        self.exercise = model.program.exercises.first(where: {$0.name == instance.name})!
-        self.instance = instance
-        self._underway = State(initialValue: instance.current.setIndex > 0)
+    init(_ vm: ExerciseVM) {
+        self.vm = vm
     }
     
     var body: some View {
         VStack {
             Group {     // we're using groups to work around the 10 item limit in VStacks
-                Text(exercise.name).font(.largeTitle)   // Burpees
+                Text(vm.name).font(.largeTitle)   // Burpees
                 Spacer()
             
-                Text(getTitle(self.exercise, self.instance)).font(.title)          // Set 1 of 1
-                Text(getSubTitle(self.exercise, self.instance)).font(.headline)    // 60s
-                Text(getSubSubTitle(self.exercise, self.instance)).font(.headline) // 10 lbs
+                Text(vm.title()).font(.title)          // Set 1 of 1
+                Text(vm.subTitle()).font(.headline)    // 60s
+                Text(vm.subSubTitle()).font(.headline) // 10 lbs
                 Spacer()
 
                 Group {
-                    Button(self.getNextLabel(), action: onNext)
+                    Button(vm.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
-//                        .sheet(isPresented: self.$startModal, onDismiss: self.onNextCompleted) {TimerView(title: self.getTimerTitle(), duration: self.startDuration(), secondDuration: self.restSecs())}
+//                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {TimerView(title: "dummy title", duration: 120)}
+                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {vm.implicitTimer()}
                     Spacer().frame(height: 50)
 
-                    Button("Start Timer", action: onStartTimer)
-                        .font(.system(size: 20.0))
-                        .sheet(isPresented: self.$explicitTimerModal) {TimerView(title: getExplicitTimerTitle(self.exercise, self.instance), duration: explicitTimerDuration(self.exercise, self.instance))}
+//                    Button("Start Timer", action: onStartTimer)
+//                        .font(.system(size: 20.0))
+//                        .sheet(isPresented: self.$explicitTimerModal) {vm.explicitTimer()}
                     Spacer()
                     Text(self.getNoteLabel()).font(.callout)   // Same previous x3
                 }
@@ -44,7 +40,7 @@ struct DurationsView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.underway)
+                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.vm.canReset())
                 Button("History", action: onStartHistory)
                     .font(.callout)
 //                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
@@ -54,7 +50,7 @@ struct DurationsView: View {
 //                    .sheet(isPresented: self.$noteModal) {NoteView(self.display, formalName: self.exercise().formalName)}
                 Button("Edit", action: onEdit)
                     .font(.callout)
-                    .sheet(isPresented: self.$editModal) {EditDurationsView(self.model,  self.exercise)}
+                    .sheet(isPresented: self.$editModal) {EditDurationsView(self.vm)}
             }
             .padding()
 //            .onReceive(timer.timer) {_ in self.onTimer()} // TODO: implement
@@ -64,18 +60,22 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        let durations = self.durations()
-        if instance.current.setIndex < durations.count {
-//            self.startModal = true
+        if vm.inProgress() {
+            self.implicitTimerModal = true
         } else {
-            self.presentation.wrappedValue.dismiss()
+            vm.reset()
 //            self.display.send(.AppendHistory(self.workout(), self.exercise()))
-//            self.display.send(.ResetCurrent(self.exercise()))
+
+            self.presentation.wrappedValue.dismiss()
         }
     }
     
+    func onNextCompleted() {
+        vm.updateCurrent()
+    }
+    
     func onReset() {
-//        self.display.send(.ResetCurrent(self.exercise()))
+        self.vm.reset()
     }
     
     private func onStartTimer() {
@@ -94,41 +94,26 @@ struct DurationsView: View {
 //        self.noteModal = true
     }
     
-    private func resetIfNeeded() {   // TODO: use shouldReset
-        instance.current = Current(weight: exercise.expected.weight)
-    }
-
-    private func getNextLabel() -> String {
-        let durations = self.durations()
-        if (instance.current.setIndex == durations.count) {
-            return "Done"
-        } else {
-            return "Start"
+    private func resetIfNeeded() {
+        if vm.shouldReset() {
+            vm.reset()
         }
     }
-    
+
     private func getNoteLabel() -> String {
 //        return getPreviouslabel(self.display, workout(), exercise())
         return "a note"
-    }
-
-    private func durations() -> [DurationSet] {
-        switch exercise.modality.sets {
-        case .durations(let d, targetSecs: _):
-            return d
-        default:
-            ASSERT(false, "exercise is not durations")
-            return []
-        }
     }
 }
 
 struct DurationsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let workout = model.program.workouts[0]
+    static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
+    static let vm = ExerciseVM(model, workout, exercise, instance)
 
     static var previews: some View {
-        DurationsView(model, workout, instance)
+        DurationsView(vm)
     }
 }

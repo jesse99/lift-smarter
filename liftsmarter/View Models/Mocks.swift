@@ -85,8 +85,8 @@ func mockProgram() -> Program {
     
     func sleeperStretch() -> Exercise {
         let durations = [
-            DurationSet(secs: 30, restSecs: 30),
-            DurationSet(secs: 30, restSecs: 30),
+            DurationSet(secs: 30, restSecs: 0),
+            DurationSet(secs: 30, restSecs: 0),
             DurationSet(secs: 30, restSecs: 0)]
         let sets = Sets.durations(durations)
         let modality = Modality(Apparatus.bodyWeight, sets)

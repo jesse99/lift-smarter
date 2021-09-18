@@ -27,4 +27,11 @@ final class Current {
         self.setIndex = 0
         self.reps = []
     }
+    
+    func reset(weight: Double) {
+        self.startDate = Date()
+        self.weight = weight
+        self.setIndex = 0
+        self.reps = []
+    }
 }

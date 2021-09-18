@@ -208,25 +208,6 @@ enum Sets: CustomStringConvertible, Equatable {
 }
 
 extension Sets {
-    func numSets() -> Int? {
-        switch self {
-        case .durations(let durations, _):
-            return durations.count
-
-        case .fixedReps(let worksets):
-            return worksets.count
-
-        case .maxReps(let restSecs, _):
-            return restSecs.count
-
-        case .repRanges(warmups: let warmups, worksets: let worksets, backoffs: let backoffs):
-            return warmups.count + worksets.count + backoffs.count
-
-        case .repTotal(total: _, rest: _):
-            return nil
-        }
-    }
-
     func caseIndex() -> Int {
         switch self {
         case .durations(secs: _):
