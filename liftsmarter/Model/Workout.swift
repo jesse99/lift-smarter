@@ -5,17 +5,16 @@ enum WeekDay: Int {
     case sunday = 0, monday, tuesday, wednesday, thursday, friday, saturday
 }
 
-/// An instantiation of an exercise for a particular workout.
+/// An instantiation of an exercise for a particular workout. Unlike exercise, this is not
+/// directly editable.
 class ExerciseInstance: Identifiable, ObservableObject {
     var name: String         // key into program.exercises
     var enabled: Bool        // true if the user wants to perform the exercise within a particular workout
-    var allowRest: Bool      // respect rest weeks
     var current = Current()  // reset if it's been too long since the user was doing the exercise
 
     init(_ name: String) {
         self.name = name
         self.enabled = true
-        self.allowRest = true
     }
 
     var id: String {

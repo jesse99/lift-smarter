@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978426F65E0900351C5A /* TimeIntervalExtension.swift */; };
+		3718978726F6955A00351C5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978626F6955A00351C5A /* History.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -56,6 +57,7 @@
 
 /* Begin PBXFileReference section */
 		3718978426F65E0900351C5A /* TimeIntervalExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntervalExtension.swift; sourceTree = "<group>"; };
+		3718978626F6955A00351C5A /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				37ECEA4826EAD74A00D0AD8E /* Program.swift */,
 				37ECEA5626EB0BAE00D0AD8E /* Sets.swift */,
 				37ECEA4C26EAD93900D0AD8E /* Workout.swift */,
+				3718978626F6955A00351C5A /* History.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -338,6 +341,7 @@
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
 				37ECEA6326ED24D900D0AD8E /* Logic.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,
+				3718978726F6955A00351C5A /* History.swift in Sources */,
 				37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */,
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
