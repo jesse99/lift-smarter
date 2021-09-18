@@ -23,7 +23,7 @@ class WorkoutVM: ObservableObject {
         let exercise = self.model.program.exercises.first(where: {$0.name == instance.name})!
         switch exercise.modality.sets {
         case .durations(let durations, _):
-            sets = durations.map({$0.description})
+            sets = durations.map({"\($0.secs)s"})
             trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
 
         case .fixedReps(_):

@@ -190,9 +190,9 @@ extension ExerciseVM {
                 let duration = durations[instance.current.setIndex]
                 if targetSecs.count > 0 {
                     let target = targetSecs[instance.current.setIndex]
-                    return "\(duration) (target is \(target)s)"
+                    return "\(duration.secs)s (target is \(target)s)"   // TODO: might want to use some sort of shortTimeStr function
                 } else {
-                    return "\(duration)"
+                    return "\(duration.secs)s"
                 }
             } else {
                 return ""
