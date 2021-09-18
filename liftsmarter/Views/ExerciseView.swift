@@ -2,15 +2,13 @@
 import SwiftUI
 
 struct ExerciseView: View {
-    let model: Model
-    let workout: Workout
+    let vm: WorkoutVM
     @ObservedObject var exercise: Exercise
     @ObservedObject var instance: ExerciseInstance
 
-    init(_ model: Model, _ workout: Workout, _ instance: ExerciseInstance) {
-        self.model = model
-        self.workout = workout
-        self.exercise = model.program.exercises.first(where: {$0.name == instance.name})!
+    init(_ vm: WorkoutVM, _ instance: ExerciseInstance) {
+        self.vm = vm
+        self.exercise = vm.model.program.exercises.first(where: {$0.name == instance.name})!
         self.instance = instance
     }
 
@@ -21,7 +19,7 @@ struct ExerciseView: View {
     private func getView() -> AnyView {
         switch exercise.modality.sets {
         case .durations(_, _):
-            let logic = ExerciseVM(model, workout, exercise, instance)
+            let logic = ExerciseVM(vm.model, vm.workout, exercise, instance)
             return AnyView(DurationsView(logic))
 
         case .fixedReps(_):
@@ -49,9 +47,10 @@ struct ExerciseView: View {
 struct ExerciseView_Previews: PreviewProvider {
     static let model = mockModel()
     static let workout = model.program.workouts[0]
+    static let vm = WorkoutVM(model, workout)
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
 
     static var previews: some View {
-        ExerciseView(model, workout, instance)
+        ExerciseView(vm, instance)
     }
 }

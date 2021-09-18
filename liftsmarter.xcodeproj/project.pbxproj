@@ -17,7 +17,7 @@
 		377791C626EEBE7B00EC5028 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C526EEBE7B00EC5028 /* Either.swift */; };
 		377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C726EEF06600EC5028 /* ArrayExtension.swift */; };
 		377791CC26F0367900EC5028 /* ExerciseVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CB26F0367900EC5028 /* ExerciseVM.swift */; };
-		377791CE26F0383300EC5028 /* Workouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CD26F0383300EC5028 /* Workouts.swift */; };
+		377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CD26F0383300EC5028 /* WorkoutVM.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
@@ -65,7 +65,7 @@
 		377791C526EEBE7B00EC5028 /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		377791C726EEF06600EC5028 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
 		377791CB26F0367900EC5028 /* ExerciseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseVM.swift; sourceTree = "<group>"; };
-		377791CD26F0383300EC5028 /* Workouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workouts.swift; sourceTree = "<group>"; };
+		377791CD26F0383300EC5028 /* WorkoutVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutVM.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -215,7 +215,7 @@
 				37ECEA6826ED4A3300D0AD8E /* Logger.swift */,
 				37ECEA6226ED24D900D0AD8E /* Logic.swift */,
 				37ECEA6426ED2FE700D0AD8E /* Mocks.swift */,
-				377791CD26F0383300EC5028 /* Workouts.swift */,
+				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
 			);
 			path = "View Models";
 			sourceTree = "<group>";
@@ -348,7 +348,7 @@
 				377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */,
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,
-				377791CE26F0383300EC5028 /* Workouts.swift in Sources */,
+				377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */,
 				377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */,
 				377791CC26F0367900EC5028 /* ExerciseVM.swift in Sources */,
 				37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */,

@@ -2,31 +2,28 @@
 import SwiftUI
 
 struct WorkoutView: View {
-    let model: Model
-    @ObservedObject var program: Program
-    @ObservedObject var workout: Workout
+    @ObservedObject var vm: WorkoutVM
 
-    init(_ model: Model, _ workout: Workout) {
-        // TODO: we need to reset current if needed, in getView? or maybe in WorkoutView?
-        self.model = model
-        self.program = model.program
-        self.workout = workout
+    init(_ vm: WorkoutVM) {
+        self.vm = vm
     }
 
     var body: some View {
         VStack {
-            List(self.workout.instances) {instance in
-                NavigationLink(destination: ExerciseView(self.model, self.workout, instance)) {
-                    VStack(alignment: .leading) {
-                        Text(instance.name).font(.headline) //.foregroundColor(entry.color)
-                        let (label, color) = getLabel(model.program, instance)
-                        if !label.isEmpty {
-                            Text(label).font(.subheadline).foregroundColor(color)
+            List(self.vm.workout.instances) {instance in
+                if instance.enabled {
+                    NavigationLink(destination: ExerciseView(self.vm, instance)) {
+                        VStack(alignment: .leading) {
+                            Text(instance.name).font(.headline) //.foregroundColor(entry.color)
+                            let (label, color) = self.vm.label(instance)
+                            if !label.isEmpty {
+                                Text(label).font(.subheadline).foregroundColor(color)
+                            }
                         }
                     }
                 }
             }
-            .navigationBarTitle(Text(self.workout.name + " Exercises"))
+            .navigationBarTitle(Text(self.vm.name + " Exercises"))
 
             Divider()
             HStack {
@@ -46,8 +43,9 @@ struct WorkoutView: View {
 
 struct WorkoutView_Previews: PreviewProvider {
     static let model = mockModel()
+    static let vm = WorkoutVM(model, model.program.workouts[0])
 
     static var previews: some View {
-        WorkoutView(model, model.program.workouts[0])
+        WorkoutView(vm)
     }
 }

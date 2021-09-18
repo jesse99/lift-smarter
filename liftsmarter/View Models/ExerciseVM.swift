@@ -119,7 +119,7 @@ extension ExerciseVM {
         }
     }
 
-    func appendCurrent(_ reps: ActualRep) {
+    func appendCurrent(_ reps: ActualReps) {
     }
     
     func setSets(_ sets: Sets) {

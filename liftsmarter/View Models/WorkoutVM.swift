@@ -2,43 +2,57 @@
 import Foundation
 import SwiftUI
 
-func getLabel(_ program: Program, _ instance: ExerciseInstance) -> (String, Color) {
-    var sets: [String] = []
-    let limit = 8
-
-    var trailer = ""
-    let exercise = program.exercises.first(where: {$0.name == instance.name})!
-    switch exercise.modality.sets {
-    case .durations(let durations, _):
-        sets = durations.map({$0.description})
-        trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
-
-    case .fixedReps(_):
-        sets.append("not implemented")
-
-    case .maxReps(_, _):
-        sets.append("not implemented")
-
-    case .repRanges(warmups: _, worksets: _, backoffs: _):
-        sets.append("not implemented")
-
-    case .repTotal(total: _, rest: _):
-        sets.append("not implemented")
+class WorkoutVM: ObservableObject {
+    let model: Model
+    let workout: Workout
+    
+    init(_ model: Model, _ workout: Workout) {
+        self.model = model
+        self.workout = workout
     }
     
-    let color = Color.black // TODO: use recentlyCompleted
-    if sets.count == 0 {
-        return ("", color)
-    } else if sets.count == 1 {
-        return (sets[0] + trailer, color)
-    } else {
-        let sets = dedupe(sets)
-        let prefix = sets.prefix(limit)
-        let result = prefix.joined(separator: ", ")
-        if prefix.count < sets.count {
-            return (result + ", ...", color)
+    var name: String {
+        get {return self.workout.name}
+    }
+
+    func label(_ instance: ExerciseInstance) -> (String, Color) {
+        var sets: [String] = []
+        let limit = 8
+
+        var trailer = ""
+        let exercise = self.model.program.exercises.first(where: {$0.name == instance.name})!
+        switch exercise.modality.sets {
+        case .durations(let durations, _):
+            sets = durations.map({$0.description})
+            trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
+
+        case .fixedReps(_):
+            sets.append("not implemented")
+
+        case .maxReps(_, _):
+            sets.append("not implemented")
+
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            sets.append("not implemented")
+
+        case .repTotal(total: _, rest: _):
+            sets.append("not implemented")
+        }
+        
+        let color = Color.black // TODO: use recentlyCompleted
+        if sets.count == 0 {
+            return ("", color)
+        } else if sets.count == 1 {
+            return (sets[0] + trailer, color)
         } else {
-            return (result + trailer, color)
+            let sets = dedupe(sets)
+            let prefix = sets.prefix(limit)
+            let result = prefix.joined(separator: ", ")
+            if prefix.count < sets.count {
+                return (result + ", ...", color)
+            } else {
+                return (result + trailer, color)
+            }
         }
     }
 }

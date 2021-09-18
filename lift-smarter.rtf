@@ -6,8 +6,25 @@
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs48 \cf2 \'95 Flesh out the workout and program views\
+\f0\fs48 \cf2 \'95 Can\'92t we get rid of label, editable, and maybe description from sets?\
+\'95\'a0Get history working:\
+	- add a vm\
+	- get the tab view working\
+	- exercise should update history\
+	- get editing working\
+\'95 Flesh out the workout view\
+	- add a vm\
+	- get view working better\
+	- add an editor\
+\'95 Flesh out the program view\
+	- add a vm\
+	- get view working better\
+	- add an editor\
+\'95\'a0Add some unit tests to test time in view model?\
+	- could have a protocol to return time\
+	- then tests could mock that out\
 \'95 Get another exercise working\
+	- maybe fixed reps\
 	- should edit view onOK and onEdited be in vm? could pass error in as a binding\
 \'95 Might want Screens and Components under Views\
 	- could use a component for stuff like rest text boxes\
@@ -17,20 +34,11 @@
 \'95\'a0Get persistence working\
 	- probably want to put Model fields into separate stores\
 \'95 History should use ActualRep (more fleshed out version of ExpectedSets)\
-\'95\'a0Get previous labels working in exercise views\
-\'95 Should logic be in the model?\
-	- could use extensions to organize\
-	- often this is done with an interactor with facadable protocols\
-	-    these don\'92t return data\
-	-    instead they either modify the model or mutate a binding passed in\
-	-        by a view\
-	- this allows views to be unit tested\
-	- might even help here, especially when dealing with time\
-	- could even use a facade with the simulator to test time\
+\'95\'a0Get previous note working in exercise views\
 \'95 Can we stick persistence into extensions to get it tucked out of the way?\
-\'95 See if we can get exercise views working properly\
-	- potentially can use combine to sequence events like timer then state update\
-	- combine can also be useful for validation\
+\'95 Use combine package more?\
+	- potentially can use to sequence events like timer then state update\
+	- can also be useful for validation\
 \
 
 \f1\fs34 \cf3 \
