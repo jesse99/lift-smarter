@@ -40,7 +40,6 @@
 		37ECEA5B26EB0C6700D0AD8E /* Current.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5A26EB0C6700D0AD8E /* Current.swift */; };
 		37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */; };
 		37ECEA6026EB0D2400D0AD8E /* SequenceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */; };
-		37ECEA6326ED24D900D0AD8E /* Logic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6226ED24D900D0AD8E /* Logic.swift */; };
 		37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6426ED2FE700D0AD8E /* Mocks.swift */; };
 		37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6626ED4A0F00D0AD8E /* Logs.swift */; };
 		37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */; };
@@ -93,7 +92,6 @@
 		37ECEA5A26EB0C6700D0AD8E /* Current.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Current.swift; sourceTree = "<group>"; };
 		37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtension.swift; sourceTree = "<group>"; };
-		37ECEA6226ED24D900D0AD8E /* Logic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logic.swift; sourceTree = "<group>"; };
 		37ECEA6426ED2FE700D0AD8E /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
 		37ECEA6626ED4A0F00D0AD8E /* Logs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logs.swift; sourceTree = "<group>"; };
 		37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsVM.swift; sourceTree = "<group>"; };
@@ -222,7 +220,6 @@
 				377791CB26F0367900EC5028 /* ExerciseVM.swift */,
 				3718978826F69F8F00351C5A /* HistoryVM.swift */,
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
-				37ECEA6226ED24D900D0AD8E /* Logic.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
 				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
 			);
@@ -345,7 +342,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
-				37ECEA6326ED24D900D0AD8E /* Logic.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,
 				3718978726F6955A00351C5A /* History.swift in Sources */,
 				37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */,
