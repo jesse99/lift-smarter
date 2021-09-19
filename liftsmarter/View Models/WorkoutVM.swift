@@ -24,7 +24,7 @@ class WorkoutVM: ObservableObject, Identifiable {
         get {return self.program.instances(self.workout)}
     }
     
-    func lastCompleted(_ exercise: Exercise) -> Date? {
+    func lastCompleted(_ exercise: ExerciseVM) -> Date? {
         return self.workout.completed[exercise.name]
     }
 
@@ -40,30 +40,52 @@ extension WorkoutVM {
     func log(_ level: LogLevel, _ message: String) {
         self.program.log(level, message)
     }
+
+    func recentlyCompleted(_ exercise: ExerciseVM) -> Bool {
+        if let completed = self.lastCompleted(exercise) {
+            return Date().hoursSinceDate(completed) < RecentHours
+        } else {
+            return false
+        }
+    }
+        
 }
 
 // UI Labels
 extension WorkoutVM {
-    func label(_ exercise: ExerciseVM) -> (String, Color) {
+    func label(_ exercise: ExerciseVM) -> String {
+        return exercise.name
+    }
+
+    func subLabel(_ exercise: ExerciseVM) -> String {
         let tuple = exercise.workoutLabel()
         let sets = tuple.0
         let trailer = tuple.1
         let limit = 8
         
-        let color = Color.black // TODO: use recentlyCompleted
         if sets.count == 0 {
-            return ("", color)
+            return ""
         } else if sets.count == 1 {
-            return (sets[0] + trailer, color)
+            return sets[0] + trailer
         } else {
             let sets = dedupe(sets)
             let prefix = sets.prefix(limit)
             let result = prefix.joined(separator: ", ")
             if prefix.count < sets.count {
-                return (result + ", ...", color)
+                return result + ", ..."
             } else {
-                return (result + trailer, color)
+                return result + trailer
             }
+        }
+    }
+
+    func color(_ exercise: ExerciseVM) -> Color {
+        if self.recentlyCompleted(exercise) {
+            return .gray
+        } else if exercise.inProgress() {
+            return .blue
+        } else {
+            return .black
         }
     }
 }

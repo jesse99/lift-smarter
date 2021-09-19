@@ -62,29 +62,6 @@ extension ExerciseVM {
         self.workout.log(level, message)
     }
 
-    fileprivate func restDuration() -> Int {
-        var secs = 0
-
-        switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            if instance.current.setIndex < durations.count {
-                secs = durations[instance.current.setIndex].restSecs
-            } else {
-                secs = durations.last!.restSecs
-            }
-        case .fixedReps(_):
-            ASSERT(false, "not implemented")
-        case .maxReps(restSecs: _, targetReps: _):
-            ASSERT(false, "not implemented")
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
-            ASSERT(false, "not implemented")
-        case .repTotal(total: _, rest: _):
-            ASSERT(false, "not implemented")
-        }
-
-        return secs
-    }
-
     func shouldReset() -> Bool {
         // 1) If it's been a long time since the user began the exercise then start over.
         // 2) If setIndex has become whacked as a result of user edits then start over.
@@ -95,14 +72,6 @@ extension ExerciseVM {
         }
     }
     
-    func canReset() -> Bool {
-        if let numSets = self.numSets() {
-            return self.setIndex > 0 && self.setIndex < numSets
-        } else {
-            return false
-        }
-    }
-        
     func reset() {
         self.willChange()
         
@@ -110,12 +79,34 @@ extension ExerciseVM {
     }
     
     func inProgress() -> Bool {
+        if let numSets = self.numSets() {
+            return self.setIndex > 0 && self.setIndex < numSets
+        } else {
+            return false
+        }
+    }
+        
+    func incomplete() -> Bool {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             return self.setIndex < durations.count
-        default:
-            ASSERT(false, "not implemented")
-            return false
+        case .fixedReps(let sets):
+            return self.setIndex < sets.count
+        case .maxReps(restSecs: let rests, targetReps: _):
+            return self.setIndex < rests.count
+        case .repRanges(warmups: let warmups, worksets: let worksets, backoffs: let backoffs):
+            return self.setIndex < (warmups.count + worksets.count + backoffs.count)
+        case .repTotal(total: let totalReps, rest: _):
+            let reps = self.instance.current.reps.reduce(0, {
+                switch $1 {
+                case .reps(count: let reps, percent: _):
+                    return $0 + reps
+                default:
+                    ASSERT(false, "expected reps")
+                    return 0
+                }
+            })
+            return reps < totalReps
         }
     }
     
@@ -194,6 +185,29 @@ extension ExerciseVM {
 //      case .untimed(restSecs: let secs):
 //          sets = Array(repeating: "untimed", count: secs.count)
         }
+    }
+
+    fileprivate func restDuration() -> Int {
+        var secs = 0
+
+        switch exercise.modality.sets {
+        case .durations(let durations, targetSecs: _):
+            if instance.current.setIndex < durations.count {
+                secs = durations[instance.current.setIndex].restSecs
+            } else {
+                secs = durations.last!.restSecs
+            }
+        case .fixedReps(_):
+            ASSERT(false, "not implemented")
+        case .maxReps(restSecs: _, targetReps: _):
+            ASSERT(false, "not implemented")
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            ASSERT(false, "not implemented")
+        case .repTotal(total: _, rest: _):
+            ASSERT(false, "not implemented")
+        }
+
+        return secs
     }
 }
 
@@ -313,7 +327,11 @@ extension ExerciseVM {
     
     private func getSetTimerTitle(_ prefix: String) -> String {
         let i = instance.current.setIndex
-        return "\(prefix) \(i+1) of \(self.numSets()!)"
+        if let numSets = self.numSets() {
+            return "\(prefix) \(i+1) of \(numSets)"
+        } else {
+            return "\(prefix) \(i+1)"
+        }
     }
 }
 

@@ -14,10 +14,13 @@ struct WorkoutView: View {
                 if exercise.enabled {
                     NavigationLink(destination: ExerciseView(exercise)) {
                         VStack(alignment: .leading) {
-                            Text(exercise.name).font(.headline) //.foregroundColor(entry.color)
-                            let (label, color) = self.workout.label(exercise)
-                            if !label.isEmpty {
-                                Text(label).font(.subheadline).foregroundColor(color)
+                            let label = self.workout.label(exercise)
+                            let color = self.workout.color(exercise)
+                            Text(label).font(.headline).foregroundColor(color)
+
+                            let sub = self.workout.subLabel(exercise)
+                            if !sub.isEmpty {
+                                Text(sub).font(.subheadline).foregroundColor(color)
                             }
                         }
                     }

@@ -40,7 +40,7 @@ struct DurationsView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.exercise.canReset())
+                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.exercise.inProgress())
                 Button("History", action: onStartHistory)
                     .font(.callout)
 //                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
@@ -60,7 +60,7 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        if exercise.inProgress() {
+        if exercise.incomplete() {
             self.implicitTimerModal = true
         } else {
             exercise.reset()
