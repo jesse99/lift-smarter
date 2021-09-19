@@ -1,21 +1,29 @@
 //  Created by Jesse Vorisek on 9/13/21.
 import Foundation
+import SwiftUI
 
-class ExerciseVM: ObservableObject {
-    private let model: Model
-    private let workout: Workout
+class ExerciseVM: Identifiable, ObservableObject {
+    let workout: WorkoutVM
     private let exercise: Exercise
     private let instance: ExerciseInstance
     
-    init(_ model: Model, _ workout: Workout, _ exercise: Exercise, _ instance: ExerciseInstance) {
-        self.model = model
-        self.workout = workout
+    init(_ vm: WorkoutVM, _ exercise: Exercise, _ instance: ExerciseInstance) {
+        self.workout = vm
         self.exercise = exercise
         self.instance = instance
     }
     
+    func willChange() {
+        self.objectWillChange.send()
+        self.workout.willChange()
+    }
+
     var name: String {
         get {return self.exercise.name}
+    }
+    
+    var enabled: Bool {
+        get {return self.instance.enabled}
     }
 
     var setIndex: Int {
@@ -40,10 +48,20 @@ class ExerciseVM: ObservableObject {
             return nil
         }
     }
+
+    var id: String {
+        get {
+            return self.name
+        }
+    }
 }
 
 // Misc Logic
 extension ExerciseVM {
+    func log(_ level: LogLevel, _ message: String) {
+        self.workout.log(level, message)
+    }
+
     fileprivate func restDuration() -> Int {
         var secs = 0
 
@@ -86,9 +104,7 @@ extension ExerciseVM {
     }
         
     func reset() {
-        self.objectWillChange.send()
-        workout.objectWillChange.send()
-        model.program.objectWillChange.send()
+        self.willChange()
         
         instance.current.reset(weight: exercise.expected.weight)
     }
@@ -107,9 +123,7 @@ extension ExerciseVM {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             ASSERT(reps == nil, "reps is for repRanges")
-            self.objectWillChange.send()
-            workout.objectWillChange.send()
-            model.program.objectWillChange.send()
+            self.willChange()
 
             let duration = durations[self.setIndex]
             instance.current.reps.append(.duration(secs: duration.secs, percent: 1.0))
@@ -119,14 +133,12 @@ extension ExerciseVM {
         }
     }
 
-    func appendCurrent(_ reps: ActualReps) {
+    func appendCurrent(_ reps: ActualRep) {
     }
     
-    func setSets(_ sets: Sets) {
-        self.objectWillChange.send()
-        workout.objectWillChange.send()
-        model.program.objectWillChange.send()
-        
+    func setSets(_ sets: Sets) { 
+        self.willChange()
+
         self.exercise.modality.sets = sets
     }
 
@@ -157,9 +169,35 @@ extension ExerciseVM {
             return TimerView(title: "not implemented", duration: 0, secondDuration: 0)
         }
     }
+
+    func view() -> AnyView {
+        switch self.exercise.modality.sets {
+        case .durations(_, _):
+            return AnyView(DurationsView(self))
+
+        case .fixedReps(_):
+            return AnyView(Text("not implemented"))
+//            return AnyView(FixedRepsView(model, workout, instance))
+
+        case .maxReps(_, _):
+            return AnyView(Text("not implemented"))
+//            return AnyView(MaxRepsView(model, workout, instance))
+
+        case .repRanges(_, _, _):
+            return AnyView(Text("not implemented"))
+//            return AnyView(RepRangesView(model, workout, instance))
+
+        case .repTotal(total: _, rest: _):
+            return AnyView(Text("not implemented"))
+//            return AnyView(RepTotalView(model, workout, instance))
+
+//      case .untimed(restSecs: let secs):
+//          sets = Array(repeating: "untimed", count: secs.count)
+        }
+    }
 }
 
-// UI Titles
+// UI Labels
 extension ExerciseVM {
     func title() -> String {
         switch exercise.modality.sets {
@@ -248,6 +286,31 @@ extension ExerciseVM {
         }
     }
 
+    func workoutLabel() -> ([String], String) {
+        var sets: [String] = []
+        var trailer = ""
+
+        switch self.exercise.modality.sets {
+        case .durations(let durations, _):
+            sets = durations.map({"\($0.secs)s"})
+            trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
+
+        case .fixedReps(_):
+            sets.append("not implemented")
+
+        case .maxReps(_, _):
+            sets.append("not implemented")
+
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            sets.append("not implemented")
+
+        case .repTotal(total: _, rest: _):
+            sets.append("not implemented")
+        }
+        
+        return (sets, trailer)
+    }
+    
     private func getSetTimerTitle(_ prefix: String) -> String {
         let i = instance.current.setIndex
         return "\(prefix) \(i+1) of \(self.numSets()!)"
@@ -382,6 +445,18 @@ extension ExerciseVM {
         } else {
             return values.joined(separator: " ")
         }
+    }
+}
+
+// View Model internals (views can't call these because they don't have direct access
+// to model classes).
+extension ExerciseVM {
+    func exercise(_ model: Model) -> Exercise {
+        return self.exercise
+    }
+
+    func instance(_ model: Model) -> ExerciseInstance {
+        return self.instance
     }
 }
 

@@ -48,15 +48,13 @@ struct MailView: UIViewControllerRepresentable {
 }
 
 struct LogView: View {
-    let model: Model
-    @ObservedObject var logs: Logs
+    @ObservedObject var logs: LogsVM
     @State var show = LogLevel.Warning
     @State var isShowingMailView = false
     @State var result: Result<MFMailComposeResult, Error>? = nil
 
-    init(_ model: Model) {
-        self.model = model
-        self.logs = model.logs
+    init(_ logs: LogsVM) {
+        self.logs = logs
     }
     
     var body: some View {
@@ -64,7 +62,7 @@ struct LogView: View {
             Text("Logs").font(.largeTitle)
             List(self.logs.lines) {line in
                 if line.level.rawValue <= self.show.rawValue {
-                    Text(getText(line)).font(.headline).foregroundColor(getColor(line))
+                    Text(logs.lineText(line)).font(.headline).foregroundColor(logs.lineColor(line))
                 }
             }
             HStack {
@@ -85,39 +83,6 @@ struct LogView: View {
         }
     }
     
-    private func getText(_ line: LogLine) -> String {
-        return line.timeStr() + " " + line.line
-    }
-    
-    private func getColor(_ line: LogLine) -> Color {
-        var color: UIColor
-        switch line.level {
-        case .Debug:
-            color = .gray
-        case .Error:
-            color = .red
-        case .Info:
-            color = .black
-        case.Warning:
-            color = .orange
-        }
-
-        if !line.current {
-            switch line.level {
-            case .Debug:
-                color = color.lighten(byPercentage: 0.3) ?? .lightGray
-            case .Error:
-                color = color.shade(byPercentage: 0.6) ?? .lightGray
-            case .Info:
-                color = color.lighten(byPercentage: 0.7) ?? .lightGray
-            case.Warning:
-                color = color.shade(byPercentage: 0.4) ?? .lightGray
-            }
-        }
-        
-        return Color(color)
-    }
-
     private func showStr() -> String {
         switch self.show {
         case .Error:
@@ -178,10 +143,10 @@ struct LogView: View {
 
 struct LogView_Previews: PreviewProvider {
     static var previews: some View {
-        LogView(makeModel())
+        LogView(makeVM())
     }
     
-    static func makeModel() -> Model {
+    static func makeVM() -> LogsVM {
         let model = mockModel()
         model.logs.lines.append(LogLine(TimeInterval(0.0), .Info, "Started up", id: 1, current: false))
         model.logs.lines.append(LogLine(TimeInterval(1.1001), .Info, "No one cares", id: 2, current: false))
@@ -197,6 +162,6 @@ struct LogView_Previews: PreviewProvider {
         model.logs.maxLines = 12
         model.logs.nextID = model.logs.lines.count + 1
 
-        return model
+        return LogsVM(model)
     }
 }

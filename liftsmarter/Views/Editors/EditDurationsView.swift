@@ -119,10 +119,11 @@ struct EditDurationsView: View {
 
 struct EditDurationsView_Previews: PreviewProvider {
     static let model = mockModel()
+    static let program = ProgramVM(model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-    static let vm = ExerciseVM(model, workout, exercise, instance)
+    static let vm = ExerciseVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
         EditDurationsView(vm)

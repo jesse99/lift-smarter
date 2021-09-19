@@ -2,42 +2,53 @@
 import Foundation
 import SwiftUI
 
-class WorkoutVM: ObservableObject {
-    let model: Model
-    let workout: Workout
+class WorkoutVM: ObservableObject, Identifiable {
+    let program: ProgramVM
+    private let workout: Workout
     
-    init(_ model: Model, _ workout: Workout) {
-        self.model = model
+    init(_ program: ProgramVM, _ workout: Workout) {
+        self.program = program
         self.workout = workout
     }
-    
+        
+    func willChange() {
+        self.objectWillChange.send()
+        self.program.willChange()
+    }
+
     var name: String {
         get {return self.workout.name}
     }
+    
+    var exercises: [ExerciseVM] {
+        get {return self.program.instances(self.workout)}
+    }
+    
+    func lastCompleted(_ exercise: Exercise) -> Date? {
+        return self.workout.completed[exercise.name]
+    }
 
-    func label(_ instance: ExerciseInstance) -> (String, Color) {
-        var sets: [String] = []
-        let limit = 8
-
-        var trailer = ""
-        let exercise = self.model.program.exercises.first(where: {$0.name == instance.name})!
-        switch exercise.modality.sets {
-        case .durations(let durations, _):
-            sets = durations.map({"\($0.secs)s"})
-            trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
-
-        case .fixedReps(_):
-            sets.append("not implemented")
-
-        case .maxReps(_, _):
-            sets.append("not implemented")
-
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
-            sets.append("not implemented")
-
-        case .repTotal(total: _, rest: _):
-            sets.append("not implemented")
+    var id: String {
+        get {
+            return self.workout.name
         }
+    }
+}
+
+// Misc logic
+extension WorkoutVM {
+    func log(_ level: LogLevel, _ message: String) {
+        self.program.log(level, message)
+    }
+}
+
+// UI Labels
+extension WorkoutVM {
+    func label(_ exercise: ExerciseVM) -> (String, Color) {
+        let tuple = exercise.workoutLabel()
+        let sets = tuple.0
+        let trailer = tuple.1
+        let limit = 8
         
         let color = Color.black // TODO: use recentlyCompleted
         if sets.count == 0 {
@@ -54,6 +65,15 @@ class WorkoutVM: ObservableObject {
                 return (result + trailer, color)
             }
         }
+    }
+}
+
+
+// View Model internals (views can't call these because they don't have direct access
+// to model classes).
+extension WorkoutVM {
+    func workout(_ model: Model) -> Workout {
+        return self.workout
     }
 }
 

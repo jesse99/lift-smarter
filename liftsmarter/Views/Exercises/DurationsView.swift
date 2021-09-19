@@ -3,36 +3,36 @@ import SwiftUI
 
 struct DurationsView: View {
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
-    @ObservedObject var vm: ExerciseVM
+    @ObservedObject var exercise: ExerciseVM
     @State var editModal = false
     @State var implicitTimerModal = false
     @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
 
-    init(_ vm: ExerciseVM) {
-        self.vm = vm
+    init(_ exercise: ExerciseVM) {
+        self.exercise = exercise
     }
     
     var body: some View {
         VStack {
             Group {     // we're using groups to work around the 10 item limit in VStacks
-                Text(vm.name).font(.largeTitle)   // Burpees
+                Text(exercise.name).font(.largeTitle)   // Burpees
                 Spacer()
             
-                Text(vm.title()).font(.title)          // Set 1 of 1
-                Text(vm.subTitle()).font(.headline)    // 60s
-                Text(vm.subSubTitle()).font(.headline) // 10 lbs
+                Text(exercise.title()).font(.title)          // Set 1 of 1
+                Text(exercise.subTitle()).font(.headline)    // 60s
+                Text(exercise.subSubTitle()).font(.headline) // 10 lbs
                 Spacer()
 
                 Group {
-                    Button(vm.nextLabel(), action: onNext)
+                    Button(exercise.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
-                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {vm.implicitTimer()}
+                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {exercise.implicitTimer()}
                     Spacer().frame(height: 50)
 
                     Button("Start Timer", action: onStartTimer)
                         .font(.system(size: 20.0))
-                        .sheet(isPresented: self.$explicitTimerModal) {vm.explicitTimer()}
+                        .sheet(isPresented: self.$explicitTimerModal) {exercise.explicitTimer()}
                     Spacer()
                     Text(self.getNoteLabel()).font(.callout)   // Same previous x3
                 }
@@ -40,7 +40,7 @@ struct DurationsView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.vm.canReset())
+                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.exercise.canReset())
                 Button("History", action: onStartHistory)
                     .font(.callout)
 //                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
@@ -50,7 +50,7 @@ struct DurationsView: View {
 //                    .sheet(isPresented: self.$noteModal) {NoteView(self.display, formalName: self.exercise().formalName)}
                 Button("Edit", action: onEdit)
                     .font(.callout)
-                    .sheet(isPresented: self.$editModal) {EditDurationsView(self.vm)}
+                    .sheet(isPresented: self.$editModal) {EditDurationsView(self.exercise)}
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
@@ -60,10 +60,10 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        if vm.inProgress() {
+        if exercise.inProgress() {
             self.implicitTimerModal = true
         } else {
-            vm.reset()
+            exercise.reset()
 //            self.display.send(.AppendHistory(self.workout(), self.exercise()))
 
             self.presentation.wrappedValue.dismiss()
@@ -71,11 +71,11 @@ struct DurationsView: View {
     }
     
     func onNextCompleted() {
-        vm.updateCurrent()
+        exercise.updateCurrent()
     }
     
     func onReset() {
-        self.vm.reset()
+        self.exercise.reset()
     }
     
     private func onStartTimer() {
@@ -95,8 +95,8 @@ struct DurationsView: View {
     }
     
     private func resetIfNeeded() {
-        if vm.shouldReset() {
-            vm.reset()
+        if exercise.shouldReset() {
+            exercise.reset()
         }
     }
 
@@ -108,10 +108,11 @@ struct DurationsView: View {
 
 struct DurationsView_Previews: PreviewProvider {
     static let model = mockModel()
+    static let program = ProgramVM(model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-    static let vm = ExerciseVM(model, workout, exercise, instance)
+    static let vm = ExerciseVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
         DurationsView(vm)

@@ -4,7 +4,7 @@ import Foundation
 let RecentHours = 8.0
 
 /// An Exercise all the details for how to do a particular movement.
-class Exercise: Identifiable, ObservableObject {
+class Exercise {
     var name: String            // "Heavy Bench"
     var formalName: String      // "Bench Press"
     var modality: Modality
@@ -42,10 +42,4 @@ class Exercise: Identifiable, ObservableObject {
 //    func hash(into hasher: inout Hasher) {
 //        hasher.combine(self.id)
 //    }
-
-    var id: String {
-        get {
-            return self.name
-        }
-    }
 }

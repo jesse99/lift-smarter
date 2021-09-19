@@ -3,11 +3,19 @@ import SwiftUI
 
 @main
 struct liftsmarterApp: App {
-    var model = mockModel()             // TODO: do something else here
+    var model: Model
+    let program: ProgramVM
+    let logs: LogsVM
+    
+    init() {
+        self.model = mockModel()             // TODO: do something else here
+        self.program = ProgramVM(model)
+        self.logs = LogsVM(model)
+    }
 
     var body: some Scene {
         WindowGroup {
-            ContentView(model)
+            ContentView(program, logs)
         }
     }
 }

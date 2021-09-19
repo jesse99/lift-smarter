@@ -7,7 +7,7 @@ enum WeekDay: Int {
 
 /// An instantiation of an exercise for a particular workout. Unlike exercise, this is not
 /// directly editable.
-class ExerciseInstance: Identifiable, ObservableObject {
+class ExerciseInstance {
     var name: String         // key into program.exercises
     var enabled: Bool        // true if the user wants to perform the exercise within a particular workout
     var current = Current()  // reset if it's been too long since the user was doing the exercise
@@ -15,12 +15,6 @@ class ExerciseInstance: Identifiable, ObservableObject {
     init(_ name: String) {
         self.name = name
         self.enabled = true
-    }
-
-    var id: String {
-        get {
-            return self.name
-        }
     }
 }
 
@@ -39,12 +33,13 @@ enum Schedule {
 }
 
 /// Encapsulates the exercises that the user is expected to peform on a day (or sey of days).
-class Workout: Identifiable, ObservableObject {
-    @Published var name: String
-    @Published var enabled: Bool                   // true if the user wants to perform this workout
-    @Published var instances: [ExerciseInstance]   // names must be unique
-    @Published var schedule: Schedule
-    @Published var restWeeks: [Int] = []           // empty => no rest, else 1-based weeks to de-schedule exercises (if they have allowRest on)
+class Workout {
+    var name: String
+    var enabled: Bool                   // true if the user wants to perform this workout
+    var instances: [ExerciseInstance]   // names must be unique
+    var schedule: Schedule
+    var restWeeks: [Int] = []           // empty => no rest, else 1-based weeks to de-schedule exercises (if they have allowRest on)
+    var completed: [String: Date] = [:] // exercise.name => date last completed
 
     init(_ name: String, _ names: [String], schedule: Schedule) {
         ASSERT_EQ(names.count, Set(names).count)
@@ -53,12 +48,6 @@ class Workout: Identifiable, ObservableObject {
         self.enabled = true
         self.instances = names.map {ExerciseInstance($0)}
         self.schedule = schedule
-    }
-
-    var id: String {
-        get {
-            return self.name
-        }
     }
 }
 

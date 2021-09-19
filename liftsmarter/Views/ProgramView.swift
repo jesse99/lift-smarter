@@ -2,19 +2,17 @@
 import SwiftUI
 
 struct ProgramView: View {
-    let model: Model
-    @ObservedObject var program: Program
+    @ObservedObject var program: ProgramVM
 
-    init(_ model: Model) {
-        self.model = model
-        self.program = model.program
+    init(_ program: ProgramVM) {
+        self.program = program
     }
     
     var body: some View {
         NavigationView {
             VStack {
                 List(self.program.workouts) {workout in
-                    NavigationLink(destination: WorkoutView(WorkoutVM(self.model, workout))) {
+                    NavigationLink(destination: WorkoutView(workout)) {
                         VStack(alignment: .leading) {
                             Text(workout.name).font(.title)
 //                            Text(entry.subLabel).foregroundColor(entry.subColor).font(.headline) // 10+ Reps or As Many Reps As Possible
@@ -65,8 +63,9 @@ struct ProgramView: View {
 
 struct ProgramView_Previews: PreviewProvider {
     static let model = mockModel()
+    static let vm = ProgramVM(model)
     
     static var previews: some View {
-        ProgramView(model)
+        ProgramView(vm)
     }
 }

@@ -2,12 +2,12 @@
 import Foundation
 
 /// Used to manage the workouts the user is expected to perform on some schedule.
-class Program: ObservableObject {
-    @Published var name: String
-    @Published var workouts: [Workout]    // workout names must be unique
-    @Published var exercises: [Exercise]  // exercise names must be unique, TODO: probably want to sort these by name
-    @Published var weeksStart: Date       // a date within week 1
-//    @Published var notes: [EditNote]
+class Program {
+    var name: String
+    var workouts: [Workout]    // workout names must be unique
+    var exercises: [Exercise]  // exercise names must be unique, TODO: probably want to sort these by name
+    var weeksStart: Date       // a date within week 1
+//    var notes: [EditNote]
 
     init(_ name: String, _ workouts: [Workout], _ exercises: [Exercise], weeksStart: Date) {
         let names = workouts.map {$0.name}

@@ -2,55 +2,25 @@
 import SwiftUI
 
 struct ExerciseView: View {
-    let vm: WorkoutVM
-    @ObservedObject var exercise: Exercise
-    @ObservedObject var instance: ExerciseInstance
+    @ObservedObject var exercise: ExerciseVM
 
-    init(_ vm: WorkoutVM, _ instance: ExerciseInstance) {
-        self.vm = vm
-        self.exercise = vm.model.program.exercises.first(where: {$0.name == instance.name})!
-        self.instance = instance
+    init(_ exercise: ExerciseVM) {
+        self.exercise = exercise
     }
 
     var body: some View {
-        getView()
-    }
-
-    private func getView() -> AnyView {
-        switch exercise.modality.sets {
-        case .durations(_, _):
-            let logic = ExerciseVM(vm.model, vm.workout, exercise, instance)
-            return AnyView(DurationsView(logic))
-
-        case .fixedReps(_):
-            return AnyView(Text("not implemented"))
-//            return AnyView(FixedRepsView(model, workout, instance))
-
-        case .maxReps(_, _):
-            return AnyView(Text("not implemented"))
-//            return AnyView(MaxRepsView(model, workout, instance))
-
-        case .repRanges(_, _, _):
-            return AnyView(Text("not implemented"))
-//            return AnyView(RepRangesView(model, workout, instance))
-
-        case .repTotal(total: _, rest: _):
-            return AnyView(Text("not implemented"))
-//            return AnyView(RepTotalView(model, workout, instance))
-
-//      case .untimed(restSecs: let secs):
-//          sets = Array(repeating: "untimed", count: secs.count)
-        }
+        self.exercise.view()
     }
 }
 
 struct ExerciseView_Previews: PreviewProvider {
     static let model = mockModel()
     static let workout = model.program.workouts[0]
-    static let vm = WorkoutVM(model, workout)
+    static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-
+    static let vm = WorkoutVM(ProgramVM(model), workout)
+    
     static var previews: some View {
-        ExerciseView(vm, instance)
+        ExerciseView(ExerciseVM(vm, exercise, instance))
     }
 }

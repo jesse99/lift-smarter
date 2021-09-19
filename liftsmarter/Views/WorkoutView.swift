@@ -2,20 +2,20 @@
 import SwiftUI
 
 struct WorkoutView: View {
-    @ObservedObject var vm: WorkoutVM
+    @ObservedObject var workout: WorkoutVM
 
-    init(_ vm: WorkoutVM) {
-        self.vm = vm
+    init(_ workout: WorkoutVM) {
+        self.workout = workout
     }
 
     var body: some View {
         VStack {
-            List(self.vm.workout.instances) {instance in
-                if instance.enabled {
-                    NavigationLink(destination: ExerciseView(self.vm, instance)) {
+            List(self.workout.exercises) {exercise in
+                if exercise.enabled {
+                    NavigationLink(destination: ExerciseView(exercise)) {
                         VStack(alignment: .leading) {
-                            Text(instance.name).font(.headline) //.foregroundColor(entry.color)
-                            let (label, color) = self.vm.label(instance)
+                            Text(exercise.name).font(.headline) //.foregroundColor(entry.color)
+                            let (label, color) = self.workout.label(exercise)
                             if !label.isEmpty {
                                 Text(label).font(.subheadline).foregroundColor(color)
                             }
@@ -23,7 +23,7 @@ struct WorkoutView: View {
                     }
                 }
             }
-            .navigationBarTitle(Text(self.vm.name + " Exercises"))
+            .navigationBarTitle(Text(self.workout.name + " Exercises"))
 
             Divider()
             HStack {
@@ -43,7 +43,8 @@ struct WorkoutView: View {
 
 struct WorkoutView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let vm = WorkoutVM(model, model.program.workouts[0])
+    static let program = ProgramVM(model)
+    static let vm = WorkoutVM(program, model.program.workouts[0])
 
     static var previews: some View {
         WorkoutView(vm)
