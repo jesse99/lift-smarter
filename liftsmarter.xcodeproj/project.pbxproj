@@ -11,6 +11,8 @@
 		3718978726F6955A00351C5A /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978626F6955A00351C5A /* History.swift */; };
 		3718978926F69F8F00351C5A /* HistoryVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978826F69F8F00351C5A /* HistoryVM.swift */; };
 		3718978D26F6BFA500351C5A /* ProgramVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978C26F6BFA500351C5A /* ProgramVM.swift */; };
+		3718978F26F81B1A00351C5A /* EditWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978E26F81B1A00351C5A /* EditWorkoutView.swift */; };
+		3718979126F96DE800351C5A /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718979026F96DE800351C5A /* StringExtension.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -61,6 +63,8 @@
 		3718978626F6955A00351C5A /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		3718978826F69F8F00351C5A /* HistoryVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryVM.swift; sourceTree = "<group>"; };
 		3718978C26F6BFA500351C5A /* ProgramVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramVM.swift; sourceTree = "<group>"; };
+		3718978E26F81B1A00351C5A /* EditWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditWorkoutView.swift; sourceTree = "<group>"; };
+		3718979026F96DE800351C5A /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -128,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
+				3718978E26F81B1A00351C5A /* EditWorkoutView.swift */,
 			);
 			path = Editors;
 			sourceTree = "<group>";
@@ -208,6 +213,7 @@
 				377791C726EEF06600EC5028 /* ArrayExtension.swift */,
 				37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */,
 				37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */,
+				3718979026F96DE800351C5A /* StringExtension.swift */,
 				3718978426F65E0900351C5A /* TimeIntervalExtension.swift */,
 				377791B426ED725D00EC5028 /* UIColorExtension.swift */,
 			);
@@ -341,6 +347,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3718978F26F81B1A00351C5A /* EditWorkoutView.swift in Sources */,
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,
 				3718978726F6955A00351C5A /* History.swift in Sources */,
@@ -372,6 +379,7 @@
 				37ECEA5126EAD9F200D0AD8E /* Exercise.swift in Sources */,
 				3718978926F69F8F00351C5A /* HistoryVM.swift in Sources */,
 				37ECEA6C26ED5B1F00D0AD8E /* LogView.swift in Sources */,
+				3718979126F96DE800351C5A /* StringExtension.swift in Sources */,
 				37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */,
 				37ECEA5926EB0C3300D0AD8E /* Expected.swift in Sources */,
 				37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */,

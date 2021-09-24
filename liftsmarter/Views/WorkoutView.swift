@@ -3,6 +3,7 @@ import SwiftUI
 
 struct WorkoutView: View {
     @ObservedObject var workout: WorkoutVM
+    @State var editModal = false
 
     init(_ workout: WorkoutVM) {
         self.workout = workout
@@ -33,14 +34,14 @@ struct WorkoutView: View {
                 Spacer()
                 Button("Edit", action: onEdit)
                     .font(.callout)
-//                    .sheet(isPresented: self.$editModal) {EditWorkoutView(self.display, self.workout())}
+                    .sheet(isPresented: self.$editModal) {EditWorkoutView(self.workout)}
             }
             .padding()
         }
     }
     
     private func onEdit() {
-//        self.editModal = true
+        self.editModal = true
     }
 }
 

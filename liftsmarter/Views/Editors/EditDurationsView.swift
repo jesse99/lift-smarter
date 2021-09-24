@@ -4,7 +4,7 @@ import SwiftUI
 let restHelpText = "The amount of time to rest after each set. Time units may be omitted so '1.5m 60s 30 0' is a minute and a half, 60 seconds, 30 seconds, and no rest time."
 
 struct EditDurationsView: View {
-    let vm: ExerciseVM
+    let exercise: ExerciseVM
     @State var durations: String
     @State var target: String
     @State var rest: String
@@ -13,10 +13,10 @@ struct EditDurationsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ vm: ExerciseVM) {
-        self.vm = vm
+    init(_ exercise: ExerciseVM) {
+        self.exercise = exercise
 
-        let table = vm.render()
+        let table = exercise.render()
         self._durations = State(initialValue: table["durations"]!)
         self._rest = State(initialValue: table["rest"]!)
         self._target = State(initialValue: table["target"]!)
@@ -24,7 +24,7 @@ struct EditDurationsView: View {
     
     var body: some View {
         VStack() {
-            Text("Edit " + self.vm.name).font(.largeTitle)
+            Text("Edit " + self.exercise.name).font(.largeTitle)
 
             VStack(alignment: .leading) {
                 HStack {
@@ -81,9 +81,9 @@ struct EditDurationsView: View {
 
     func onOK() {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch vm.parse(table) {
+        switch exercise.parse(table) {
         case .right(let sets):
-            self.vm.setSets(sets)
+            self.exercise.setSets(sets)
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
@@ -93,7 +93,7 @@ struct EditDurationsView: View {
 
     private func onEditedSets(_ text: String) {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch vm.parse(table) {
+        switch exercise.parse(table) {
         case .right(_):
             self.error = ""
         case .left(let err):

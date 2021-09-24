@@ -37,6 +37,19 @@ class WorkoutVM: ObservableObject, Identifiable {
 
 // Misc logic
 extension WorkoutVM {
+    func setName(_ name: String) {
+        // Note that we don't update History records because it is supposed to be a historical record.
+        if name != self.workout.name {
+            self.willChange()
+            self.workout.name = name
+        }
+    }
+    
+    func setSchedule(_ schedule: Schedule) {
+        self.willChange()
+        self.workout.schedule = schedule
+    }
+
     func log(_ level: LogLevel, _ message: String) {
         self.program.log(level, message)
     }
@@ -48,11 +61,90 @@ extension WorkoutVM {
             return false
         }
     }
-        
 }
 
 // UI Labels
 extension WorkoutVM {
+    func scheduleButton(_ schedule: Binding<Schedule>, _ text: Binding<String>, _ label: Binding<String>,
+    _ subSchedule: Binding<Schedule?>, _ subText: Binding<String>, _ subLabel: Binding<String>) -> AnyView {
+        var menuText = ""
+        switch schedule.wrappedValue {
+        case .anyDay: menuText = "Any Day"
+        case .cyclic(_): menuText = "Every"
+        case .days(_): menuText = "Days"
+        case .weeks(_, _): menuText = "Weeks"
+        }
+        
+        let button = Menu(menuText) {
+            Button("Any Day", action: {
+                schedule.wrappedValue = .anyDay
+                text.wrappedValue = ""
+                label.wrappedValue = ""
+                
+                subSchedule.wrappedValue = nil
+                subText.wrappedValue = ""
+                subLabel.wrappedValue = ""
+            })
+            Button("Every N Days", action: {
+                schedule.wrappedValue = .cyclic(2)
+                text.wrappedValue = "2"
+                label.wrappedValue = " days"
+                
+                subSchedule.wrappedValue = nil
+                subText.wrappedValue = ""
+                subLabel.wrappedValue = ""
+            })
+            Button("Week Days", action: {
+                schedule.wrappedValue = .days([.monday, .wednesday, .friday])
+                text.wrappedValue = "Mon Wed Fri"
+                label.wrappedValue = ""
+                
+                subSchedule.wrappedValue = nil
+                subText.wrappedValue = ""
+                subLabel.wrappedValue = ""
+            })
+            Button("Weeks", action: {
+                subSchedule.wrappedValue = .days([.monday, .wednesday, .friday])
+                subText.wrappedValue = "Mon Wed Fri"
+                subLabel.wrappedValue = ""
+
+                schedule.wrappedValue = .weeks([1, 3], subSchedule.wrappedValue!)
+                text.wrappedValue = "1 3"
+                label.wrappedValue = ""
+                
+            })
+            Button("Cancel", action: {})
+        }.font(.callout)
+        return AnyView(button)
+    }
+
+    func subScheduleButton(_ schedule: Binding<Schedule?>, _ text: Binding<String>, _ label: Binding<String>) -> AnyView {
+        var menuText = ""
+        switch schedule.wrappedValue! {
+        case .anyDay: menuText = "Any Day"
+        case .cyclic(_): menuText = "Every"
+        case .days(_): menuText = "Days"
+        case .weeks(_, _): ASSERT(false, "sub-schedule cannot be weeks")
+        }
+
+        let button = Menu(menuText) {
+            Button("Any Day", action: {schedule.wrappedValue = .anyDay; text.wrappedValue = ""; label.wrappedValue = ""})
+            Button("Every N Days", action: {schedule.wrappedValue = .cyclic(2); text.wrappedValue = "2"; label.wrappedValue = " days"})
+            Button("Week Days", action: {schedule.wrappedValue = .days([.monday, .wednesday, .friday]); text.wrappedValue = "Mon Wed Fri"; label.wrappedValue = ""})
+            Button("Cancel", action: {})
+        }.font(.callout)
+        return AnyView(button)
+    }
+
+    func hasScheduleText(_ schedule: Schedule) -> Bool {
+        switch schedule {
+        case .anyDay: return false
+        case .cyclic(_): return true
+        case .days(_): return true
+        case .weeks(_, _): return true
+        }
+    }
+
     func label(_ exercise: ExerciseVM) -> String {
         return exercise.name
     }
@@ -90,6 +182,175 @@ extension WorkoutVM {
     }
 }
 
+// Editing
+extension WorkoutVM {
+    func render() -> (Schedule, String, String, Schedule?, String, String) {
+        switch self.workout.schedule {
+        case .anyDay:
+            return (self.workout.schedule, "", "", nil, "", "")
+        case .cyclic(let n):
+            return (self.workout.schedule, n.description, "days", nil, "", "")
+        case .days(let days):
+            return (self.workout.schedule, self.renderWeekDays(days), "", nil, "", "")
+        case .weeks(let weeks, let subSchedule):
+            let w = weeks.map({$0.description})
+            switch subSchedule {
+            case .anyDay:
+                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, "", "")
+            case .cyclic(let n):
+                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, n.description, "days")
+            case .days(let days):
+                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, self.renderWeekDays(days), "")
+            case .weeks(_, let subSchedule):
+                ASSERT(false, "sub-schedule can't be weeks")
+                return (self.workout.schedule, "", "", subSchedule, "", "")
+            }
+        }
+    }
+
+    func parse(_ name: String, _ schedule: Schedule, _ scheduleText: String, _ subSchedule: Schedule?, _ subScheduleText: String) -> Either<String, Schedule> {
+        var errors: [String] = []
+        
+        if name.isBlankOrEmpty() {
+            errors.append("Name cannot be empty.")
+        } else {
+            for w in self.program.workouts {
+                if w.workout !== self.workout {
+                    if w.name == name {
+                        errors.append("Workout names must be unique.")
+                        break
+                    }
+                }
+            }
+        }
+        
+        var result = Schedule.anyDay
+        switch schedule {
+        case .anyDay:
+            ASSERT(subSchedule == nil, "anyDay shouldn't have a sub-schedule")
+            result = .anyDay
+        case .cyclic(_):
+            ASSERT(subSchedule == nil, "cyclic shouldn't have a sub-schedule")
+            if let n = Int(scheduleText) {
+                result = .cyclic(n)
+            } else {
+                errors.append("Days must be a number.")
+            }
+        case .days(_):
+            ASSERT(subSchedule == nil, "days shouldn't have a sub-schedule")
+            if let days = parseWeekDays(scheduleText) {
+                result = .days(days)
+            } else {
+                errors.append("Days must be space separated (abreviated) day names.")
+            }
+        case .weeks(_, _):
+            ASSERT(subSchedule != nil, "weeks should have a sub-schedule")
+            if let weeks = self.parseWeeks(scheduleText) {
+                switch subSchedule! {
+                case .anyDay:
+                    result = .weeks(weeks, .anyDay)
+                case .cyclic(_):
+                    if let n = Int(subScheduleText) {
+                        result = .weeks(weeks, .cyclic(n))
+                    } else {
+                        errors.append("Days must be a number.")
+                    }
+                case .days(_):
+                    if let days = parseWeekDays(subScheduleText) {
+                        result = .weeks(weeks, .days(days))
+                    } else {
+                        errors.append("Days must be space separated (abreviated) day names.")
+                    }
+                case .weeks(_, _):
+                    ASSERT(false, "weeks should not have a weeks sub-scedule")
+                }
+            } else {
+                errors.append("Days must be space separated list of 1-based week indexes.")
+            }
+        }
+        
+        if !errors.isEmpty {
+            return .left(errors.joined(separator: " "))
+        } else {
+            return .right(result)
+        }
+    }
+                
+    private func parseWeeks(_ text: String) -> [Int]? {
+        var result: [Int] = []
+        
+        let parts = text.split(separator: " ")
+        for part in parts {
+            if let week = Int(part) {
+                result.append(week)
+            } else {
+                return nil
+            }
+        }
+        
+        return result
+    }
+    
+    private func parseWeekDays(_ text: String) -> [WeekDay]? {
+        var result: [WeekDay] = []
+        
+        let parts = text.split(separator: " ")
+        for part in parts {
+            if let day = parseWeekDay(part.lowercased()) {
+                result.append(day)
+            } else {
+                return nil
+            }
+        }
+        
+        return result
+    }
+    
+    private func parseWeekDay(_ text: String) -> WeekDay? {
+        let days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+
+        var result: WeekDay? = nil
+        for (i, day) in days.enumerated() {
+            if day.hasPrefix(text) {
+                if result == nil {
+                    result = WeekDay(rawValue: i)
+                } else {
+                    return nil
+                }
+            }
+        }
+        
+        return result
+    }
+    
+    private func renderWeekDays(_ days: [WeekDay]) -> String {
+        var result: [String] = []
+        
+        if days.contains(.sunday) {
+            result.append("Sun")
+        }
+        if days.contains(.monday) {
+            result.append("Mon")
+        }
+        if days.contains(.tuesday) {
+            result.append("Tues")
+        }
+        if days.contains(.wednesday) {
+            result.append("Wed")
+        }
+        if days.contains(.thursday) {
+            result.append("Thur")
+        }
+        if days.contains(.friday) {
+            result.append("Fri")
+        }
+        if days.contains(.saturday) {
+            result.append("Sat")
+        }
+
+        return result.joined(separator: " ")
+    }
+}
 
 // View Model internals (views can't call these because they don't have direct access
 // to model classes).

@@ -29,7 +29,7 @@ enum Schedule {
     case days([WeekDay])
     
     /// Scheduled for specific 1-based weeks. Note that Program contains the date for week 1.
-    case weeks([Int], [Schedule])
+    indirect case weeks([Int], Schedule)
 }
 
 /// Encapsulates the exercises that the user is expected to peform on a day (or sey of days).
@@ -38,7 +38,6 @@ class Workout {
     var enabled: Bool                   // true if the user wants to perform this workout
     var instances: [ExerciseInstance]   // names must be unique
     var schedule: Schedule
-    var restWeeks: [Int] = []           // empty => no rest, else 1-based weeks to de-schedule exercises (if they have allowRest on)
     var completed: [String: Date] = [:] // exercise.name => date last completed
 
     init(_ name: String, _ names: [String], schedule: Schedule) {

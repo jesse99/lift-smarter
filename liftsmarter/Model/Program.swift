@@ -6,6 +6,7 @@ class Program {
     var name: String
     var workouts: [Workout]    // workout names must be unique
     var exercises: [Exercise]  // exercise names must be unique, TODO: probably want to sort these by name
+    var restWeeks: [Int] = []  // empty => no rest, else 1-based weeks to de-schedule exercises (if they have allowRest on)
     var weeksStart: Date       // a date within week 1
 //    var notes: [EditNote]
 
