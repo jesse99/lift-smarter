@@ -43,6 +43,13 @@ extension ProgramVM {
 // View Model internals (views can't call these because they don't have direct access
 // to model classes).
 extension ProgramVM {
+    func exercices(_ workout: Workout) -> [ExerciseVM] {
+        let vm = WorkoutVM(self, workout)
+        return self.model.program.exercises.map({
+            return ExerciseVM(vm, $0, ExerciseInstance($0.name))
+        })
+    }
+
     func instances(_ workout: Workout) -> [ExerciseVM] {
         let vm = WorkoutVM(self, workout)
         return workout.instances.map({

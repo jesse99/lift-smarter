@@ -20,7 +20,7 @@ class Program {
 
         self.name = name
         self.workouts = workouts
-        self.exercises = exercises
+        self.exercises = exercises.sorted(by: {$0.name < $1.name})
         self.weeksStart = weeksStart
 //        self.notes = []
 //        self.addNote("Created")

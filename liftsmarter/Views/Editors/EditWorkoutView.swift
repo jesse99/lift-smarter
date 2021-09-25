@@ -105,7 +105,7 @@ struct EditWorkoutView: View {
                 Spacer()
                 Spacer()
                 Button("Paste", action: self.onPaste).font(.callout).disabled(!self.workout.canPaste())
-                Button("Add", action: self.onAdd).font(.callout)
+                self.workout.addButton()
                 Button("OK", action: self.onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -114,10 +114,6 @@ struct EditWorkoutView: View {
             ActionSheet(title: Text(self.selection!.name), buttons: self.workout.editButtons(self.$selection))}
     }
     
-    private func onAdd() {
-//        self.showSheet = true
-    }
-
     private func onPaste() {
         self.workout.paste()
     }

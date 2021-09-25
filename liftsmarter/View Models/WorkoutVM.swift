@@ -97,12 +97,16 @@ extension WorkoutVM {
         return false
     }
 
+    func append(_ instance: ExerciseInstance) {
+        if self.exercises.firstIndex(where: {$0.name == instance.name}) == nil {
+            self.willChange()
+            self.workout.instances.append(instance)
+        }
+    }
+
     func paste() {
-        self.willChange()
         for candidate in self.program.instanceClipboard {
-            if self.exercises.firstIndex(where: {$0.name == candidate.name}) == nil {
-                self.workout.instances.append(candidate)
-            }
+            self.append(candidate)
         }
     }
 
@@ -224,6 +228,18 @@ extension WorkoutVM {
         case .days(_): return true
         case .weeks(_, _): return true
         }
+    }
+
+    func addButton() -> AnyView {
+        let button = Menu("Add") {
+            Button("Cancel", action: {})
+            ForEach(self.program.exercices(self.workout).reversed()) {exercise in
+                if self.exercises.firstIndex(where: {$0.name == exercise.name}) == nil {
+                    Button(exercise.name, action: {self.append(exercise.instance(self.workout))})
+                }
+            }
+        }.font(.callout)
+        return AnyView(button)
     }
 
     func label(_ exercise: ExerciseVM) -> String {
