@@ -8,6 +8,7 @@ class Program {
     var exercises: [Exercise]  // exercise names must be unique, TODO: probably want to sort these by name
     var restWeeks: [Int] = []  // empty => no rest, else 1-based weeks to de-schedule exercises (if they have allowRest on)
     var weeksStart: Date       // a date within week 1
+    var instanceClipboard: [ExerciseInstance] = []
 //    var notes: [EditNote]
 
     init(_ name: String, _ workouts: [Workout], _ exercises: [Exercise], weeksStart: Date) {

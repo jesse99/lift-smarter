@@ -45,9 +45,65 @@ extension WorkoutVM {
         }
     }
     
+    func setInstances(_ exercises: [ExerciseVM]) {
+        self.willChange()
+        self.workout.instances = exercises.map({$0.instance(self.workout)})
+    }
+    
     func setSchedule(_ schedule: Schedule) {
         self.willChange()
         self.workout.schedule = schedule
+    }
+
+    func move(_ exercise: ExerciseVM, by: Int) {
+        self.willChange()
+
+        let index = self.exercises.firstIndex(where: {$0.name == exercise.name})!
+        let instance = self.workout.instances.remove(at: index)
+        self.workout.instances.insert(instance, at: index + by)
+    }
+
+    func delete(_ exercise: ExerciseVM) {
+        self.willChange()
+
+        let index = self.exercises.firstIndex(where: {$0.name == exercise.name})!
+        self.workout.instances.remove(at: index)
+    }
+
+    func deleteAll() {
+        self.willChange()
+        self.workout.instances.removeAll()
+    }
+
+    func copy(_ exercise: ExerciseVM) {
+        self.program.copyInstances([exercise])
+    }
+
+    func copyAll() {
+        self.program.copyInstances(self.exercises)
+    }
+
+    func cut(_ exercise: ExerciseVM) {
+        self.program.copyInstances([exercise])
+        self.delete(exercise)
+    }
+    
+    func canPaste() -> Bool {
+        for candidate in self.program.instanceClipboard {
+            if self.exercises.firstIndex(where: {$0.name == candidate.name}) == nil {
+                return true
+            }
+        }
+        return false
+    }
+
+    func paste() {
+        self.willChange()
+        for candidate in self.program.instanceClipboard {
+            if self.exercises.firstIndex(where: {$0.name == candidate.name}) == nil {
+                self.workout.instances.append(candidate)
+            }
+        }
     }
 
     func log(_ level: LogLevel, _ message: String) {
@@ -63,10 +119,35 @@ extension WorkoutVM {
     }
 }
 
-// UI Labels
+// UI
 extension WorkoutVM {
+    func editButtons(_ selection: Binding<ExerciseVM?>) -> [ActionSheet.Button] { 
+        var buttons: [ActionSheet.Button] = []
+
+        buttons.append(.default(Text("Copy"), action: {self.copy(selection.wrappedValue!)}))
+        buttons.append(.default(Text("Copy All"), action: {self.copyAll()}))
+        buttons.append(.default(Text("Cut"), action: {self.cut(selection.wrappedValue!)}))
+        if selection.wrappedValue!.enabled {
+            buttons.append(.default(Text("Disable Exercise"), action: {selection.wrappedValue!.toggleEnabled()}))
+        } else {
+            buttons.append(.default(Text("Enable Exercise"), action: {selection.wrappedValue!.toggleEnabled()}))
+        }
+        buttons.append(.destructive(Text("Delete Exercise"), action: {self.delete(selection.wrappedValue!)}))
+        buttons.append(.destructive(Text("Delete All Exercises"), action: {self.deleteAll()}))
+        if self.exercises.first != selection.wrappedValue {
+            buttons.append(.default(Text("Move Up"), action: {self.move(selection.wrappedValue!, by: -1)}))
+        }
+        if self.exercises.last != selection.wrappedValue {
+            buttons.append(.default(Text("Move Down"), action: {self.move(selection.wrappedValue!, by: 1)}))
+        }
+
+        buttons.append(.cancel(Text("Cancel"), action: {}))
+
+        return buttons
+    }
+
     func scheduleButton(_ schedule: Binding<Schedule>, _ text: Binding<String>, _ label: Binding<String>,
-    _ subSchedule: Binding<Schedule?>, _ subText: Binding<String>, _ subLabel: Binding<String>) -> AnyView {
+                        _ subSchedule: Binding<Schedule?>, _ subText: Binding<String>, _ subLabel: Binding<String>) -> AnyView {
         var menuText = ""
         switch schedule.wrappedValue {
         case .anyDay: menuText = "Any Day"

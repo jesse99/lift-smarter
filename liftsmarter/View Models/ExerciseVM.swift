@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-class ExerciseVM: Identifiable, ObservableObject {
+class ExerciseVM: Equatable, Identifiable, ObservableObject {
     let workout: WorkoutVM
     private let exercise: Exercise
     private let instance: ExerciseInstance
@@ -49,6 +49,10 @@ class ExerciseVM: Identifiable, ObservableObject {
         }
     }
 
+    static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
+        return lhs.name == rhs.name
+    }
+    
     var id: String {
         get {
             return self.name
@@ -131,6 +135,11 @@ extension ExerciseVM {
         self.willChange()
 
         self.exercise.modality.sets = sets
+    }
+
+    func toggleEnabled() {
+        self.willChange()
+        self.instance.enabled = !self.instance.enabled
     }
 
     // For rest between sets.
@@ -474,6 +483,10 @@ extension ExerciseVM {
     }
 
     func instance(_ model: Model) -> ExerciseInstance {
+        return self.instance
+    }
+
+    func instance(_ workout: Workout) -> ExerciseInstance {
         return self.instance
     }
 }

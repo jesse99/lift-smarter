@@ -5,7 +5,7 @@ import Foundation
 // mutable model classes although they are allowed to access model enums and structs,
 class ProgramVM: ObservableObject {
     private let model: Model
-    
+
     init(_ model: Model) {
         self.model = model
     }
@@ -18,6 +18,10 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.workouts.map({WorkoutVM(self, $0)})}
     }
     
+    var instanceClipboard: [ExerciseInstance] {
+        get {return self.model.program.instanceClipboard}
+    }
+    
     func willChange() {
         self.objectWillChange.send()
     }
@@ -28,6 +32,11 @@ extension ProgramVM {
     func log(_ level: LogLevel, _ message: String) {
         let vm = LogsVM(model)
         vm.log(level, message)
+    }
+    
+    func copyInstances(_ exercises: [ExerciseVM]) {
+        self.willChange()
+        self.model.program.instanceClipboard = exercises.map({$0.instance(self.model)})
     }
 }
 

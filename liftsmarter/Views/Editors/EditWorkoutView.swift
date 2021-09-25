@@ -4,7 +4,10 @@ import SwiftUI
 struct EditWorkoutView: View {
     let workout: WorkoutVM
     @State var name: String
+    @State var oldExercises: [ExerciseVM]
+    @State var selection: ExerciseVM? = nil
     @State var clipboard: [String] = []
+    @State var showEditActions = false
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
@@ -19,7 +22,8 @@ struct EditWorkoutView: View {
     init(_ workout: WorkoutVM) {
         self.workout = workout
         self._name = State(initialValue: workout.name)
-        
+        self._oldExercises = State(initialValue: workout.exercises)
+
         let tuple = workout.render()
         self._schedule = State(initialValue: tuple.0)
         self._scheduleText = State(initialValue: tuple.1)
@@ -85,11 +89,11 @@ struct EditWorkoutView: View {
                             Text(exercise.name).font(.headline).strikethrough(color: .red)
                         }
                     }
-//                    .contentShape(Rectangle())  // so we can click within spacer
-//                        .onTapGesture {
-//                            self.selection = exercise
-//                            self.showEditActions = true
-//                        }
+                    .contentShape(Rectangle())  // so we can click within spacer
+                        .onTapGesture {
+                            self.selection = exercise
+                            self.showEditActions = true
+                        }
                 }
             }
             Spacer()
@@ -97,15 +101,17 @@ struct EditWorkoutView: View {
 
             Divider()
             HStack {
-                Button("Cancel", action: onCancel).font(.callout)
+                Button("Cancel", action: self.onCancel).font(.callout)
                 Spacer()
                 Spacer()
-                Button("Paste", action: self.onPaste).font(.callout).disabled(self.clipboard.isEmpty)
+                Button("Paste", action: self.onPaste).font(.callout).disabled(!self.workout.canPaste())
                 Button("Add", action: self.onAdd).font(.callout)
-                Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
+                Button("OK", action: self.onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
         }
+        .actionSheet(isPresented: $showEditActions) {
+            ActionSheet(title: Text(self.selection!.name), buttons: self.workout.editButtons(self.$selection))}
     }
     
     private func onAdd() {
@@ -113,10 +119,13 @@ struct EditWorkoutView: View {
     }
 
     private func onPaste() {
-//        self.display.send(.PasteExercise(self.workout))
+        self.workout.paste()
     }
 
     private func onCancel() {
+        if self.oldExercises != self.workout.exercises {
+            self.workout.setInstances(self.oldExercises)
+        }
         self.presentation.wrappedValue.dismiss()
     }
 
