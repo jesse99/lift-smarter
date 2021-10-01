@@ -113,8 +113,17 @@ extension ProgramVM {
     }
 }
 
+struct Confirmation: Identifiable {
+    let title: String
+    let message: String
+    let button: String
+    let callback: () -> Void
+
+    var id: String {get {return self.title + self.message}}
+}
+
 extension ProgramVM {
-    func editButtons(_ selection: Binding<WorkoutVM?>) -> [ActionSheet.Button] {
+    func editButtons(_ selection: Binding<WorkoutVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
         var buttons: [ActionSheet.Button] = []
 
         if self.workouts.first !== selection.wrappedValue {
@@ -128,13 +137,19 @@ extension ProgramVM {
         } else {
             buttons.append(.default(Text("Enable Workout"), action: {self.toggleEnabled(selection.wrappedValue!)}))
         }
-        buttons.append(.destructive(Text("Delete Workout"), action: {self.deleteWorkout(selection.wrappedValue!)}))
+        buttons.append(.destructive(Text("Delete Workout"), action: {
+            confirm.wrappedValue = Confirmation(
+                title: "Confirm delete",
+                message: selection.wrappedValue!.name + " workout",
+                button: "Delete",
+                callback: {self.deleteWorkout(selection.wrappedValue!)})
+            
+        }))
 
         buttons.append(.cancel(Text("Cancel"), action: {}))
 
         return buttons
     }
-
 }
 
 // Editing

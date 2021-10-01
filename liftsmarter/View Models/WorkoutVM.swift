@@ -133,7 +133,7 @@ extension WorkoutVM {
 
 // UI
 extension WorkoutVM {
-    func editButtons(_ selection: Binding<ExerciseVM?>) -> [ActionSheet.Button] { 
+    func editButtons(_ selection: Binding<ExerciseVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
         var buttons: [ActionSheet.Button] = []
 
         buttons.append(.default(Text("Copy"), action: {self.copy(selection.wrappedValue!)}))
@@ -144,8 +144,22 @@ extension WorkoutVM {
         } else {
             buttons.append(.default(Text("Enable Exercise"), action: {selection.wrappedValue!.toggleEnabled()}))
         }
-        buttons.append(.destructive(Text("Delete Exercise"), action: {self.delete(selection.wrappedValue!)}))
-        buttons.append(.destructive(Text("Delete All Exercises"), action: {self.deleteAll()}))
+        buttons.append(.destructive(Text("Delete Exercise"), action: {
+            confirm.wrappedValue = Confirmation(
+                title: "Confirm delete",
+                message: selection.wrappedValue!.name + " exercise",
+                button: "Delete",
+                callback: {self.delete(selection.wrappedValue!)})
+            
+        }))
+        buttons.append(.destructive(Text("Delete All Exercises"), action: {
+            confirm.wrappedValue = Confirmation(
+                title: "Confirm delete all",
+                message: "exercises",
+                button: "Delete All",
+                callback: {self.deleteAll()})
+            
+        }))
         if self.exercises.first != selection.wrappedValue {
             buttons.append(.default(Text("Move Up"), action: {self.move(selection.wrappedValue!, by: -1)}))
         }

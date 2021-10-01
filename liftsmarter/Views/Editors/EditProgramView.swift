@@ -9,6 +9,7 @@ struct EditProgramView: View {
     @State var oldWorkouts: [WorkoutVM]
     @State var selection: WorkoutVM? = nil
     @State var showEditActions = false
+    @State var confirm: Confirmation? = nil
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
@@ -83,7 +84,14 @@ struct EditProgramView: View {
             .padding()
         }
         .actionSheet(isPresented: $showEditActions) {
-            ActionSheet(title: Text(self.selection!.name), buttons: self.program.editButtons(self.$selection))}
+            ActionSheet(title: Text(self.selection!.name), buttons: self.program.editButtons(self.$selection, self.$confirm))}
+        .alert(item: self.$confirm) {confirm in
+            Alert(
+                title: Text(confirm.title),
+                message: Text(confirm.message),
+                primaryButton: .destructive(Text(confirm.button)) {confirm.callback()},
+                secondaryButton: .default(Text("Cancel")))
+        }
     }
     
     private func onAdd() {
