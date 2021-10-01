@@ -13,6 +13,9 @@
 		3718978D26F6BFA500351C5A /* ProgramVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978C26F6BFA500351C5A /* ProgramVM.swift */; };
 		3718978F26F81B1A00351C5A /* EditWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718978E26F81B1A00351C5A /* EditWorkoutView.swift */; };
 		3718979126F96DE800351C5A /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718979026F96DE800351C5A /* StringExtension.swift */; };
+		371897932700DDA500351C5A /* EditProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371897922700DDA500351C5A /* EditProgramView.swift */; };
+		371897952700EB2000351C5A /* ScheduleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371897942700EB2000351C5A /* ScheduleTests.swift */; };
+		371897992702C63F00351C5A /* Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371897982702C63F00351C5A /* Parsers.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -65,6 +68,9 @@
 		3718978C26F6BFA500351C5A /* ProgramVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramVM.swift; sourceTree = "<group>"; };
 		3718978E26F81B1A00351C5A /* EditWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditWorkoutView.swift; sourceTree = "<group>"; };
 		3718979026F96DE800351C5A /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
+		371897922700DDA500351C5A /* EditProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProgramView.swift; sourceTree = "<group>"; };
+		371897942700EB2000351C5A /* ScheduleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTests.swift; sourceTree = "<group>"; };
+		371897982702C63F00351C5A /* Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parsers.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -132,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
+				371897922700DDA500351C5A /* EditProgramView.swift */,
 				3718978E26F81B1A00351C5A /* EditWorkoutView.swift */,
 			);
 			path = Editors;
@@ -184,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				37ECEA2E26EAD65300D0AD8E /* ModelTests.swift */,
+				371897942700EB2000351C5A /* ScheduleTests.swift */,
 			);
 			path = liftsmarterTests;
 			sourceTree = "<group>";
@@ -226,6 +234,7 @@
 				377791CB26F0367900EC5028 /* ExerciseVM.swift */,
 				3718978826F69F8F00351C5A /* HistoryVM.swift */,
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
+				371897982702C63F00351C5A /* Parsers.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
 				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
 			);
@@ -369,10 +378,12 @@
 				37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */,
 				37ECEA5526EB07F500D0AD8E /* Apparatus.swift in Sources */,
 				3718978D26F6BFA500351C5A /* ProgramVM.swift in Sources */,
+				371897992702C63F00351C5A /* Parsers.swift in Sources */,
 				37ECEA6026EB0D2400D0AD8E /* SequenceExtension.swift in Sources */,
 				377791C626EEBE7B00EC5028 /* Either.swift in Sources */,
 				377791C226EEAF8A00EC5028 /* EditDurationsView.swift in Sources */,
 				377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */,
+				371897932700DDA500351C5A /* EditProgramView.swift in Sources */,
 				37ECEA5326EB07BE00D0AD8E /* Modality.swift in Sources */,
 				37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */,
 				37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */,
@@ -390,6 +401,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				371897952700EB2000351C5A /* ScheduleTests.swift in Sources */,
 				37ECEA2F26EAD65300D0AD8E /* ModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

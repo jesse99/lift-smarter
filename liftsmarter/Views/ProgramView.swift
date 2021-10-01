@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ProgramView: View {
     @ObservedObject var program: ProgramVM
+    @State var editModal = false
 
     init(_ program: ProgramVM) {
         self.program = program
@@ -34,7 +35,7 @@ struct ProgramView: View {
                     Spacer()
                     Button("Edit", action: onEdit)
                         .font(.callout).labelStyle(/*@START_MENU_TOKEN@*/DefaultLabelStyle()/*@END_MENU_TOKEN@*/)
-//                        .sheet(isPresented: self.$editModal) {EditProgramView(self.display)}
+                        .sheet(isPresented: self.$editModal) {EditProgramView(self.program)}
                 }
                 .padding()
             }
@@ -44,7 +45,7 @@ struct ProgramView: View {
     }
     
     private func onEdit() {
-//        self.editModal = true
+        self.editModal = true
     }
     
     private func onPrograms() {

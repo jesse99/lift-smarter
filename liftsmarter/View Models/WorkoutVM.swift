@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-class WorkoutVM: ObservableObject, Identifiable {
+class WorkoutVM: Equatable, ObservableObject, Identifiable {
     let program: ProgramVM
     private let workout: Workout
     
@@ -20,6 +20,10 @@ class WorkoutVM: ObservableObject, Identifiable {
         get {return self.workout.name}
     }
     
+    var enabled: Bool {
+        get {return self.workout.enabled}
+    }
+    
     var exercises: [ExerciseVM] {
         get {return self.program.instances(self.workout)}
     }
@@ -28,6 +32,10 @@ class WorkoutVM: ObservableObject, Identifiable {
         return self.workout.completed[exercise.name]
     }
 
+    static func == (lhs: WorkoutVM, rhs: WorkoutVM) -> Bool {
+        return lhs.name == rhs.name
+    }
+    
     var id: String {
         get {
             return self.workout.name
@@ -233,7 +241,7 @@ extension WorkoutVM {
     func addButton() -> AnyView {
         let button = Menu("Add") {
             Button("Cancel", action: {})
-            ForEach(self.program.exercices(self.workout).reversed()) {exercise in
+            ForEach(self.program.exercises(self.workout).reversed()) {exercise in
                 if self.exercises.firstIndex(where: {$0.name == exercise.name}) == nil {
                     Button(exercise.name, action: {self.append(exercise.instance(self.workout))})
                 }
@@ -342,7 +350,8 @@ extension WorkoutVM {
             }
         case .weeks(_, _):
             ASSERT(subSchedule != nil, "weeks should have a sub-schedule")
-            if let weeks = self.parseWeeks(scheduleText) {
+            switch parseIntList(scheduleText, label: "Weeks", zeroOK: false, emptyOK: false) {
+            case .right(let weeks):
                 switch subSchedule! {
                 case .anyDay:
                     result = .weeks(weeks, .anyDay)
@@ -359,10 +368,10 @@ extension WorkoutVM {
                         errors.append("Days must be space separated (abreviated) day names.")
                     }
                 case .weeks(_, _):
-                    ASSERT(false, "weeks should not have a weeks sub-scedule")
+                    ASSERT(false, "weeks should not have a weeks sub-schedule")
                 }
-            } else {
-                errors.append("Days must be space separated list of 1-based week indexes.")
+            case .left(let err):
+                errors.append(err)
             }
         }
         
@@ -373,21 +382,6 @@ extension WorkoutVM {
         }
     }
                 
-    private func parseWeeks(_ text: String) -> [Int]? {
-        var result: [Int] = []
-        
-        let parts = text.split(separator: " ")
-        for part in parts {
-            if let week = Int(part) {
-                result.append(week)
-            } else {
-                return nil
-            }
-        }
-        
-        return result
-    }
-    
     private func parseWeekDays(_ text: String) -> [WeekDay]? {
         var result: [WeekDay] = []
         

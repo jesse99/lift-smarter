@@ -31,13 +31,20 @@ extension Date {
             return Date()
         }
     }
+
+    func string(format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: self)
+    }
 }
 
-fileprivate func weeksBetween(from: Date, to: Date) -> Int {
-    ASSERT_EQ(from.compare(to), .orderedAscending)
-    let fromWeek = Calendar.current.component(.weekOfYear, from: from)
-    let toWeek = Calendar.current.component(.weekOfYear, from: to)
-    return toWeek - fromWeek
+func weeksBetween(from: Date, to: Date) -> Int {
+    ASSERT_NE(from.compare(to), .orderedDescending)
+
+    let start1 = from.startOfWeek()
+    let start2 = to.startOfWeek()
+    return Calendar.current.dateComponents([.weekOfMonth], from: start1, to: start2).weekOfMonth!
 }
 
 // blockStart is an arbitrary week within week 1.

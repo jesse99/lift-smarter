@@ -50,7 +50,7 @@ extension Either {
 }
 
 /// These are for the case where we have several Either values and want to extract either the values
-///or an accumulated error string.
+/// or an accumulated error string.
 func coalesce<R1, R2>(_ e1: Either<String, R1>, _ e2: Either<String, R2>) -> Either<String, (R1, R2)> {
     if e1.isRight() && e2.isRight() {
         return .right((e1.unwrap(), e2.unwrap()))
