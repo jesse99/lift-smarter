@@ -2,13 +2,14 @@
 import SwiftUI
 
 struct EditProgramView: View {
-    let program: ProgramVM
+    @ObservedObject var program: ProgramVM
     @State var name: String
     @State var currentWeek: String
     @State var restWeeks: String
     @State var oldWorkouts: [WorkoutVM]
     @State var selection: WorkoutVM? = nil
     @State var showAddSheet: Bool = false
+    @State var editExercisesSheet: Bool = false
     @State var showEditActions = false
     @State var confirm: Confirmation? = nil
     @State var error = ""
@@ -85,8 +86,9 @@ struct EditProgramView: View {
             .padding()
         }
         .actionSheet(isPresented: $showEditActions) {
-            ActionSheet(title: Text(self.selection!.name), buttons: self.program.editButtons(self.$selection, self.$confirm))}
-        .sheet(isPresented: self.$showAddSheet) {EditTextView(title: "Exercise Name", content: "", caps: .words, validator: self.onValidateAdd, sender: self.doAdd)}
+            ActionSheet(title: Text(self.selection!.name), buttons: self.program.editWorkoutButtons(self.$selection, self.$confirm))}
+        .sheet(isPresented: self.$showAddSheet) {EditTextView(title: "Workout Name", content: "", caps: .words, validator: self.onValidateAdd, sender: self.doAdd)}
+        .sheet(isPresented: self.$editExercisesSheet) {EditExercisesView(self.program)}
         .alert(item: self.$confirm) {confirm in
             Alert(
                 title: Text(confirm.title),
@@ -117,7 +119,7 @@ struct EditProgramView: View {
     }
 
     private func onExercises() {
-        print("not implemented")
+        self.editExercisesSheet = true
     }
 
     private func onEdited(_ text: String) {

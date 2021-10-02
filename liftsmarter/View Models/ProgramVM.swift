@@ -19,8 +19,11 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.workouts.map({WorkoutVM(self, $0)})}
     }
     
-    var exercises: [String] {
-        get {return self.model.program.exercises.map({$0.name})}
+    var exercises: [ExerciseVM] {
+        get {
+            let program = ProgramVM(self.model)
+            return self.model.program.exercises.map({ExerciseVM(program, $0)})
+        }
     }
     
     var instanceClipboard: [ExerciseInstance] {
@@ -39,10 +42,33 @@ extension ProgramVM {
         self.model.program.name = name
     }
     
+    func setExercises(_ exercises: [ExerciseVM]) {
+        self.willChange()
+        self.model.program.exercises = exercises.map({$0.exercise(self.model)})
+    }
+    
     func addWorkout(_ name: String) {
         self.willChange()
         let workout = Workout(name, [], schedule: .days([.monday, .wednesday, .friday]))
         self.model.program.workouts.append(workout)
+    }
+    
+    func addExercise(_ name: String) {
+        let work = FixedRepsSet(reps: FixedReps(10), restSecs: 60)
+        let sets = Sets.fixedReps([work, work, work])
+        let modality = Modality(Apparatus.bodyWeight, sets)
+        let exercise = Exercise(name, "", modality, Expected(weight: 0.0, sets: .fixedReps))
+
+        self.willChange()
+        self.model.program.exercises.append(exercise)
+        self.model.program.exercises.sort(by: {$0.name < $1.name})
+    }
+
+    // Should only be called if no workouts reference the exercise.
+    func deleteExercise(_ exercise: ExerciseVM) {
+        self.willChange()
+        let index = self.model.program.exercises.firstIndex(where: {$0.name == exercise.name})!
+        self.model.program.exercises.remove(at: index)
     }
 
     func copyInstances(_ exercises: [InstanceVM]) {
@@ -133,7 +159,7 @@ struct Confirmation: Identifiable {
 }
 
 extension ProgramVM {
-    func editButtons(_ selection: Binding<WorkoutVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
+    func editWorkoutButtons(_ selection: Binding<WorkoutVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
         var buttons: [ActionSheet.Button] = []
 
         if self.workouts.first !== selection.wrappedValue {
@@ -156,6 +182,20 @@ extension ProgramVM {
             
         }))
 
+        buttons.append(.cancel(Text("Cancel"), action: {}))
+
+        return buttons
+    }
+
+    func editExerciseButtons(_ selection: Binding<ExerciseVM?>) -> [ActionSheet.Button] {
+        var buttons: [ActionSheet.Button] = []
+
+        if selection.wrappedValue!.canDelete() {
+            buttons.append(.destructive(Text("Delete Exercise"), action: {  // maybe we should have confirmation here
+                    self.deleteExercise(selection.wrappedValue!)
+            }))
+        }
+        
         buttons.append(.cancel(Text("Cancel"), action: {}))
 
         return buttons
