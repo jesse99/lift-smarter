@@ -34,6 +34,12 @@ extension ProgramVM {
         self.willChange()
         self.model.program.name = name
     }
+    
+    func addWorkout(_ name: String) {
+        self.willChange()
+        let workout = Workout(name, [], schedule: .days([.monday, .wednesday, .friday]))
+        self.model.program.workouts.append(workout)
+    }
 
     func copyInstances(_ exercises: [ExerciseVM]) {
         self.willChange()

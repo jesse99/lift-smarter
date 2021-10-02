@@ -8,6 +8,7 @@ struct EditProgramView: View {
     @State var restWeeks: String
     @State var oldWorkouts: [WorkoutVM]
     @State var selection: WorkoutVM? = nil
+    @State var showAddSheet: Bool = false
     @State var showEditActions = false
     @State var confirm: Confirmation? = nil
     @State var error = ""
@@ -25,7 +26,7 @@ struct EditProgramView: View {
     
     var body: some View {
         VStack() {
-            Text("Edit Workout").font(.largeTitle)
+            Text("Edit Program").font(.largeTitle)
 
             VStack(alignment: .leading) {
                 HStack {
@@ -85,6 +86,7 @@ struct EditProgramView: View {
         }
         .actionSheet(isPresented: $showEditActions) {
             ActionSheet(title: Text(self.selection!.name), buttons: self.program.editButtons(self.$selection, self.$confirm))}
+        .sheet(isPresented: self.$showAddSheet) {EditTextView(title: "Exercise Name", content: "", caps: .words, validator: self.onValidateAdd, sender: self.doAdd)}
         .alert(item: self.$confirm) {confirm in
             Alert(
                 title: Text(confirm.title),
@@ -95,7 +97,23 @@ struct EditProgramView: View {
     }
     
     private func onAdd() {
-        print("not implemented")
+        self.showAddSheet = true
+    }
+    
+    private func onValidateAdd(_ text: String) -> String {
+        if text.isBlankOrEmpty() {
+            return "Workout name cannot be empty."
+        }
+        for workout in self.program.workouts {
+            if workout.name == text {
+                return "Workout names must be unique."
+            }
+        }
+        return ""
+    }
+
+    private func doAdd(_ text: String) {
+        self.program.addWorkout(text)
     }
 
     private func onExercises() {
