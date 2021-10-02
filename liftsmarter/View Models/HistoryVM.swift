@@ -15,7 +15,7 @@ extension HistoryVM {
         self.model.logs.log(level, message)
     }
 
-    @discardableResult func append(_ workout: WorkoutVM, _ exercise: ExerciseVM) -> History.Record {
+    @discardableResult func append(_ workout: WorkoutVM, _ exercise: InstanceVM) -> History.Record {
         self.objectWillChange.send()
         workout.willChange()
         
@@ -29,7 +29,7 @@ extension HistoryVM {
         return record
     }
     
-    func delete(_ workout: WorkoutVM, _ exercise: ExerciseVM, _ record: History.Record) {
+    func delete(_ workout: WorkoutVM, _ exercise: InstanceVM, _ record: History.Record) {
         self.objectWillChange.send()
         workout.willChange()
 
@@ -52,7 +52,7 @@ extension HistoryVM {
         }
     }
     
-    func deleteAll(_ workout: WorkoutVM, _ exercise: ExerciseVM) {
+    func deleteAll(_ workout: WorkoutVM, _ exercise: InstanceVM) {
         self.objectWillChange.send()
         workout.willChange()
 

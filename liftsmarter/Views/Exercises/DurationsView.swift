@@ -3,13 +3,13 @@ import SwiftUI
 
 struct DurationsView: View {
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
-    @ObservedObject var exercise: ExerciseVM
+    @ObservedObject var exercise: InstanceVM
     @State var editModal = false
     @State var implicitTimerModal = false
     @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
 
-    init(_ exercise: ExerciseVM) {
+    init(_ exercise: InstanceVM) {
         self.exercise = exercise
     }
     
@@ -112,7 +112,7 @@ struct DurationsView_Previews: PreviewProvider {
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-    static let vm = ExerciseVM(WorkoutVM(program, workout), exercise, instance)
+    static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
         DurationsView(vm)

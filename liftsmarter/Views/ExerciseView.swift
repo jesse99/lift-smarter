@@ -2,9 +2,9 @@
 import SwiftUI
 
 struct ExerciseView: View {
-    @ObservedObject var exercise: ExerciseVM
+    @ObservedObject var exercise: InstanceVM
 
-    init(_ exercise: ExerciseVM) {
+    init(_ exercise: InstanceVM) {
         self.exercise = exercise
     }
 
@@ -21,6 +21,6 @@ struct ExerciseView_Previews: PreviewProvider {
     static let vm = WorkoutVM(ProgramVM(model), workout)
     
     static var previews: some View {
-        ExerciseView(ExerciseVM(vm, exercise, instance))
+        ExerciseView(InstanceVM(vm, exercise, instance))
     }
 }

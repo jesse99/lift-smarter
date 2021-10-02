@@ -4,8 +4,8 @@ import SwiftUI
 struct EditWorkoutView: View {
     let workout: WorkoutVM
     @State var name: String
-    @State var oldExercises: [ExerciseVM]
-    @State var selection: ExerciseVM? = nil
+    @State var oldExercises: [InstanceVM]
+    @State var selection: InstanceVM? = nil
     @State var clipboard: [String] = []
     @State var showEditActions = false
     @State var confirm: Confirmation? = nil

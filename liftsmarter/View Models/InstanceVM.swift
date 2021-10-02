@@ -2,7 +2,7 @@
 import Foundation
 import SwiftUI
 
-class ExerciseVM: Equatable, Identifiable, ObservableObject {
+class InstanceVM: Equatable, Identifiable, ObservableObject {
     let workout: WorkoutVM
     private let exercise: Exercise
     private let instance: ExerciseInstance
@@ -49,7 +49,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
 
-    static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
+    static func ==(lhs: InstanceVM, rhs: InstanceVM) -> Bool {
         return lhs.name == rhs.name
     }
     
@@ -61,7 +61,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
 }
 
 // Misc Logic
-extension ExerciseVM {
+extension InstanceVM {
     func log(_ level: LogLevel, _ message: String) {
         self.workout.log(level, message)
     }
@@ -221,7 +221,7 @@ extension ExerciseVM {
 }
 
 // UI Labels
-extension ExerciseVM {
+extension InstanceVM {
     func title() -> String {
         switch exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
@@ -345,7 +345,7 @@ extension ExerciseVM {
 }
 
 // Editing
-extension ExerciseVM {
+extension InstanceVM {
     func render() -> [String: String] {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: let target): // ["durations: "60s x3", "rest": "0s x3", "target": "90s x3"]
@@ -477,7 +477,7 @@ extension ExerciseVM {
 
 // View Model internals (views can't call these because they don't have direct access
 // to model classes).
-extension ExerciseVM {
+extension InstanceVM {
     func exercise(_ model: Model) -> Exercise {
         return self.exercise
     }

@@ -17,6 +17,7 @@
 		371897952700EB2000351C5A /* ScheduleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371897942700EB2000351C5A /* ScheduleTests.swift */; };
 		371897992702C63F00351C5A /* Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371897982702C63F00351C5A /* Parsers.swift */; };
 		3718979B2706BB2800351C5A /* EditTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718979A2706BB2800351C5A /* EditTextView.swift */; };
+		3718979D2708D40B00351C5A /* EditExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718979C2708D40B00351C5A /* EditExercisesView.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -25,7 +26,7 @@
 		377791C226EEAF8A00EC5028 /* EditDurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C126EEAF8A00EC5028 /* EditDurationsView.swift */; };
 		377791C626EEBE7B00EC5028 /* Either.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C526EEBE7B00EC5028 /* Either.swift */; };
 		377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791C726EEF06600EC5028 /* ArrayExtension.swift */; };
-		377791CC26F0367900EC5028 /* ExerciseVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CB26F0367900EC5028 /* ExerciseVM.swift */; };
+		377791CC26F0367900EC5028 /* InstanceVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CB26F0367900EC5028 /* InstanceVM.swift */; };
 		377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791CD26F0383300EC5028 /* WorkoutVM.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
@@ -73,6 +74,7 @@
 		371897942700EB2000351C5A /* ScheduleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTests.swift; sourceTree = "<group>"; };
 		371897982702C63F00351C5A /* Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parsers.swift; sourceTree = "<group>"; };
 		3718979A2706BB2800351C5A /* EditTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTextView.swift; sourceTree = "<group>"; };
+		3718979C2708D40B00351C5A /* EditExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExercisesView.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -81,7 +83,7 @@
 		377791C126EEAF8A00EC5028 /* EditDurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDurationsView.swift; sourceTree = "<group>"; };
 		377791C526EEBE7B00EC5028 /* Either.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Either.swift; sourceTree = "<group>"; };
 		377791C726EEF06600EC5028 /* ArrayExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtension.swift; sourceTree = "<group>"; };
-		377791CB26F0367900EC5028 /* ExerciseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseVM.swift; sourceTree = "<group>"; };
+		377791CB26F0367900EC5028 /* InstanceVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstanceVM.swift; sourceTree = "<group>"; };
 		377791CD26F0383300EC5028 /* WorkoutVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutVM.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
+				3718979C2708D40B00351C5A /* EditExercisesView.swift */,
 				371897922700DDA500351C5A /* EditProgramView.swift */,
 				3718979A2706BB2800351C5A /* EditTextView.swift */,
 				3718978E26F81B1A00351C5A /* EditWorkoutView.swift */,
@@ -234,8 +237,8 @@
 		37ECEA6126ED24B300D0AD8E /* View Models */ = {
 			isa = PBXGroup;
 			children = (
-				377791CB26F0367900EC5028 /* ExerciseVM.swift */,
 				3718978826F69F8F00351C5A /* HistoryVM.swift */,
+				377791CB26F0367900EC5028 /* InstanceVM.swift */,
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
 				371897982702C63F00351C5A /* Parsers.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
@@ -373,10 +376,11 @@
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
 				377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */,
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
+				3718979D2708D40B00351C5A /* EditExercisesView.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,
 				377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */,
 				377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */,
-				377791CC26F0367900EC5028 /* ExerciseVM.swift in Sources */,
+				377791CC26F0367900EC5028 /* InstanceVM.swift in Sources */,
 				37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */,
 				37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */,
 				37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */,

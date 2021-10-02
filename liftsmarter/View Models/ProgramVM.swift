@@ -19,6 +19,10 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.workouts.map({WorkoutVM(self, $0)})}
     }
     
+    var exercises: [String] {
+        get {return self.model.program.exercises.map({$0.name})}
+    }
+    
     var instanceClipboard: [ExerciseInstance] {
         get {return self.model.program.instanceClipboard}
     }
@@ -41,7 +45,7 @@ extension ProgramVM {
         self.model.program.workouts.append(workout)
     }
 
-    func copyInstances(_ exercises: [ExerciseVM]) {
+    func copyInstances(_ exercises: [InstanceVM]) {
         self.willChange()
         self.model.program.instanceClipboard = exercises.map({$0.instance(self.model)})
     }
@@ -214,19 +218,19 @@ extension ProgramVM {
 // View Model internals (views can't call these because they don't have direct access
 // to model classes).
 extension ProgramVM {
-    func exercises(_ workout: Workout) -> [ExerciseVM] {
+    func exercises(_ workout: Workout) -> [InstanceVM] {
         let vm = WorkoutVM(self, workout)
         return self.model.program.exercises.map({
-            return ExerciseVM(vm, $0, ExerciseInstance($0.name))
+            return InstanceVM(vm, $0, ExerciseInstance($0.name))
         })
     }
 
-    func instances(_ workout: Workout) -> [ExerciseVM] {
+    func instances(_ workout: Workout) -> [InstanceVM] {
         let vm = WorkoutVM(self, workout)
         return workout.instances.map({
             let name = $0.name
             let exercise = self.model.program.exercises.first(where: {$0.name == name})!
-            return ExerciseVM(vm, exercise, $0)
+            return InstanceVM(vm, exercise, $0)
         })
     }
 }
