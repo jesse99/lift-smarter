@@ -28,6 +28,7 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         get {return self.program.instances(self.workout)}
     }
     
+    // TODO: do we need this?
     func lastCompleted(_ exercise: InstanceVM) -> Date? {
         return self.workout.completed[exercise.name]
     }

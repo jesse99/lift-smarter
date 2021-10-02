@@ -95,9 +95,7 @@ class ScheduleTests: XCTestCase {
         XCTAssertEqual(vm.getWeek(date(year: 2022, month: 1, day: 1)), 4)
         XCTAssertEqual(vm.getWeek(date(year: 2022, month: 1, day: 2)), 1)
     }
-    
-    // TODO: also need workout scheduling tests
-    
+        
     private func date(year: Int = 2021, month: Int = 9, day: Int = 1, minutes: Int = 1) -> Date {
         return self.formatter.date(from: "\(year)/\(month)/\(day) 09:\(minutes)")!
     }

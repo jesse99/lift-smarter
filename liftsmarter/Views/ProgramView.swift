@@ -30,13 +30,13 @@ struct ProgramView: View {
                 Divider()
                 HStack {
                     // Would be nice to make this a tab but then switching programs completely hoses all
-                    // existing views.
-                    Button("Programs", action: onPrograms)
-                        .font(.callout).labelStyle(/*@START_MENU_TOKEN@*/DefaultLabelStyle()/*@END_MENU_TOKEN@*/)
+                    // existing views. TODO: maybe that'll work better now?
+                    Button("Programs", action: onPrograms)  // TODO: implement this
+                        .font(.callout).disabled(true)
 //                        .sheet(isPresented: self.$programsModal) {ProgramsView(self.display)}
                     Spacer()
                     Button("Edit", action: onEdit)
-                        .font(.callout).labelStyle(/*@START_MENU_TOKEN@*/DefaultLabelStyle()/*@END_MENU_TOKEN@*/)
+                        .font(.callout)
                         .sheet(isPresented: self.$editModal) {EditProgramView(self.program)}
                 }
                 .padding()

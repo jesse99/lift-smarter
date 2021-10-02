@@ -30,6 +30,10 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.instanceClipboard}
     }
     
+    func history() -> HistoryVM {
+        return HistoryVM(self.model)
+    }
+    
     func willChange() {
         self.objectWillChange.send()
     }
@@ -158,7 +162,52 @@ struct Confirmation: Identifiable {
     var id: String {get {return self.title + self.message}}
 }
 
+// UI
 extension ProgramVM {
+    func label(_ workout: WorkoutVM) -> String {
+        return workout.name
+    }
+    
+    func subLabel(_ workout: WorkoutVM, now: Date = Date()) -> (String, Color) {
+//        let calendar = Calendar.current
+        
+        if workout.instances.isEmpty {
+            return ("no exercises", .black)
+        }
+        
+        let instances = workout.instances.filter({$0.enabled})
+        if instances.count == 0 {
+            return ("nothing enabled", .black)
+        }
+        
+        for candidate in instances {
+            let instance = candidate.instance(self.model)
+            if now.hoursSinceDate(instance.current.startDate) <= RecentHours && candidate.inProgress() {
+                // If any exercise has been started recently but not completed.
+                return ("in progress", .red)
+            }
+        }
+        
+        var numCompleted = 0
+        for candidate in instances {
+            if let record = self.model.history.records[candidate.name]?.last {
+                if now.hoursSinceDate(record.completed) <= RecentHours {
+                    numCompleted += 1
+                }
+            }
+        }
+        if numCompleted > 0 && numCompleted < instances.count {
+            // Some but not all exercises were completed recently.
+            return ("partially completed", .red)
+        }
+        else if numCompleted == instances.count {
+            // If every exercise has been completed recently.
+            return ("completed", .black)
+        }
+
+        return ("", .black)
+    }
+    
     func editWorkoutButtons(_ selection: Binding<WorkoutVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
         var buttons: [ActionSheet.Button] = []
 

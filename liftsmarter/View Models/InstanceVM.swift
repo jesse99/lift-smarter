@@ -119,17 +119,26 @@ extension InstanceVM {
         case .durations(let durations, targetSecs: _):
             ASSERT(reps == nil, "reps is for repRanges")
             self.willChange()
+            
+            if instance.current.setIndex == 0 {
+                instance.current.startDate = Date()
+            }
 
             let duration = durations[self.setIndex]
-            instance.current.reps.append(.duration(secs: duration.secs, percent: 1.0))
             instance.current.setIndex += 1
+            instance.current.reps.append(.duration(secs: duration.secs, percent: 1.0))
+            
+            if instance.current.setIndex == durations.count {
+                let history = self.workout.program.history()
+                history.append(self.workout, self)
+            }
         default:
             ASSERT(false, "not implemented")
         }
     }
 
-    func appendCurrent(_ reps: ActualRep) {
-    }
+//    func appendCurrent(_ reps: ActualRep) {
+//    }
     
     func setSets(_ sets: Sets) { 
         self.willChange()
