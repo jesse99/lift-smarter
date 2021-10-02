@@ -23,7 +23,7 @@ struct EditWorkoutView: View {
     init(_ workout: WorkoutVM) {
         self.workout = workout
         self._name = State(initialValue: workout.name)
-        self._oldExercises = State(initialValue: workout.exercises)
+        self._oldExercises = State(initialValue: workout.instances)
 
         let tuple = workout.render()
         self._schedule = State(initialValue: tuple.0)
@@ -82,7 +82,7 @@ struct EditWorkoutView: View {
                     }.padding(.leading).padding(.trailing)
                 }
 
-                List(self.workout.exercises) {exercise in
+                List(self.workout.instances) {exercise in
                     VStack() {
                         if exercise.enabled {
                             Text(exercise.name).font(.headline)
@@ -127,7 +127,7 @@ struct EditWorkoutView: View {
     }
 
     private func onCancel() {
-        if self.oldExercises != self.workout.exercises {
+        if self.oldExercises != self.workout.instances {
             self.workout.setInstances(self.oldExercises)
         }
         self.presentation.wrappedValue.dismiss()

@@ -11,7 +11,7 @@ struct WorkoutView: View {
 
     var body: some View {
         VStack {
-            List(self.workout.exercises) {exercise in
+            List(self.workout.instances) {exercise in
                 if exercise.enabled {
                     NavigationLink(destination: ExerciseView(exercise)) {
                         VStack(alignment: .leading) {

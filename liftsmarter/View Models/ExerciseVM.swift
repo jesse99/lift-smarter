@@ -46,7 +46,7 @@ extension ExerciseVM {
         var disabled: [String] = []
         
         for workout in self.program.workouts {
-            for instance in workout.exercises {
+            for instance in workout.instances {
                 if instance.name == self.name {
                     if instance.enabled {
                         enabled.append(workout.name)
@@ -78,7 +78,7 @@ extension ExerciseVM {
 
     func canDelete() -> Bool {
         for workout in self.program.workouts {
-            for instance in workout.exercises {
+            for instance in workout.instances {
                 if instance.name == self.name {
                     return false
                 }

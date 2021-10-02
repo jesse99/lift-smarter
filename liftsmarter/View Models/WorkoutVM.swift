@@ -24,7 +24,7 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         get {return self.workout.enabled}
     }
     
-    var exercises: [InstanceVM] {
+    var instances: [InstanceVM] {
         get {return self.program.instances(self.workout)}
     }
     
@@ -66,7 +66,7 @@ extension WorkoutVM {
     func move(_ exercise: InstanceVM, by: Int) {
         self.willChange()
 
-        let index = self.exercises.firstIndex(where: {$0.name == exercise.name})!
+        let index = self.instances.firstIndex(where: {$0.name == exercise.name})!
         let instance = self.workout.instances.remove(at: index)
         self.workout.instances.insert(instance, at: index + by)
     }
@@ -74,7 +74,7 @@ extension WorkoutVM {
     func delete(_ exercise: InstanceVM) {
         self.willChange()
 
-        let index = self.exercises.firstIndex(where: {$0.name == exercise.name})!
+        let index = self.instances.firstIndex(where: {$0.name == exercise.name})!
         self.workout.instances.remove(at: index)
     }
 
@@ -88,7 +88,7 @@ extension WorkoutVM {
     }
 
     func copyAll() {
-        self.program.copyInstances(self.exercises)
+        self.program.copyInstances(self.instances)
     }
 
     func cut(_ exercise: InstanceVM) {
@@ -98,7 +98,7 @@ extension WorkoutVM {
     
     func canPaste() -> Bool {
         for candidate in self.program.instanceClipboard {
-            if self.exercises.firstIndex(where: {$0.name == candidate.name}) == nil {
+            if self.instances.firstIndex(where: {$0.name == candidate.name}) == nil {
                 return true
             }
         }
@@ -106,7 +106,7 @@ extension WorkoutVM {
     }
 
     func append(_ instance: ExerciseInstance) {
-        if self.exercises.firstIndex(where: {$0.name == instance.name}) == nil {
+        if self.instances.firstIndex(where: {$0.name == instance.name}) == nil {
             self.willChange()
             self.workout.instances.append(instance)
         }
@@ -160,10 +160,10 @@ extension WorkoutVM {
                 callback: {self.deleteAll()})
             
         }))
-        if self.exercises.first != selection.wrappedValue {
+        if self.instances.first != selection.wrappedValue {
             buttons.append(.default(Text("Move Up"), action: {self.move(selection.wrappedValue!, by: -1)}))
         }
-        if self.exercises.last != selection.wrappedValue {
+        if self.instances.last != selection.wrappedValue {
             buttons.append(.default(Text("Move Down"), action: {self.move(selection.wrappedValue!, by: 1)}))
         }
 
@@ -256,7 +256,7 @@ extension WorkoutVM {
         let button = Menu("Add") {
             Button("Cancel", action: {})
             ForEach(self.program.exercises(self.workout).reversed()) {exercise in
-                if self.exercises.firstIndex(where: {$0.name == exercise.name}) == nil {
+                if self.instances.firstIndex(where: {$0.name == exercise.name}) == nil {
                     Button(exercise.name, action: {self.append(exercise.instance(self.workout))})
                 }
             }
