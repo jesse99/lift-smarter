@@ -2,6 +2,7 @@
 import SwiftUI
 
 struct ProgramView: View {
+    let timer = RestartableTimer(every: TimeInterval.minutes(30)) // subLabel can change after a low number of hours so we'll force updates fairly often
     @ObservedObject var program: ProgramVM
     @State var editModal = false
 
@@ -27,9 +28,9 @@ struct ProgramView: View {
                     }
                 }
                 .navigationBarTitle(Text("\(self.program.name) Workouts"))
-//                .onAppear {self.timer.restart(); self.display.send(.TimePassed)}
-//                .onDisappear {self.timer.stop()}
-//                .onReceive(self.timer.timer) {_ in self.display.send(.TimePassed)}
+                .onAppear {self.timer.restart(); self.program.willChange()}
+                .onDisappear {self.timer.stop()}
+                .onReceive(self.timer.timer) {_ in self.program.willChange()}
 
                 Divider()
                 HStack {
