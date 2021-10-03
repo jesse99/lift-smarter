@@ -29,8 +29,8 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
     }
     
     // TODO: do we need this?
-    func lastCompleted(_ exercise: InstanceVM) -> Date? {
-        return self.workout.completed[exercise.name]
+    func lastCompleted(_ instance: InstanceVM) -> Date? {
+        return self.workout.completed[instance.name]
     }
 
     static func == (lhs: WorkoutVM, rhs: WorkoutVM) -> Bool {
@@ -54,9 +54,9 @@ extension WorkoutVM {
         }
     }
     
-    func setInstances(_ exercises: [InstanceVM]) {
+    func setInstances(_ instances: [InstanceVM]) {
         self.willChange()
-        self.workout.instances = exercises.map({$0.instance(self.workout)})
+        self.workout.instances = instances.map({$0.instance(self.workout)})
     }
     
     func setSchedule(_ schedule: Schedule) {
@@ -64,18 +64,18 @@ extension WorkoutVM {
         self.workout.schedule = schedule
     }
 
-    func move(_ exercise: InstanceVM, by: Int) {
+    func move(_ instance: InstanceVM, by: Int) {
         self.willChange()
 
-        let index = self.instances.firstIndex(where: {$0.name == exercise.name})!
+        let index = self.instances.firstIndex(where: {$0.name == instance.name})!
         let instance = self.workout.instances.remove(at: index)
         self.workout.instances.insert(instance, at: index + by)
     }
 
-    func delete(_ exercise: InstanceVM) {
+    func delete(_ instance: InstanceVM) {
         self.willChange()
 
-        let index = self.instances.firstIndex(where: {$0.name == exercise.name})!
+        let index = self.instances.firstIndex(where: {$0.name == instance.name})!
         self.workout.instances.remove(at: index)
     }
 
@@ -84,17 +84,17 @@ extension WorkoutVM {
         self.workout.instances.removeAll()
     }
 
-    func copy(_ exercise: InstanceVM) {
-        self.program.copyInstances([exercise])
+    func copy(_ instance: InstanceVM) {
+        self.program.copyInstances([instance])
     }
 
     func copyAll() {
         self.program.copyInstances(self.instances)
     }
 
-    func cut(_ exercise: InstanceVM) {
-        self.program.copyInstances([exercise])
-        self.delete(exercise)
+    func cut(_ instance: InstanceVM) {
+        self.program.copyInstances([instance])
+        self.delete(instance)
     }
     
     func canPaste() -> Bool {
@@ -123,8 +123,8 @@ extension WorkoutVM {
         self.program.log(level, message)
     }
 
-    func recentlyCompleted(_ exercise: InstanceVM) -> Bool {
-        if let completed = self.lastCompleted(exercise) {
+    func recentlyCompleted(_ instance: InstanceVM) -> Bool {
+        if let completed = self.lastCompleted(instance) {
             return Date().hoursSinceDate(completed) < RecentHours
         } else {
             return false
@@ -264,12 +264,12 @@ extension WorkoutVM {
         return AnyView(button)
     }
 
-    func label(_ exercise: InstanceVM) -> String {
-        return exercise.name
+    func label(_ instance: InstanceVM) -> String {
+        return instance.name
     }
 
-    func subLabel(_ exercise: InstanceVM) -> String {
-        let tuple = exercise.workoutLabel()
+    func subLabel(_ instance: InstanceVM) -> String {
+        let tuple = instance.workoutLabel()
         let sets = tuple.0
         let trailer = tuple.1
         let limit = 8
@@ -290,10 +290,10 @@ extension WorkoutVM {
         }
     }
 
-    func color(_ exercise: InstanceVM) -> Color {
-        if self.recentlyCompleted(exercise) {
+    func color(_ instance: InstanceVM) -> Color {
+        if self.recentlyCompleted(instance) {
             return .gray
-        } else if exercise.inProgress() {
+        } else if instance.inProgress() {
             return .blue
         } else {
             return .black
