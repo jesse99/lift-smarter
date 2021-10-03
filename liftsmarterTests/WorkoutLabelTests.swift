@@ -253,11 +253,101 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .black)
     }
 
-    func testRestWeek() throws {
-        // add tests for exercise.allowRest on and off
-        // on would override workout week
+    func testRestWeekAllAllowed() throws {
+        let (_, program, workout) = create(["Squat", "Lunge"], .weeks([1, 4], .anyDay), restWeeks: [3, 4, 6])
+        
+        var (label, color) = program.subLabel(workout, now: date())
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 2))
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 6))
+        XCTAssertEqual(label, "in 34 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 16))  // rest week
+        XCTAssertEqual(label, "in 24 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 23))  // both rest and workout week
+        XCTAssertEqual(label, "in 17 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 30))
+        XCTAssertEqual(label, "in 10 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(month: 10, day: 11))
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
     }
     
+    func testRestWeekSomeAllowed() throws {
+        let (model, program, workout) = create(["Squat", "Lunge"], .weeks([1, 4], .anyDay), restWeeks: [3, 4, 6])
+        
+        let exercise = program.exercises[0].exercise(model)
+        exercise.allowRest = false
+        
+        var (label, color) = program.subLabel(workout, now: date())     // these are the same as testAnyDayWeeks because the workout is scheduled even during rest weeks
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 2))
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 6))
+        XCTAssertEqual(label, "in 13 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 16))
+        XCTAssertEqual(label, "in 3 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 23))
+        XCTAssertEqual(label, "any day")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 30))
+        XCTAssertEqual(label, "in 10 days")
+        XCTAssertEqual(color, .black)
+    }
+
+    func testAllRest() throws {
+        let (_, program, workout) = create(["Squat", "Lunge"], .weeks([1, 4], .anyDay), restWeeks: [1, 2, 3, 4, 5, 6])
+        
+        var (label, color) = program.subLabel(workout, now: date())
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 2))
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 6))
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 16))  // rest week
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 23))  // both rest and workout week
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 30))
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(month: 10, day: 11))
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .black)
+    }
+
     private func create(_ names: [String], _ schedule: Schedule = .anyDay, restWeeks: [Int] = []) -> (Model, ProgramVM, WorkoutVM) {
         let exercises = names.map({Exercise($0, $0, Modality(Apparatus.bodyWeight, .durations([DurationSet(secs: 30), DurationSet(secs: 30)])))})
         let workout = Workout("Workout", names, schedule: schedule)

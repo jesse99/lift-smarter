@@ -16,13 +16,17 @@ struct ProgramView: View {
                     if workout.enabled {
                         NavigationLink(destination: WorkoutView(workout)) {
                             VStack(alignment: .leading) {
-                                Text(workout.name).font(.title)
-    //                            Text(entry.subLabel).foregroundColor(entry.subColor).font(.headline) // 10+ Reps or As Many Reps As Possible
+                                Text(program.label(workout)).font(.title)
+                                
+                                let (sub, color) = program.subLabel(workout)
+                                if !sub.isEmpty {
+                                    Text(sub).foregroundColor(color).font(.headline)
+                                }
                             }
                         }
                     }
                 }
-                .navigationBarTitle(Text(getTitle()))
+                .navigationBarTitle(Text("\(self.program.name) Workouts"))
 //                .onAppear {self.timer.restart(); self.display.send(.TimePassed)}
 //                .onDisappear {self.timer.stop()}
 //                .onReceive(self.timer.timer) {_ in self.display.send(.TimePassed)}
@@ -52,15 +56,6 @@ struct ProgramView: View {
     
     private func onPrograms() {
 //        self.programsModal = true
-    }
-
-    private func getTitle() -> String {
-//        if let start = display.program.blockStart, let num = display.program.numWeeks() {
-//            let todaysWeek = currentWeek(blockStart: start, currentDate: now(), numWeeks: num)
-//            return "\(self.display.program.name) Workouts \(todaysWeek)"
-//        } else {
-            return "\(self.program.name) Workouts"
-//        }
     }
 }
 

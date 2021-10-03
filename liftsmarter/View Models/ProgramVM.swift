@@ -206,7 +206,8 @@ extension ProgramVM {
         let workout = workout.workout(self.model)
         var delta: ScheduleDelta = .error
         switch workout.schedule {
-        case .weeks(let weeks, let subSchedule):
+        case .weeks(let defaultWeeks, let subSchedule):
+            let weeks = pruneRestWeeks(workout, defaultWeeks)
             if scheduledForThisWeek(weeks, subSchedule, now) {
                 delta = findDelta(instances, subSchedule, now) 
 
@@ -413,6 +414,28 @@ extension ProgramVM {
         } else {
             return nil
         }
+    }
+    
+    private func pruneRestWeeks(_ workout: Workout, _ weeks: [Int]) -> [Int] {
+        var result: [Int] = []
+        
+        let filterIn = {(exercise: Exercise) -> Bool in workout.instances.contains(where: {$0.name == exercise.name})}
+        let exercises = self.model.program.exercises.filter(filterIn)
+        let allWillRest = exercises.all({$0.allowRest})
+        if allWillRest {
+            for candidate in weeks {
+                if !self.model.program.restWeeks.contains(candidate) {
+                    result.append(candidate)
+                }
+            }
+
+        } else {
+            // If any exercise ignores rest weeks then, in the program view, we don't want to special case
+            // the week (but we will special case it in the workout view).
+            result = weeks
+        }
+        
+        return result
     }
     
     private func daysTo(_ now: Date, _ scheduledDay: WeekDay) -> Int {
