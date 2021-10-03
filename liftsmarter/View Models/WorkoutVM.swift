@@ -358,7 +358,11 @@ extension WorkoutVM {
         case .days(_):
             ASSERT(subSchedule == nil, "days shouldn't have a sub-schedule")
             if let days = parseWeekDays(scheduleText) {
-                result = .days(days)
+                if days.isEmpty {
+                    errors.append("Days must be space separated (abreviated) day names.")
+                } else {
+                    result = .days(days)
+                }
             } else {
                 errors.append("Days must be space separated (abreviated) day names.")
             }
