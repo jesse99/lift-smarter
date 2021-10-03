@@ -26,6 +26,10 @@ class ProgramVM: ObservableObject {
         }
     }
     
+    var restWeeks: [Int] {
+        get {return self.model.program.restWeeks}
+    }
+    
     var instanceClipboard: [ExerciseInstance] {
         get {return self.model.program.instanceClipboard}
     }
@@ -491,7 +495,7 @@ extension ProgramVM {
             if w < 1 {
                 errors.append("Current week should be greater than zero.")
             } else if w > self.maxWeek() {
-                errors.append("Current week should be less than the max workout week (\(self.maxWeek()).")
+                errors.append("Current week should be less than the max workout week (\(self.maxWeek())).")
             }
         } else {
             errors.append("Current week should be a 1-based number.")
@@ -501,12 +505,6 @@ extension ProgramVM {
         switch parseIntList(restWeeks, label: "Rest weeks", zeroOK: false, emptyOK: true) {
         case .right(let weeks):
             rest = weeks
-            for week in weeks {
-                if week > self.maxWeek() {
-                    errors.append("Rest week should be less than the max workout week (\(self.maxWeek()).")
-                    break
-                }
-            }
         case .left(let err):
             errors.append(err)
         }

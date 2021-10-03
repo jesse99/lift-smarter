@@ -291,13 +291,23 @@ extension WorkoutVM {
     }
 
     func color(_ instance: InstanceVM) -> Color {
-        if self.recentlyCompleted(instance) {
+        if self.recentlyCompleted(instance) || self.isResting(instance) {
             return .gray
         } else if instance.inProgress() {
             return .blue
         } else {
             return .black
         }
+    }
+    
+    private func isResting(_ instance: InstanceVM) -> Bool {
+        let currentWeek = self.program.getWeek()
+        if self.program.restWeeks.contains(currentWeek) {
+            if let exercise = self.program.exercises.first(where: {$0.name == instance.name}) {
+                return exercise.allowRest
+            }
+        }
+        return false
     }
 }
 

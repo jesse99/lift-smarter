@@ -19,6 +19,10 @@ class ExerciseVM: Equatable, Identifiable {
         get {return self.exercise.name}
     }
     
+    var allowRest: Bool {
+        get {return self.exercise.allowRest}
+    }
+    
     static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
         return lhs.name == rhs.name
     }
