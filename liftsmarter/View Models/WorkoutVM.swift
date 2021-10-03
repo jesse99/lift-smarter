@@ -230,14 +230,13 @@ extension WorkoutVM {
         var menuText = ""
         switch schedule.wrappedValue! {
         case .anyDay: menuText = "Any Day"
-        case .cyclic(_): menuText = "Every"
+        case .cyclic(_): ASSERT(false, "sub-schedule cannot be cyclic")
         case .days(_): menuText = "Days"
         case .weeks(_, _): ASSERT(false, "sub-schedule cannot be weeks")
         }
 
         let button = Menu(menuText) {
             Button("Any Day", action: {schedule.wrappedValue = .anyDay; text.wrappedValue = ""; label.wrappedValue = ""})
-            Button("Every N Days", action: {schedule.wrappedValue = .cyclic(2); text.wrappedValue = "2"; label.wrappedValue = " days"})
             Button("Week Days", action: {schedule.wrappedValue = .days([.monday, .wednesday, .friday]); text.wrappedValue = "Mon Wed Fri"; label.wrappedValue = ""})
             Button("Cancel", action: {})
         }.font(.callout)
