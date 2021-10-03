@@ -114,14 +114,14 @@ extension InstanceVM {
         }
     }
     
-    func updateCurrent(_ reps: Int? = nil) {
+    func updateCurrent(_ reps: Int? = nil, now: Date = Date()) {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             ASSERT(reps == nil, "reps is for repRanges")
             self.willChange()
             
             if instance.current.setIndex == 0 {
-                instance.current.startDate = Date()
+                instance.current.startDate = now
             }
 
             let duration = durations[self.setIndex]

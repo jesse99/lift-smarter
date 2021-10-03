@@ -26,7 +26,7 @@ extension Date {
     func startOfWeek() -> Date {
         let calendar = Calendar.current
         if let sunday = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: self)) {
-            return calendar.date(byAdding: .day, value: 1, to: sunday) ?? Date()    // TODOL handle year change
+            return sunday    // TODO: handle year change
         } else {
             return Date()
         }
@@ -37,6 +37,19 @@ extension Date {
         formatter.dateFormat = format
         return formatter.string(from: self)
     }
+
+    func daysMatch(_ rhs: Date) -> Bool {
+        let delta = Calendar.current.dateComponents([.day], from: self, to: rhs)
+        return delta.day == 0
+    }
+}
+
+func daysBetween(from: Date, to: Date) -> Int {
+    ASSERT_NE(from.compare(to), .orderedDescending)
+
+    let start1 = from.startOfDay()
+    let start2 = to.startOfDay()
+    return Calendar.current.dateComponents([.day], from: start1, to: start2).day!
 }
 
 func weeksBetween(from: Date, to: Date) -> Int {

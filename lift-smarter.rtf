@@ -1,22 +1,21 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2580
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 AndaleMono;\f1\fswiss\fcharset0 Helvetica;\f2\fswiss\fcharset0 Helvetica-Bold;
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AndaleMono;\f2\fswiss\fcharset0 Helvetica-Bold;
 \f3\fswiss\fcharset0 Helvetica-Oblique;}
-{\colortbl;\red255\green255\blue255;\red0\green116\blue0;\red0\green0\blue0;\red2\green2\blue2;
-}
-{\*\expandedcolortbl;;\csgenericrgb\c0\c45600\c0;\csgenericrgb\c0\c0\c0;\csgenericrgb\c784\c784\c784;
-}
+{\colortbl;\red255\green255\blue255;\red2\green2\blue2;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgenericrgb\c784\c784\c784;\csgenericrgb\c0\c0\c0;}
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs34 \cf2 completed === history,completed is today\cf3 \
-
-\f1\fs48 \cf4 \
-shower curtain\
-carpet\
-bills\
+\f0\fs48 \cf2 bills\
+AC\
 \
 \'95 Flesh out the program view:\
 	- get view working better\
+\'95 Week schedule should not allow cyclic sub-schedule\
+\'95 Do we dis-allow .days with no days?\
+	- if now should we have a test for that?\
+	- wouldn\'92t it be better to just disable th workout?\
+\'95 Workout view should do something special if on a rest week for exercises that allow rest\
 \'95 Rename updateCurrent appendCurrent?\
 \'95\'a0Exercises need to call HistoryVM.append when finishing\
 \'95\'a0Make sure program view goes from in \'93today\'94 to \'93in progress\'94 to \'93completed\'94\
@@ -44,12 +43,12 @@ bills\
 	- can also be useful for validation\
 \
 
-\f0\fs34 \cf3 \
+\f1\fs34 \cf3 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b\fs48 \cf4 SwiftUI\
+\f2\b\fs48 \cf2 SwiftUI\
 
-\f1\b0 good summary of @State etc\
+\f0\b0 good summary of @State etc\
 	https://sarunw.com/posts/data-in-swiftui-3\
 	https://www.raywenderlich.com/11781349-understanding-data-flow-in-swiftui\
 view communication\
@@ -62,7 +61,7 @@ AppState, Inspector, etc\
 \f2\b \
 MVVM\
 
-\f1\b0 View -> ViewModel -> Model\
+\f0\b0 View -> ViewModel -> Model\
 	references are all one way\
 \ul 	initing a view with the same args should always result in the same view\ulnone \
 	ViewModel has state associatd with the view\
@@ -71,7 +70,7 @@ MVVM\
 
 \f2\b Combine\
 	
-\f1\b0 https://developer.apple.com/documentation/combine\
+\f0\b0 https://developer.apple.com/documentation/combine\
 	https://heckj.github.io/swiftui-notes/#when-to-use-combine\
 used for async events\
 note that user input can be thought of as an async event\
@@ -82,12 +81,12 @@ can be useful for validation\
 \
 Edit Program\
 
-\f1\b0 \
+\f0\b0 \
 Name: [Covid]\
 Current Week: [1]\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
-\cf4 \ul \ulc4 Workouts\ulnone \
+\cf2 \ul \ulc2 Workouts\ulnone \
 \ul Exercises\ulnone \
 \
 \ul Cancel\ulnone             \ul OK\ulnone \
@@ -95,29 +94,29 @@ Current Week: [1]\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b \cf4 Edit Workouts\
+\f2\b \cf2 Edit Workouts\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f1\b0 \cf4 Cardio\
+\f0\b0 \cf2 Cardio\
 Lower\
 Upper\
 \
 \ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
 \f3\i adds a new empty workout
-\f1\i0 \
+\f0\i0 \
 \
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b \cf4 Edit Exercises\
+\f2\b \cf2 Edit Exercises\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f1\b0 \cf4 Bench\
+\f0\b0 \cf2 Bench\
 OHP\
 Pull Ups\
 \
 \ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
 \f3\i adds a default exercise
-\f1\i0 \
+\f0\i0 \
 \
 }

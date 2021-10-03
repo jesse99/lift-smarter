@@ -169,8 +169,6 @@ extension ProgramVM {
     }
     
     func subLabel(_ workout: WorkoutVM, now: Date = Date()) -> (String, Color) {
-//        let calendar = Calendar.current
-        
         if workout.instances.isEmpty {
             return ("no exercises", .black)
         }
@@ -204,8 +202,73 @@ extension ProgramVM {
             // If every exercise has been completed recently.
             return ("completed", .black)
         }
+        
+        let workout = workout.workout(self.model)
+        var delta: ScheduleDelta = .error
+        switch workout.schedule {
+        case .weeks(let weeks, let subSchedule):
+            if scheduledForThisWeek(weeks, subSchedule, now) {
+                delta = findDelta(instances, subSchedule, now) 
 
-        return ("", .black)
+            } else {
+                if let scheduledStart = startOfNextScheduledWeek(weeks, now) {
+                    let extraDays = daysBetween(from: now, to: scheduledStart)
+                    let adjustedNow = Calendar.current.date(byAdding: .day, value: extraDays, to: now)!
+                    delta = findDelta(instances, subSchedule, adjustedNow)
+                    switch delta {
+                    case .anyDay:
+                        delta = .days(extraDays)
+                    case .days(let n):
+                        delta = .days(n + extraDays)
+                    case .error:
+                        break
+                    case .notScheduled:
+                        break
+                    case .notStarted:
+                        break
+                    case .overdue(_):
+                        ASSERT(false, "week schedule dosn't support cyclic sub-schedule")
+                        delta = .error
+                    }
+                } else {
+                    delta = .notScheduled
+                }
+            }
+        default:
+            delta = findDelta(instances, workout.schedule, now)
+        }
+        
+        switch delta {
+        case .anyDay:
+            return ("any day", .orange)
+            
+        case .days(let n):
+            switch n {
+            case 0: return ("today", .orange)
+            case 1: return ("tomorrow", .black)
+            default: return ("in \(n) days", .black)
+            }
+
+        case .error:
+            return ("", .black)
+                
+        case .notScheduled:
+            return ("not scheduled", .black)
+                
+        case .notStarted:
+            return ("never started", .orange)
+
+        case .overdue(let n):
+            if n == 1 {
+                return ("overdue by 1 day", .orange)
+            } else if n > 60 {
+                return ("overdue by more than \(n/30) months", .orange) // relatively crude estimate is fine here
+            } else if n > 30 {
+                return ("overdue by more than 1 month", .orange)
+            } else {
+                return ("overdue by \(n) days", .orange)
+            }
+        }
     }
     
     func editWorkoutButtons(_ selection: Binding<WorkoutVM?>, _ confirm: Binding<Confirmation?>) -> [ActionSheet.Button] {
@@ -248,6 +311,135 @@ extension ProgramVM {
         buttons.append(.cancel(Text("Cancel"), action: {}))
 
         return buttons
+    }
+    
+    enum ScheduleDelta {
+        case anyDay
+        case days(Int)
+        case error
+        case notScheduled
+        case notStarted
+        case overdue(Int)
+    }
+    
+    private func findDelta(_ instances: [InstanceVM], _ schedule: Schedule, _ now: Date) -> ScheduleDelta {
+        switch schedule {
+        case .anyDay:
+            return .anyDay
+                
+        case .cyclic(let delta):
+            let calendar = Calendar.current
+            if let completed = self.newestCompleted(instances) {
+                let dueDate = calendar.date(byAdding: .day, value: delta, to: completed)!
+                if now.compare(dueDate) != .orderedDescending {
+                    for n in 0..<delta {
+                        let candidate = calendar.date(byAdding: .day, value: -n, to: dueDate)!
+                        if candidate.daysMatch(now) {
+                            return .days(n)
+                        }
+                    }
+                    ASSERT(false, "should never happen")
+                    return .error
+                } else {
+                    let n = daysBetween(from: dueDate, to: now)
+                    return .overdue(n)
+                }
+                
+            } else {
+                if delta == 1 {
+                    return .days(0)
+                } else {
+                    return .notStarted
+                }
+            }
+
+        case .days(let days):
+            var daysToScheduled = 8
+            for day in days {
+                daysToScheduled = min(self.daysTo(now, day), daysToScheduled)
+            }
+            switch daysToScheduled {
+            case 8: return .notScheduled
+            default: return .days(daysToScheduled)
+            }
+
+        case .weeks(_, _):
+            ASSERT(false, "don't call this with a week schedule")
+            return .error
+        }
+    }
+    
+    private func scheduledForThisWeek(_ weeks: [Int], _ schedule: Schedule, _ now: Date) -> Bool {
+        let currentWeek = self.getWeek(now)
+        switch schedule {
+        case .anyDay:
+            return weeks.contains(currentWeek)
+        case .days(let days):
+            if weeks.contains(currentWeek) {
+                let currentDay = Calendar.current.component(.weekday, from: now) - 1
+                for candidate in days {
+                    if currentDay <= candidate.rawValue {
+                        return true
+                    }
+                }
+            }
+        default:
+            ASSERT(false, "not supported as a sub-schedule")
+        }
+        return false
+    }
+    
+    private func startOfNextScheduledWeek(_ weeks: [Int], _ now: Date) -> Date? {
+        let currentWeek = self.getWeek(now)
+        
+        // Find the smallest scheduled week larger than currentWeek.
+        var nextWeek: Int? = nil
+        for candidate in weeks {
+            if candidate > currentWeek && (nextWeek == nil || candidate < nextWeek!) {
+                nextWeek = candidate
+            }
+        }
+        
+        // If not then the weeks have wrapped around.
+        if nextWeek == nil {
+            if let firstWeek = weeks.min() {
+                nextWeek = firstWeek + self.maxWeek()
+            }
+        }
+        
+        if let next = nextWeek {
+            let scheduledWeek = Calendar.current.date(byAdding: .weekOfMonth, value: next - currentWeek, to: now)!
+            return scheduledWeek.startOfWeek()
+        } else {
+            return nil
+        }
+    }
+    
+    private func daysTo(_ now: Date, _ scheduledDay: WeekDay) -> Int {
+        let nowDay = Calendar.current.component(.weekday, from: now) - 1
+        if scheduledDay.rawValue >= nowDay {
+            return scheduledDay.rawValue - nowDay
+        } else {
+            return 7 + scheduledDay.rawValue - nowDay
+        }
+    }
+    
+    private func newestCompleted(_ instances: [InstanceVM]) -> Date? {
+        var result: Date? = nil
+        
+        for candidate in instances {
+            if let record = self.model.history.records[candidate.name]?.last {
+                if let r = result {
+                    if r.compare(record.completed) == .orderedAscending {
+                        result = record.completed
+                    }
+                } else {
+                    result = record.completed
+                }
+            }
+        }
+        
+        return result
     }
 }
 
