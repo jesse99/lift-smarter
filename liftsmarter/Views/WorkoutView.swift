@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 9/12/21.
 import SwiftUI
 
-struct WorkoutView: View {
+struct WorkoutView: View {  // TODO: might want a timer here (if time advances enough can fall into a rest week)
     @ObservedObject var workout: WorkoutVM
     @State var editModal = false
 

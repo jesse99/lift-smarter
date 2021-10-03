@@ -35,23 +35,23 @@ class WorkoutLabelTests: XCTestCase {
         let (_, program, workout) = create(["Squat", "Lunge"])
 
         var instance = workout.instances.first(where: {$0.name == "Squat"})!
-        instance.updateCurrent()
+        instance.appendCurrent()
         var (label, color) = program.subLabel(workout)
         XCTAssertEqual(label, "in progress")
         XCTAssertEqual(color, .red)
 
-        instance.updateCurrent()
+        instance.appendCurrent()
         (label, color) = program.subLabel(workout)
         XCTAssertEqual(label, "partially completed")
         XCTAssertEqual(color, .red)
 
         instance = workout.instances.first(where: {$0.name == "Lunge"})!
-        instance.updateCurrent()
+        instance.appendCurrent()
         (label, color) = program.subLabel(workout)
         XCTAssertEqual(label, "in progress")
         XCTAssertEqual(color, .red)
 
-        instance.updateCurrent()
+        instance.appendCurrent()
         (label, color) = program.subLabel(workout)
         XCTAssertEqual(label, "completed")
         XCTAssertEqual(color, .black)
@@ -73,8 +73,8 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .orange)
 
         let instance = workout.instances.first(where: {$0.name == "Squat"})!
-        instance.updateCurrent(now: date(minutes: 10))
-        instance.updateCurrent(now: date(minutes: 20))
+        instance.appendCurrent(now: date(minutes: 10))
+        instance.appendCurrent(now: date(minutes: 20))
 
         (label, color) = program.subLabel(workout, now: date(minutes: 30))
         XCTAssertEqual(label, "partially completed")
@@ -113,8 +113,8 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .orange)
 
         let instance = workout.instances.first(where: {$0.name == "Squat"})!
-        instance.updateCurrent(now: date(minutes: 10))
-        instance.updateCurrent(now: date(minutes: 20))
+        instance.appendCurrent(now: date(minutes: 10))
+        instance.appendCurrent(now: date(minutes: 20))
 
         (label, color) = program.subLabel(workout, now: date(minutes: 30))
         XCTAssertEqual(label, "partially completed")
@@ -145,8 +145,8 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .orange)
 
         let instance = workout.instances.first(where: {$0.name == "Squat"})!
-        instance.updateCurrent(now: date(minutes: 10))
-        instance.updateCurrent(now: date(minutes: 20))
+        instance.appendCurrent(now: date(minutes: 10))
+        instance.appendCurrent(now: date(minutes: 20))
 
         (label, color) = program.subLabel(workout, now: date(minutes: 30))
         XCTAssertEqual(label, "partially completed")

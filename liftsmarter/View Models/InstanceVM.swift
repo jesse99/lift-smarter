@@ -114,7 +114,7 @@ extension InstanceVM {
         }
     }
     
-    func updateCurrent(_ reps: Int? = nil, now: Date = Date()) {
+    func appendCurrent(_ reps: Int? = nil, now: Date = Date()) {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             ASSERT(reps == nil, "reps is for repRanges")

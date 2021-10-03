@@ -71,7 +71,7 @@ struct DurationsView: View {
     }
     
     func onNextCompleted() {
-        exercise.updateCurrent()
+        exercise.appendCurrent()
     }
     
     func onReset() {
