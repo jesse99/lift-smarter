@@ -11,15 +11,15 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
 
     var body: some View {
         VStack {
-            List(self.workout.instances) {exercise in
-                if exercise.enabled {
-                    NavigationLink(destination: ExerciseView(exercise)) {
+            List(self.workout.instances) {instance in
+                if instance.enabled {
+                    NavigationLink(destination: ExerciseView(instance)) {
                         VStack(alignment: .leading) {
-                            let label = self.workout.label(exercise)
-                            let color = self.workout.color(exercise)
+                            let label = self.workout.label(instance)
+                            let color = self.workout.color(instance)
                             Text(label).font(.headline).foregroundColor(color)
 
-                            let sub = self.workout.subLabel(exercise)
+                            let sub = self.workout.subLabel(instance)
                             if !sub.isEmpty {
                                 Text(sub).font(.subheadline).foregroundColor(color)
                             }
@@ -28,6 +28,7 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
                 }
             }
             .navigationBarTitle(Text(self.workout.name + " Exercises"))
+            .onAppear {self.workout.willChange()}   // something goofy going on with changes inside the sheet that prevents this view from updating unless we have this extra willChange call
 
             Divider()
             HStack {
