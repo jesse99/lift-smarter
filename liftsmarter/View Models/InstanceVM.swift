@@ -131,18 +131,17 @@ extension InstanceVM {
             if instance.current.setIndex == durations.count {
                 let history = self.workout.program.history()
                 history.append(self.workout, self)
+                
+                let workout = workout.workout(self.instance)
+                workout.completed[self.name] = now
             }
         default:
             ASSERT(false, "not implemented")
         }
     }
-
-//    func appendCurrent(_ reps: ActualRep) {
-//    }
     
     func setSets(_ sets: Sets) { 
         self.willChange()
-
         self.exercise.modality.sets = sets
     }
 

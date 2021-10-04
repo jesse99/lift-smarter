@@ -2,6 +2,7 @@
 import Foundation
 
 class History {
+    // Note that this is associated with the exercise: to know when an instance has been completed check the workout.
     class Record {
         var completed: Date     // date exercise was finished
         var weight: Double      // may be 0.0, this is from current.weight

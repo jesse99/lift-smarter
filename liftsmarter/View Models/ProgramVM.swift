@@ -172,12 +172,12 @@ extension ProgramVM {
         return workout.name
     }
     
-    func subLabel(_ workout: WorkoutVM, now: Date = Date()) -> (String, Color) {
-        if workout.instances.isEmpty {
+    func subLabel(_ workoutVM: WorkoutVM, now: Date = Date()) -> (String, Color) {
+        if workoutVM.instances.isEmpty {
             return ("no exercises", .black)
         }
         
-        let instances = workout.instances.filter({$0.enabled})
+        let instances = workoutVM.instances.filter({$0.enabled})
         if instances.count == 0 {
             return ("nothing enabled", .black)
         }
@@ -192,8 +192,8 @@ extension ProgramVM {
         
         var numCompleted = 0
         for candidate in instances {
-            if let record = self.model.history.records[candidate.name]?.last {
-                if now.hoursSinceDate(record.completed) <= RecentHours {
+            if let completed = workoutVM.lastCompleted(candidate) {
+                if now.hoursSinceDate(completed) <= RecentHours {
                     numCompleted += 1
                 }
             }
@@ -207,19 +207,19 @@ extension ProgramVM {
             return ("completed", .black)
         }
         
-        let workout = workout.workout(self.model)
+        let workout = workoutVM.workout(self.model)
         var delta: ScheduleDelta = .error
         switch workout.schedule {
         case .weeks(let defaultWeeks, let subSchedule):
             let weeks = pruneRestWeeks(workout, defaultWeeks)
             if scheduledForThisWeek(weeks, subSchedule, now) {
-                delta = findDelta(instances, subSchedule, now) 
+                delta = findDelta(workoutVM, instances, subSchedule, now)
 
             } else {
                 if let scheduledStart = startOfNextScheduledWeek(weeks, now) {
                     let extraDays = daysBetween(from: now, to: scheduledStart)
                     let adjustedNow = Calendar.current.date(byAdding: .day, value: extraDays, to: now)!
-                    delta = findDelta(instances, subSchedule, adjustedNow)
+                    delta = findDelta(workoutVM, instances, subSchedule, adjustedNow)
                     switch delta {
                     case .anyDay:
                         delta = .days(extraDays)
@@ -240,7 +240,7 @@ extension ProgramVM {
                 }
             }
         default:
-            delta = findDelta(instances, workout.schedule, now)
+            delta = findDelta(workoutVM, instances, workout.schedule, now)
         }
         
         switch delta {
@@ -327,14 +327,14 @@ extension ProgramVM {
         case overdue(Int)
     }
     
-    private func findDelta(_ instances: [InstanceVM], _ schedule: Schedule, _ now: Date) -> ScheduleDelta {
+    private func findDelta(_ workout: WorkoutVM, _ instances: [InstanceVM], _ schedule: Schedule, _ now: Date) -> ScheduleDelta {
         switch schedule {
         case .anyDay:
             return .anyDay
                 
         case .cyclic(let delta):
             let calendar = Calendar.current
-            if let completed = self.newestCompleted(instances) {
+            if let completed = self.newestCompleted(workout, instances) {
                 let dueDate = calendar.date(byAdding: .day, value: delta, to: completed)!
                 if now.compare(dueDate) != .orderedDescending {
                     for n in 0..<delta {
@@ -451,17 +451,17 @@ extension ProgramVM {
         }
     }
     
-    private func newestCompleted(_ instances: [InstanceVM]) -> Date? {
+    private func newestCompleted(_ workout: WorkoutVM, _ instances: [InstanceVM]) -> Date? {
         var result: Date? = nil
         
         for candidate in instances {
-            if let record = self.model.history.records[candidate.name]?.last {
+            if let completed = workout.lastCompleted(candidate) {
                 if let r = result {
-                    if r.compare(record.completed) == .orderedAscending {
-                        result = record.completed
+                    if r.compare(completed) == .orderedAscending {
+                        result = completed
                     }
                 } else {
-                    result = record.completed
+                    result = completed
                 }
             }
         }

@@ -477,6 +477,10 @@ extension WorkoutVM {
     func workout(_ model: Model) -> Workout {
         return self.workout
     }
+
+    func workout(_ instance: ExerciseInstance) -> Workout {
+        return self.workout
+    }
 }
 
 /// Replaces consecutive duplicate strings, e.g. ["alpha", "alpha", "beta"]
