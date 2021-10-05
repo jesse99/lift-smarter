@@ -28,7 +28,7 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
                 }
             }
             .navigationBarTitle(Text(self.workout.name + " Exercises"))
-            .onAppear {self.workout.willChange()}   // something goofy going on with changes inside the sheet that prevents this view from updating unless we have this extra willChange call
+            .onAppear {self.workout.willChange()}   // something goofy is going on with changes inside the sheet that prevents this view from updating unless we have this extra willChange call
 
             Divider()
             HStack {

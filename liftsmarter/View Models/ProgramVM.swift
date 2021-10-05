@@ -218,29 +218,23 @@ extension ProgramVM {
             } else {
                 if let scheduledStart = startOfNextScheduledWeek(weeks, now) {
                     let extraDays = daysBetween(from: now, to: scheduledStart)
-                    let adjustedNow = Calendar.current.date(byAdding: .day, value: extraDays, to: now)!
-                    delta = findDelta(workoutVM, instances, subSchedule, adjustedNow)
-                    switch delta {
-                    case .anyDay:
-                        delta = .days(extraDays)
-                    case .days(let n):
-                        delta = .days(n + extraDays)
-                    case .error:
-                        break
-                    case .notScheduled:
-                        break
-                    case .notStarted:
-                        break
-                    case .overdue(_):
-                        ASSERT(false, "week schedule dosn't support cyclic sub-schedule")
-                        delta = .error
-                    }
+                    delta = findAdjustedDelta(workoutVM, instances, subSchedule, extraDays, now)
                 } else {
                     delta = .notScheduled
                 }
             }
         default:
-            delta = findDelta(workoutVM, instances, workout.schedule, now)
+            let currentWeek = self.getWeek(now)
+            if self.restWeeks.contains(currentWeek) {
+                if let start = startOfNonRestWeek(now) {
+                    let extraDays = daysBetween(from: now, to: start)
+                    delta = findAdjustedDelta(workoutVM, instances, workout.schedule, extraDays, now)
+                } else {
+                    delta = .notScheduled
+                }
+            } else {
+                delta = findDelta(workoutVM, instances, workout.schedule, now)
+            }
         }
         
         switch delta {
@@ -273,6 +267,22 @@ extension ProgramVM {
             } else {
                 return ("overdue by \(n) days", .orange)
             }
+        }
+    }
+    
+    private func findAdjustedDelta(_ workout: WorkoutVM, _ instances: [InstanceVM], _ schedule: Schedule, _ extraDays: Int, _ now: Date) -> ScheduleDelta {
+        let adjustedNow = Calendar.current.date(byAdding: .day, value: extraDays, to: now)!
+        let delta = findDelta(workout, instances, schedule, adjustedNow)
+        switch delta {
+        case .anyDay:
+            return .days(extraDays)
+        case .days(let n):
+            return .days(n + extraDays)
+        case .error, .notScheduled, .notStarted:
+            return delta
+        case .overdue(_):
+            ASSERT(false, "week schedule dosn't support cyclic sub-schedule")
+            return .error
         }
     }
     
@@ -394,6 +404,7 @@ extension ProgramVM {
         return false
     }
     
+    // Used for weeks schedule.
     private func startOfNextScheduledWeek(_ weeks: [Int], _ now: Date) -> Date? {
         let currentWeek = self.getWeek(now)
         
@@ -418,6 +429,21 @@ extension ProgramVM {
         } else {
             return nil
         }
+    }
+    
+    // Used for non-weeks schedule.
+    private func startOfNonRestWeek(_ now: Date) -> Date? {
+        let currentWeek = self.getWeek(now)
+        
+        for delta in 1..<self.maxWeek() {
+            let week = (currentWeek + delta - 1) % self.maxWeek() + 1
+            if !self.restWeeks.contains(week) {
+                let date = Calendar.current.date(byAdding: .weekOfMonth, value: delta, to: now)!
+                return date.startOfWeek()
+            }
+        }
+        
+        return nil
     }
     
     private func pruneRestWeeks(_ workout: Workout, _ weeks: [Int]) -> [Int] {

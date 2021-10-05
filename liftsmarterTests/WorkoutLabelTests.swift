@@ -348,6 +348,46 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .black)
     }
 
+    func testRestWithNoWeeks() throws {
+        let (_, program, workout) = create(["Squat", "Lunge"], .days([.monday, .wednesday]), restWeeks: [3])
+        
+        var (label, color) = program.subLabel(workout, now: date(day: 5))   // sunday
+        XCTAssertEqual(label, "tomorrow")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 6))   // monday
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 7))   // tuesday
+        XCTAssertEqual(label, "tomorrow")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 8))   // wednesay
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = program.subLabel(workout, now: date(day: 9))   // thursday
+        XCTAssertEqual(label, "in 4 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 10))   // friday
+        XCTAssertEqual(label, "in 3 days")
+        XCTAssertEqual(color, .black)
+        
+        (label, color) = program.subLabel(workout, now: date(day: 11))   // saturday
+        XCTAssertEqual(label, "in 2 days")
+        XCTAssertEqual(color, .black)
+        
+        (label, color) = program.subLabel(workout, now: date(day: 15))   // wednesday (rest)
+        XCTAssertEqual(label, "in 5 days")
+        XCTAssertEqual(color, .black)
+
+        (label, color) = program.subLabel(workout, now: date(day: 22))   // wednesday
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+    }
+
     private func create(_ names: [String], _ schedule: Schedule = .anyDay, restWeeks: [Int] = []) -> (Model, ProgramVM, WorkoutVM) {
         let exercises = names.map({Exercise($0, $0, Modality(Apparatus.bodyWeight, .durations([DurationSet(secs: 30), DurationSet(secs: 30)])))})
         let workout = Workout("Workout", names, schedule: schedule)
@@ -361,6 +401,22 @@ class WorkoutLabelTests: XCTestCase {
         return (model, vm, WorkoutVM(vm, workout))
     }
 
+    //     September
+    // Su Mo Tu We Th Fr Sa
+    //          1  2  3  4      date defaults to Sep 1, 2021
+    // 5  6  7  8  9 10 11
+    // 12 13 14 15 16 17 18
+    // 19 20 21 22 23 24 25
+    // 26 27 28 29 30
+    //
+    //      October
+    // Su Mo Tu We Th Fr Sa
+    //                1  2
+    // 3  4  5  6  7  8  9
+    // 10 11 12 13 14 15 16
+    // 17 18 19 20 21 22 23
+    // 24 25 26 27 28 29 30
+    // 31
     private func date(year: Int = 2021, month: Int = 9, day: Int = 1, minutes: Int = 1) -> Date {
         return self.formatter.date(from: "\(year)/\(month)/\(day) 09:\(minutes)")!
     }
