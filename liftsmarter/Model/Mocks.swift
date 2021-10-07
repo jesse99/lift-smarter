@@ -3,9 +3,9 @@ import Foundation
 
 func mockProgram() -> Program {
     // https://www.defrancostraining.com/joe-ds-qlimber-11q-flexibility-routine/
-    func formRolling() -> Exercise {
-        let work = FixedRepsSet(reps: FixedReps(15), restSecs: 0)
-        let sets = Sets.fixedReps([work])
+    func foamRolling() -> Exercise {
+        let work = FixedRepsSet(reps: FixedReps(15), restSecs: 30)
+        let sets = Sets.fixedReps([work, work])
         let modality = Modality(Apparatus.bodyWeight, sets)
         return Exercise("Foam Rolling", "IT-Band Foam Roll", modality)
     }
@@ -170,7 +170,7 @@ func mockProgram() -> Program {
     }
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
-    let mobilityExercises = [formRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
+    let mobilityExercises = [foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
     let lowerExercises = [splitSquats(), lunge()]
     let upperExercises = [planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     
@@ -187,9 +187,12 @@ func mockProgram() -> Program {
     let date = formatter.date(from: "2021/09/06 09:00")!
 
     return Program("Home", workouts, exercises, weeksStart: date)
+
 }
 
 func mockModel() -> Model {
     let program = mockProgram()
-    return Model(program)
+    let model = Model(program)
+    model.fixedWeights = ["Dumbbells": FixedWeightSet([5, 10, 20, 25, 35]), "Cable machine": FixedWeightSet([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
+    return model
 }

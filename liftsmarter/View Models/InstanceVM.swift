@@ -78,7 +78,6 @@ extension InstanceVM {
     
     func reset() {
         self.willChange()
-        
         instance.current.reset(weight: exercise.expected.weight)
     }
     
@@ -86,7 +85,7 @@ extension InstanceVM {
         if let numSets = self.numSets() {
             return self.setIndex > 0 && self.setIndex < numSets
         } else {
-            return false
+            return false        // TODO: this doesn't seem right
         }
     }
         
@@ -115,15 +114,15 @@ extension InstanceVM {
     }
     
     func appendCurrent(_ reps: Int? = nil, now: Date = Date()) {
+        self.willChange()
+
+        if instance.current.setIndex == 0 {
+            instance.current.startDate = now
+        }
+
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             ASSERT(reps == nil, "reps is for repRanges")
-            self.willChange()
-            
-            if instance.current.setIndex == 0 {
-                instance.current.startDate = now
-            }
-
             let duration = durations[self.setIndex]
             instance.current.setIndex += 1
             instance.current.reps.append(.duration(secs: duration.secs, percent: 1.0))
@@ -135,6 +134,21 @@ extension InstanceVM {
                 let workout = workout.workout(self.instance)
                 workout.completed[self.name] = now
             }
+
+        case .fixedReps(let sets):
+            ASSERT(reps == nil, "reps is for repRanges")
+            let reps = sets[self.setIndex].reps.reps
+            instance.current.setIndex += 1
+            instance.current.reps.append(.reps(count: reps, percent: 1.0))
+            
+            if instance.current.setIndex == sets.count {
+                let history = self.workout.program.history()
+                history.append(self.workout, self)
+                
+                let workout = workout.workout(self.instance)
+                workout.completed[self.name] = now
+            }
+
         default:
             ASSERT(false, "not implemented")
         }
@@ -155,6 +169,8 @@ extension InstanceVM {
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
             return TimerView(title: self.getSetTimerTitle("Set"), duration: durations[self.setIndex].secs, secondDuration: self.restDuration())
+        case .fixedReps(let sets):
+            return TimerView(title: self.getSetTimerTitle("Set"), duration: sets[self.setIndex].restSecs)
         default:
             return TimerView(title: "not implemented", duration: 120)
         }
@@ -162,20 +178,15 @@ extension InstanceVM {
     
     // User pressed the Start Timer button.
     func explicitTimer() -> TimerView {
-        switch self.exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            var title: String
-            if instance.current.setIndex < durations.count {
-                title = getSetTimerTitle("On set")
-            } else {
-                title = "Finished"
-            }
-
-            let secs = self.restDuration()
-            return TimerView(title: title, duration: secs > 0 ? secs : 60)
-        default:
-            return TimerView(title: "not implemented", duration: 0, secondDuration: 0)
+        var title: String
+        if instance.current.setIndex < self.numSets() ?? 1000 {
+            title = getSetTimerTitle("On set")
+        } else {
+            title = "Finished"
         }
+
+        let secs = self.restDuration()
+        return TimerView(title: title, duration: secs > 0 ? secs : 60)
     }
 
     func view() -> AnyView {
@@ -184,23 +195,16 @@ extension InstanceVM {
             return AnyView(DurationsView(self))
 
         case .fixedReps(_):
-            return AnyView(Text("not implemented"))
-//            return AnyView(FixedRepsView(model, workout, instance))
+            return AnyView(FixedRepsView(self))
 
         case .maxReps(_, _):
             return AnyView(Text("not implemented"))
-//            return AnyView(MaxRepsView(model, workout, instance))
 
         case .repRanges(_, _, _):
             return AnyView(Text("not implemented"))
-//            return AnyView(RepRangesView(model, workout, instance))
 
         case .repTotal(total: _, rest: _):
             return AnyView(Text("not implemented"))
-//            return AnyView(RepTotalView(model, workout, instance))
-
-//      case .untimed(restSecs: let secs):
-//          sets = Array(repeating: "untimed", count: secs.count)
         }
     }
 
@@ -214,8 +218,12 @@ extension InstanceVM {
             } else {
                 secs = durations.last!.restSecs
             }
-        case .fixedReps(_):
-            ASSERT(false, "not implemented")
+        case .fixedReps(let sets):
+            if instance.current.setIndex < sets.count {
+                secs = sets[instance.current.setIndex].restSecs
+            } else {
+                secs = sets.last!.restSecs
+            }
         case .maxReps(restSecs: _, targetReps: _):
             ASSERT(false, "not implemented")
         case .repRanges(warmups: _, worksets: _, backoffs: _):
@@ -231,17 +239,21 @@ extension InstanceVM {
 // UI Labels
 extension InstanceVM {
     func title() -> String {
-        switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            if instance.current.setIndex < durations.count {
-                return "Set \(instance.current.setIndex+1) of \(durations.count)"
-            } else if durations.count == 1 {
+        func text(numSets: Int) -> String {
+            if instance.current.setIndex < numSets {
+                return "Set \(instance.current.setIndex+1) of \(numSets)"
+            } else if numSets == 1 {
                 return "Finished"
             } else {
-                return "Finished all \(durations.count) sets"
+                return "Finished all \(numSets) sets"
             }
-        case .fixedReps(_):
-            return "not implemented"
+        }
+
+        switch exercise.modality.sets {
+        case .durations(let durations, targetSecs: _):  // TODO: might be able to use numSets()
+            return text(numSets: durations.count)
+        case .fixedReps(let sets):
+            return text(numSets: sets.count)
         case .maxReps(restSecs: _, targetReps: _):
             return "not implemented"
         case .repRanges(warmups: _, worksets: _, backoffs: _):
@@ -252,31 +264,48 @@ extension InstanceVM {
     }
 
     func subTitle() -> String {
+        var text = ""
+        
+        let weight = exercise.expected.weight
+        let percent = WeightPercent(1.0)
         switch exercise.modality.sets {
         case .durations(let durations, targetSecs: let targetSecs):
-            // TODO: If there is an expected weight I think we'd annotate subTitle.
             if instance.current.setIndex < durations.count {
                 let duration = durations[instance.current.setIndex]
                 if targetSecs.count > 0 {
                     let target = targetSecs[instance.current.setIndex]
-                    return "\(duration.secs)s (target is \(target)s)"   // TODO: might want to use some sort of shortTimeStr function
+                    text = "\(duration.secs)s (target is \(target)s)"   // TODO: might want to use some sort of shortTimeStr function
                 } else {
-                    return "\(duration.secs)s"
+                    text = "\(duration.secs)s"
                 }
-            } else {
-                return ""
             }
-        case .fixedReps(_):
-            return "not implemented"
+        case .fixedReps(let sets):
+            if instance.current.setIndex < sets.count {
+                let reps = sets[instance.current.setIndex]
+                if reps.reps.reps == 1 {
+                    text = "1 rep"
+                } else {
+                    text = "\(reps.reps.reps) reps"
+                }
+            }
         case .maxReps(restSecs: _, targetReps: _):
-            return "not implemented"
+            text = "not implemented"
         case .repRanges(warmups: _, worksets: _, backoffs: _):
-            return "not implemented"
+            text = "not implemented"
         case .repTotal(total: _, rest: _):
-            return "not implemented"
+            text = "not implemented"
         }
+        
+        let closest = exercise.getClosestBelow(self.workout.model(instance), weight*percent)
+        if case .right(let weight) = closest {
+            let suffix = percent.value >= 0.01 && weight >= 0.1 ? " @ " + friendlyUnitsWeight(weight) : ""
+            text += suffix
+        }
+
+        return text
     }
 
+    // TODO: this would be stuff like plates
     func subSubTitle() -> String {
         switch exercise.modality.sets {
         case .durations(_, targetSecs: _):
@@ -288,7 +317,7 @@ extension InstanceVM {
     //        }
             return ""       // TODO: implement this
         case .fixedReps(_):
-            return "not implemented"
+            return ""
         case .maxReps(restSecs: _, targetReps: _):
             return "not implemented"
         case .repRanges(warmups: _, worksets: _, backoffs: _):
@@ -299,15 +328,19 @@ extension InstanceVM {
     }
 
     func nextLabel() -> String {
-        switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            if self.setIndex == durations.count {
+        func text(numSets: Int) -> String {
+            if self.setIndex == numSets {
                 return "Done"
             } else {
                 return "Start"
             }
-        case .fixedReps(_):
-            return "not implemented"
+        }
+
+        switch exercise.modality.sets {
+        case .durations(let durations, targetSecs: _):
+            return text(numSets: durations.count)
+        case .fixedReps(let sets):
+            return text(numSets: sets.count)
         case .maxReps(restSecs: _, targetReps: _):
             return "not implemented"
         case .repRanges(warmups: _, worksets: _, backoffs: _):
@@ -317,29 +350,45 @@ extension InstanceVM {
         }
     }
 
-    func workoutLabel() -> ([String], String) {
-        var sets: [String] = []
+    func workoutLabel() -> ([String], String, Int) {
+        func getFixedRepsLabel(_ index: Int, _ sets: FixedRepsSet) -> String {
+            let reps = sets.reps.reps
+            let suffix = weightSuffix(WeightPercent(1.0), exercise.expected.weight)
+            if !suffix.isEmpty {
+                return reps.description + suffix   // 5 @ 120 lbs
+            } else {
+                if reps == 1 {
+                    return "1 rep"
+                } else {
+                    return "\(reps) reps"  // 5 reps
+                }
+            }
+        }
+        
+        var setStrs: [String] = []
         var trailer = ""
+        var limit = 8
 
         switch self.exercise.modality.sets {
         case .durations(let durations, _):
-            sets = durations.map({"\($0.secs)s"})
+            setStrs = durations.map({"\($0.secs)s"})
             trailer = weightSuffix(WeightPercent(1.0), exercise.expected.weight)    // always the same for each set so we'll stick it at the end
 
-        case .fixedReps(_):
-            sets.append("not implemented")
+        case .fixedReps(let sets):
+            setStrs = sets.mapi(getFixedRepsLabel)
+            limit = 6
 
         case .maxReps(_, _):
-            sets.append("not implemented")
+            setStrs.append("not implemented")
 
         case .repRanges(warmups: _, worksets: _, backoffs: _):
-            sets.append("not implemented")
+            setStrs.append("not implemented")
 
         case .repTotal(total: _, rest: _):
-            sets.append("not implemented")
+            setStrs.append("not implemented")
         }
         
-        return (sets, trailer)
+        return (setStrs, trailer, limit)
     }
     
     private func getSetTimerTitle(_ prefix: String) -> String {

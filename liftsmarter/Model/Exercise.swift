@@ -35,6 +35,23 @@ class Exercise {
         }
     }
 
+    func getClosestBelow(_ model: Model, _ target: Double) -> Either<String, Double> {
+        switch self.modality.apparatus {
+        case .fixedWeights(name: let name):
+            if let name = name {
+                if let fws = model.fixedWeights[name] {
+                    return .right(fws.getClosestBelow(target))
+                } else {
+                    return .left("There is no fixed weight set named \(name)")
+                }
+            } else {
+                return .left("No fixed weights activated")
+            }
+        default:
+            return .right(target)
+        }
+    }
+
 //    static func ==(lhs: Exercise, rhs: Exercise) -> Bool {  // TODO: names would have to be unique?
 //        return lhs.name == rhs.name
 //    }

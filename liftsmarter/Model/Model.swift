@@ -11,6 +11,7 @@ class Model {
     // within arrays we need to explicitly call objectWillChange.send to inform views that the state changed
     // (this is the "nested ObservableObject" problem).
     var program: Program
+    var fixedWeights: [String: FixedWeightSet] = [:]
     var history: History
     var logs: Logs
     // TODO: add history, fixed weight sets, userNotes

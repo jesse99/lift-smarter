@@ -1,7 +1,7 @@
-//  Created by Jesse Vorisek on 9/12/21.
+//  Created by Jesse Vorisek on 10/5/21.
 import SwiftUI
 
-struct DurationsView: View {
+struct FixedRepsView: View {
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
     @ObservedObject var exercise: InstanceVM
     @State var editModal = false
@@ -105,15 +105,15 @@ struct DurationsView: View {
     }
 }
 
-struct DurationsView_Previews: PreviewProvider {
+struct FixedRepsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let workout = model.program.workouts[0]
-    static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
-    static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
+    static let workout = model.program.workouts[1]
+    static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
+    static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
     static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
-        DurationsView(vm)
+        FixedRepsView(vm)
     }
 }

@@ -269,10 +269,7 @@ extension WorkoutVM {
     }
 
     func subLabel(_ instance: InstanceVM) -> String {
-        let tuple = instance.workoutLabel()
-        let sets = tuple.0
-        let trailer = tuple.1
-        let limit = 8
+        let (sets, trailer, limit) = instance.workoutLabel()
         
         if sets.count == 0 {
             return ""
@@ -480,6 +477,10 @@ extension WorkoutVM {
 
     func workout(_ instance: ExerciseInstance) -> Workout {
         return self.workout
+    }
+
+    func model(_ instance: ExerciseInstance) -> Model {
+        return self.program.model(self.workout)
     }
 }
 
