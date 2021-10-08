@@ -86,7 +86,7 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 3))
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 4))
         XCTAssertEqual(label, "today")
@@ -122,7 +122,7 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 2))
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 3))
         XCTAssertEqual(label, "today")
@@ -170,7 +170,7 @@ class WorkoutLabelTests: XCTestCase {
         
         var (label, color) = program.subLabel(workout, now: date(day: 5))   // sunday
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 6))   // monday
         XCTAssertEqual(label, "today")
@@ -178,7 +178,7 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 7))   // tuesday
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 8))   // wednesay
         XCTAssertEqual(label, "today")
@@ -246,7 +246,7 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 21))
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 30))
         XCTAssertEqual(label, "in 11 days")
@@ -353,7 +353,7 @@ class WorkoutLabelTests: XCTestCase {
         
         var (label, color) = program.subLabel(workout, now: date(day: 5))   // sunday
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 6))   // monday
         XCTAssertEqual(label, "today")
@@ -361,7 +361,7 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 7))   // tuesday
         XCTAssertEqual(label, "tomorrow")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .blue)
 
         (label, color) = program.subLabel(workout, now: date(day: 8))   // wednesay
         XCTAssertEqual(label, "today")

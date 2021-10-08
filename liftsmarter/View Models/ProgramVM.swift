@@ -244,7 +244,7 @@ extension ProgramVM {
         case .days(let n):
             switch n {
             case 0: return ("today", .orange)
-            case 1: return ("tomorrow", .black)
+            case 1: return ("tomorrow", .blue)
             default: return ("in \(n) days", .black)
             }
 
