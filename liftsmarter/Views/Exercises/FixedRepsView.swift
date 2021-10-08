@@ -50,7 +50,7 @@ struct FixedRepsView: View {
 //                    .sheet(isPresented: self.$noteModal) {NoteView(self.display, formalName: self.exercise().formalName)}
                 Button("Edit", action: onEdit)
                     .font(.callout)
-                    .sheet(isPresented: self.$editModal) {EditDurationsView(self.exercise)}
+                    .sheet(isPresented: self.$editModal) {EditFixedRepsView(self.exercise)}
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
