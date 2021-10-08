@@ -66,6 +66,11 @@ extension InstanceVM {
         self.workout.log(level, message)
     }
 
+    func setName(_ name: String) {
+        self.willChange()
+        self.instance.name = name
+    }
+    
     func shouldReset() -> Bool {
         // 1) If it's been a long time since the user began the exercise then start over.
         // 2) If setIndex has become whacked as a result of user edits then start over.

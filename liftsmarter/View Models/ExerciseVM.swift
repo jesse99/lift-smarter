@@ -2,7 +2,7 @@
 import Foundation
 
 // Typically InstanceVM is used instead of this.
-class ExerciseVM: Equatable, Identifiable {
+class ExerciseVM: Equatable, Identifiable, ObservableObject {
     let program: ProgramVM
     private let exercise: Exercise
     
@@ -12,6 +12,7 @@ class ExerciseVM: Equatable, Identifiable {
     }
     
     func willChange() {
+        self.objectWillChange.send()
         self.program.willChange()
     }
 
@@ -19,8 +20,16 @@ class ExerciseVM: Equatable, Identifiable {
         get {return self.exercise.name}
     }
     
+    var formalName: String {
+        get {return self.exercise.formalName}
+    }
+    
     var allowRest: Bool {
         get {return self.exercise.allowRest}
+    }
+    
+    var expectedWeight: Double {
+        get {return self.exercise.expected.weight}
     }
     
     static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
@@ -35,8 +44,30 @@ class ExerciseVM: Equatable, Identifiable {
 }
 
 // Misc Logic
-// If we ever support editing the exercise itself then we'll need to make ExerciseVM ObservableObject.
 extension ExerciseVM {
+    func setName(_ name: String) {
+        self.willChange()
+        
+        for workout in self.program.workouts {
+            for instance in workout.instances {
+                if instance.name == self.exercise.name {
+                    instance.setName(name)
+                }
+            }
+        }
+
+        self.exercise.name = name
+    }
+    
+    func setFormalName(_ name: String) {
+        self.willChange()
+        self.exercise.formalName = name
+    }
+    
+    func setWeight(_ weight: Double) {
+        self.willChange()
+        self.exercise.expected.weight = weight
+    }
 }
 
 // UI Labels
@@ -94,6 +125,32 @@ extension ExerciseVM {
 
 // Editing
 extension ExerciseVM {
+    func parseExercise(_ name: String, _ weightStr: String) -> Either<String, Double> {
+        var errors: [String] = []
+        
+        if name.isBlankOrEmpty() {
+            errors.append("Name cannot be empty.")
+        } else if name != self.name {
+            if self.program.exercises.any({$0.name == name}) {
+                errors.append("Name must be unique.")
+            }
+        }
+        
+        let weight = Double(weightStr)
+        if let w = weight {
+            if w < 0.0 {
+                errors.append("Weight cannot be negative.")
+            }
+        } else {
+            errors.append("Weight should be a number.")
+        }
+        
+        if !errors.isEmpty {
+            return .left(errors.joined(separator: " "))
+        } else {
+            return .right(weight!)
+        }
+    }
 }
 
 // View Model internals (views can't call these because they don't have direct access
