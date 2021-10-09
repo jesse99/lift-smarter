@@ -26,18 +26,16 @@ struct EditExerciseView: View {
     }
 
     // TODO:
-    // add a picker for weight?
-    // get some sort of allow rest checkbox working
+    // get aparatus editing working
     // get sets editing working
     //    be sure to reset expected.sets
-    // get aparatus editing working
     var body: some View {
         VStack() {
             Text("Edit Exercise").font(.largeTitle).padding()
 
             VStack(alignment: .leading) {
                 wordsField("Name", self.$name, self.onEdited, onHelp: self.onNameHelp)
-
+                
                 HStack {
                     Text("Formal Name:").font(.headline)
                     Button(self.formalName, action: {self.formalNameModal = true})
@@ -46,7 +44,10 @@ struct EditExerciseView: View {
                     Spacer()
                     Button("?", action: self.onFormalNameHelp).font(.callout).padding(.trailing)
                 }.padding(.leading)
+                
                 self.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
+                
+                Toggle("Respect Rest Weeks", isOn: self.$allowRest).padding(.trailing).padding(.leading)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
@@ -128,6 +129,9 @@ struct EditExerciseView: View {
             }
             if weight != self.exercise.expectedWeight {
                 self.exercise.setWeight(weight)
+            }
+            if self.allowRest != self.exercise.allowRest {
+                self.exercise.setAllowRest(self.allowRest)
             }
         case .left(_):
             ASSERT(false, "onEdited should have caught this")

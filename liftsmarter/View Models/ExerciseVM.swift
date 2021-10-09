@@ -73,6 +73,11 @@ extension ExerciseVM {
         self.willChange()
         self.exercise.expected.weight = weight
     }
+    
+    func setAllowRest(_ allow: Bool) {
+        self.willChange()
+        self.exercise.allowRest = allow
+    }
 }
 
 // UI
@@ -179,7 +184,7 @@ extension ExerciseVM {
                         Button(text.wrappedValue, action: {modal.wrappedValue = true})
                             .font(.callout)
                             .sheet(isPresented: modal) {
-                                PickerView(title: name, prompt: "Weight:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, type: .decimalPad)
+                                PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, type: .decimalPad)
                             }
                         Spacer()
                         Button("?", action: onHelp).font(.callout).padding(.trailing)
