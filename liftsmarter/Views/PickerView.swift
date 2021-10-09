@@ -25,15 +25,17 @@ struct PickerView: View {
     let initial: String
     let populate: Populate
     let confirm: Confirm
+    let type: UIKeyboardType
     @State var value: String
     @Environment(\.presentationMode) private var presentation
     
-    init(title: String, prompt: String, initial: String, populate: @escaping Populate, confirm: @escaping Confirm) {
+    init(title: String, prompt: String, initial: String, populate: @escaping Populate, confirm: @escaping Confirm, type: UIKeyboardType = .default) {
         self.title = title
         self.prompt = prompt
         self.initial = initial
         self.populate = populate
         self.confirm = confirm
+        self.type = type
         self._value = State(initialValue: initial)
     }
 
@@ -45,7 +47,7 @@ struct PickerView: View {
                 Text(self.prompt).font(.headline)
                 TextField("", text: self.$value)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .keyboardType(.default)
+                    .keyboardType(self.type)
                     .disableAutocorrection(true)
             }.padding(.leading)
             Divider().background(Color.black)
@@ -63,7 +65,7 @@ struct PickerView: View {
                 Spacer()
                 Spacer()
                 Button("OK", action: onOK).font(.callout)
-            }
+            }.padding()
         }
     }
     

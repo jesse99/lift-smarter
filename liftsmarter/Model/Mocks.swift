@@ -108,7 +108,7 @@ func mockProgram() -> Program {
         let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.0), restSecs: 90)
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60)
         let sets = Sets.repRanges(warmups: [warmup], worksets: [work, work, work], backoffs: [])
-        let modality = Modality(Apparatus.bodyWeight, sets)
+        let modality = Modality(Apparatus.fixedWeights(name: "Dumbbells"), sets)
         return Exercise("Split Squat", "Body-weight Split Squat", modality, Expected(weight: 16.4, sets: .repRanges(warmupsReps: [5,3], worksetsReps: [8,8,8], backoffsReps: [])))
     }
 
@@ -116,7 +116,7 @@ func mockProgram() -> Program {
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 150)
         let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0)
         let sets = Sets.repRanges(warmups: [], worksets: [work, work, work2], backoffs: [])
-        let modality = Modality(Apparatus.bodyWeight, sets)
+        let modality = Modality(Apparatus.fixedWeights(name: "Dumbbells"), sets)
         return Exercise("Lunge", "Dumbbell Lunge", modality, Expected(weight: 16.4, sets: .repRanges(warmupsReps: [5,3], worksetsReps: [8,8,8], backoffsReps: [])))
     }
 
@@ -150,23 +150,22 @@ func mockProgram() -> Program {
     
     func curls() -> Exercise {
         let sets = Sets.maxReps(restSecs: [90, 90, 90])
-        let modality = Modality(Apparatus.bodyWeight, sets)
+        let modality = Modality(Apparatus.fixedWeights(name: "Dumbbells"), sets)
         return Exercise("Curls", "Hammer Curls", modality, Expected(weight: 16.4, sets: .maxReps(reps: [10,10,10])))
      }
 
     func latRaise() -> Exercise {
         let work = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 120)
         let sets = Sets.repRanges(warmups: [], worksets: [work, work, work], backoffs: [])
-        let modality = Modality(Apparatus.bodyWeight, sets)
+        let modality = Modality(Apparatus.fixedWeights(name: "Dumbbells"), sets)
         return Exercise("Lateral Raise", "Side Lateral Raise", modality, Expected(weight: 8.2, sets: .repRanges(warmupsReps: [], worksetsReps: [12,12,12], backoffsReps: [])))
     }
 
     func tricepPress() -> Exercise {
-        let work1 = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 120)
-        let work2 = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 0)
-        let sets = Sets.repRanges(warmups: [], worksets: [work1, work1, work2], backoffs: [])
-        let modality = Modality(Apparatus.bodyWeight, sets)
-        return Exercise("Triceps Press", "Standing Triceps Press", modality, Expected(weight: 8.2, sets: .repRanges(warmupsReps: [], worksetsReps: [11,11,11], backoffsReps: [])))
+        let work = FixedRepsSet(reps: FixedReps(15), restSecs: 0)
+        let sets = Sets.fixedReps([work])
+        let modality = Modality(Apparatus.fixedWeights(name: "Dumbbells"), sets)
+        return Exercise("Triceps Press", "Standing Triceps Press", modality)
     }
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]

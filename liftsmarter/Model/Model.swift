@@ -21,5 +21,5 @@ class Model {
         self.program = program
         self.history = History()
         self.logs = Logs()
-    }
+    }    
 }

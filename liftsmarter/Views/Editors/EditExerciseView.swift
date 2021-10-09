@@ -9,6 +9,7 @@ struct EditExerciseView: View {
     @State var weight: String
     @State var allowRest: Bool
     @State var formalNameModal = false
+    @State var weightsModal = false
     @State var showHelp = false
     @State var helpText = ""
     @State var error = ""
@@ -41,22 +42,11 @@ struct EditExerciseView: View {
                     Text("Formal Name:").font(.headline)
                     Button(self.formalName, action: {self.formalNameModal = true})
                         .font(.callout)
-                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name: ", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
+                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name:", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
                     Spacer()
                     Button("?", action: self.onFormalNameHelp).font(.callout).padding(.trailing)
                 }.padding(.leading)
-
-                // TODO: Probably want to handle weight differently for different apparatus. For example, for barbell
-                // could use a picker like formal name uses: user can type in a weight and then is able to see
-                // all the nearby weights and select one if he wants.
-                HStack {
-                    Text("Weight:").font(.headline)
-                    TextField("", text: self.$weight)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.decimalPad)
-                        .onChange(of: self.weight, perform: self.onEdited)
-                    Button("?", action: self.onWeightHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
+                self.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)

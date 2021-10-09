@@ -42,6 +42,10 @@ class ProgramVM: ObservableObject {
         return HistoryVM(self.model)
     }
     
+    func getFWS(_ name: String) -> FixedWeightSet? {
+        return self.model.fixedWeights[name]
+    }
+
     func willChange() {
         self.objectWillChange.send()
     }

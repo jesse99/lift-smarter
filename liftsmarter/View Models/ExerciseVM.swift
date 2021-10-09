@@ -1,5 +1,6 @@
 //  Created by Jesse Vorisek on 10/2/21.
 import Foundation
+import SwiftUI
 
 // Typically InstanceVM is used instead of this.
 class ExerciseVM: Equatable, Identifiable, ObservableObject {
@@ -74,7 +75,7 @@ extension ExerciseVM {
     }
 }
 
-// UI Labels
+// UI
 extension ExerciseVM {
     func label() -> String {
         return self.name
@@ -124,6 +125,70 @@ extension ExerciseVM {
             }
         }
         return true
+    }
+
+    func weightPicker(_ text: Binding<String>, _ modal: Binding<Bool>, _ onEdit: @escaping (String) -> Void, _ onHelp: @escaping HelpFunc) -> AnyView {
+        func populate(_ text: String, _ fws: FixedWeightSet) -> [String] {
+            var weights: [Double] = []
+            
+            if let weight = Double(text) {
+                let middle = fws.getClosest(weight)
+                if let below = fws.getBelow(middle) {
+                    weights.append(below)
+                }
+                weights.append(middle)
+                if let above = fws.getAbove(middle) {
+                    weights.append(above)
+                }
+            } else {
+                weights = fws.getAll()
+            }
+
+            return weights.map({friendlyWeight($0)})
+        }
+        
+        func confirm(_ newText: String) {
+            text.wrappedValue = newText
+            onEdit(newText)
+        }
+        
+        func weightField() -> AnyView {
+            return AnyView(
+                HStack {
+                    Text("Weight:").font(.headline)
+                    TextField("", text: text)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.decimalPad)
+                        .disableAutocorrection(true)
+                        .onChange(of: text.wrappedValue, perform: onEdit)
+                    Button("?", action: onHelp).font(.callout).padding(.trailing)
+                }.padding(.leading)
+            )
+        }
+        
+        // This isn't currently shared but it's complex enough that we define it here to hide it away.
+        switch self.exercise.modality.apparatus {
+        case .bodyWeight:
+            return weightField()
+            
+        case .fixedWeights(let theName):
+            if let name = theName, let fws = self.program.getFWS(name) {
+                return AnyView(
+                    HStack {
+                        Text("Weight:").font(.headline)
+                        Button(text.wrappedValue, action: {modal.wrappedValue = true})
+                            .font(.callout)
+                            .sheet(isPresented: modal) {
+                                PickerView(title: name, prompt: "Weight:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, type: .decimalPad)
+                            }
+                        Spacer()
+                        Button("?", action: onHelp).font(.callout).padding(.trailing)
+                    }.padding(.leading)
+                )
+            } else {
+                return weightField()
+            }
+        }
     }
 }
 

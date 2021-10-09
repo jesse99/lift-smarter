@@ -35,6 +35,10 @@ class FixedWeights: Sequence {
         }
     }
     
+    var first: Double? {
+        return self.weights.first
+    }
+    
     var last: Double? {
         return self.weights.last
     }
@@ -82,6 +86,11 @@ class FixedWeightSet {
         }
     }
     
+    func getAll() -> [Double] {
+        return self.weights.map({$0})
+    }
+    
+    // Equal or below.
     func getClosestBelow(_ target: Double) -> Double {
         if let index = self.weights.firstIndex(where: {$0 >= target}) {
             if self.weights[index] == target {
@@ -96,6 +105,7 @@ class FixedWeightSet {
         return 0.0
     }
     
+    // Equal or above.
     func getClosestAbove(_ target: Double) -> Double? {
         if let index = self.weights.firstIndex(where: {$0 >= target}) {
             return self.weights[index]
@@ -105,5 +115,28 @@ class FixedWeightSet {
             }
             return nil
         }
+    }
+    
+    // Next weight below specified weight (weight should be in fws).
+    func getBelow(_ weight: Double) -> Double? {
+        if let index = self.weights.firstIndex(where: {$0 == weight}) {
+            if index > 0 {
+                return self.weights[index - 1]
+            }
+        }
+        return nil
+    }
+
+    // Next weight above specified weight (weight should be zero or in fws).
+    func getAbove(_ weight: Double) -> Double? {
+        if let index = self.weights.firstIndex(where: {$0 == weight}) {
+            if index + 1 < self.weights.count {
+                return self.weights[index + 1]
+            }
+        }
+        if let first = self.weights.first, weight < first {
+            return first
+        }
+        return nil
     }
 }
