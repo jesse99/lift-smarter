@@ -35,16 +35,7 @@ struct EditExerciseView: View {
             Text("Edit Exercise").font(.largeTitle).padding()
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text("Name:").font(.headline)
-                    TextField("", text: self.$name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .autocapitalization(.words)
-                        .onChange(of: self.name, perform: self.onEdited)
-                    Button("?", action: self.onNameHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
+                wordsField("Name", self.$name, self.onEdited, onHelp: self.onNameHelp)
 
                 HStack {
                     Text("Formal Name:").font(.headline)

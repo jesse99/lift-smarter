@@ -27,33 +27,9 @@ struct EditDurationsView: View {
             Text("Edit " + self.exercise.name).font(.largeTitle)
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text("Durations:").font(.headline)
-                    TextField("", text: self.$durations)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .onChange(of: self.durations, perform: self.onEditedSets)
-                    Button("?", action: self.onDurationsHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
-                HStack {
-                    Text("Target:").font(.headline)
-                    TextField("", text: self.$target)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .onChange(of: self.target, perform: self.onEditedSets)
-                    Button("?", action: self.onTargetHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
-                HStack {
-                    Text("Rest:").font(.headline)
-                    TextField("", text: self.$rest)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .onChange(of: self.rest, perform: self.onEditedSets)
-                    Button("?", action: self.onRestHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
+                numericishField("Durations", self.$durations, self.onEditedSets, self.onDurationsHelp)
+                numericishField("Target", self.$target, self.onEditedSets, self.onTargetHelp)
+                numericishField("Rest", self.$rest, self.onEditedSets, self.onRestHelp)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)

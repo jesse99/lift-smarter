@@ -40,15 +40,7 @@ struct EditWorkoutView: View {
             Text("Edit Workout").font(.largeTitle)
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text("Name:").font(.headline)
-                    TextField("", text: self.$name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .autocapitalization(.words)
-                        .disableAutocorrection(false)
-                        .onChange(of: self.name, perform: self.onEdited)
-                }.padding(.leading).padding(.trailing)
+                wordsField("Name", self.$name, self.onEdited)
 
                 HStack {
                     self.workout.scheduleButton(self.$schedule, self.$scheduleText, self.$scheduleLabel, self.$subSchedule, self.$subScheduleText, self.$subScheduleLabel)

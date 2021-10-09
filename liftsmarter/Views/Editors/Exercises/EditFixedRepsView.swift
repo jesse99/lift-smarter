@@ -23,24 +23,8 @@ struct EditFixedRepsView: View {
             Text("Edit " + self.exercise.name).font(.largeTitle)
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text("Reps:").font(.headline)
-                    TextField("", text: self.$reps)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .onChange(of: self.reps, perform: self.onEditedSets)
-                    Button("?", action: self.onRepsHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
-                HStack {
-                    Text("Rest:").font(.headline)
-                    TextField("", text: self.$rest)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .disableAutocorrection(true)
-                        .onChange(of: self.rest, perform: self.onEditedSets)
-                    Button("?", action: self.onRestHelp).font(.callout).padding(.trailing)
-                }.padding(.leading)
+                numericishField("Reps", self.$reps, self.onEditedSets, self.onRepsHelp)
+                numericishField("Rest", self.$rest, self.onEditedSets, self.onRestHelp)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)

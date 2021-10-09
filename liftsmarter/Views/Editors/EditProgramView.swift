@@ -30,15 +30,7 @@ struct EditProgramView: View {
             Text("Edit Program").font(.largeTitle)
 
             VStack(alignment: .leading) {
-                HStack {
-                    Text("Name:").font(.headline)
-                    TextField("", text: self.$name)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .keyboardType(.default)
-                        .autocapitalization(.words)
-                        .disableAutocorrection(false)
-                        .onChange(of: self.name, perform: self.onEdited)
-                }.padding(.leading).padding(.trailing)
+                wordsField("Name", self.$name, self.onEdited)
 
                 HStack {
                     Text("Current Week:").font(.headline)
