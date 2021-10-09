@@ -13,6 +13,7 @@ class Model {
     var program: Program
     var fixedWeights: [String: FixedWeightSet] = [:]
     var history: History
+    var userNotes: [String: String] = [:]    // this overrides defaultNotes
     var logs: Logs
     // TODO: add history, fixed weight sets, userNotes
     

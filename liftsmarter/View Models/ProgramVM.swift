@@ -26,6 +26,10 @@ class ProgramVM: ObservableObject {
         }
     }
     
+    var userNoteKeys: [String] {
+        get {return Array(self.model.userNotes.keys)}
+    }
+    
     var restWeeks: [Int] {
         get {return self.model.program.restWeeks}
     }

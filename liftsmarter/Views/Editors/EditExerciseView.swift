@@ -3,6 +3,7 @@ import SwiftUI
 
 struct EditExerciseView: View {
     let exercise: ExerciseVM
+    let instance: InstanceVM
     @State var name: String
     @State var formalName: String
     @State var weight: String
@@ -13,8 +14,9 @@ struct EditExerciseView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exercise: ExerciseVM) {
-        self.exercise = exercise
+    init(_ instance: InstanceVM) {
+        self.exercise = instance.exerciseVM
+        self.instance = instance
 
         self._name = State(initialValue: exercise.name)
         self._formalName = State(initialValue: exercise.formalName)
@@ -23,8 +25,6 @@ struct EditExerciseView: View {
     }
 
     // TODO:
-    // make sure that name and weight work
-    // get formal name working
     // add a picker for weight?
     // get some sort of allow rest checkbox working
     // get sets editing working
@@ -50,7 +50,7 @@ struct EditExerciseView: View {
                     Text("Formal Name:").font(.headline)
                     Button(self.formalName, action: {self.formalNameModal = true})
                         .font(.callout)
-//                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name: ", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
+                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name: ", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
                     Spacer()
                     Button("?", action: self.onFormalNameHelp).font(.callout).padding(.trailing)
                 }.padding(.leading)
@@ -94,6 +94,42 @@ struct EditExerciseView: View {
         case .left(let err):
             self.error = err
         }
+    }
+    
+    private func onEditedFormalName(_ text: String) {
+        self.formalName = text      // no need for validation here
+    }
+
+    private func matchFormalName(_ inText: String) -> [String] {
+        var names: [String] = []
+        
+        // TODO: better to do a proper fuzzy search
+        let needle = inText.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
+
+        // First match any custom names defined by the user.
+        for candidate in self.exercise.userNoteKeys {
+            if defaultNotes[candidate] == nil {
+                let haystack = candidate.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
+                if haystack.contains(needle) {
+                    names.append(candidate)
+                }
+            }
+        }
+        
+        // Then match the standard names.
+        for candidate in defaultNotes.keys {
+            let haystack = candidate.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
+            if haystack.contains(needle) {
+                names.append(candidate)
+            }
+            
+            // Not much point in showing the user a huge list of names.
+            if names.count >= 100 {
+                break
+            }
+        }
+
+        return names
     }
 
     func onCancel() {
@@ -140,7 +176,8 @@ struct EditExerciseView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[1]
     static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
-    static let vm = ExerciseVM(ProgramVM(model), exercise)
+    static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
+    static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
         EditExerciseView(vm)

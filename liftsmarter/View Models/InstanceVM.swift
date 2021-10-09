@@ -18,6 +18,10 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
         self.workout.willChange()
     }
 
+    var exerciseVM: ExerciseVM {
+        get {return ExerciseVM(self.workout.program, self.exercise)}
+    }
+    
     var name: String {
         get {return self.exercise.name}
     }

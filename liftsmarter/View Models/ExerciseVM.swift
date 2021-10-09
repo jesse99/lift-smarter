@@ -24,6 +24,10 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.formalName}
     }
     
+    var userNoteKeys: [String] {
+        get {return self.program.userNoteKeys}
+    }
+    
     var allowRest: Bool {
         get {return self.exercise.allowRest}
     }
