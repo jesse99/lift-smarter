@@ -37,6 +37,9 @@
 		37A3C5ED2711469800BFA8CC /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5EC2711469800BFA8CC /* PickerView.swift */; };
 		37A3C5EF271147F400BFA8CC /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5EE271147F400BFA8CC /* Notes.swift */; };
 		37A3C5F22712115000BFA8CC /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F12712115000BFA8CC /* Components.swift */; };
+		37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F32712504400BFA8CC /* EditFWSsView.swift */; };
+		37A3C5F6271252DB00BFA8CC /* EditFWSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */; };
+		37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
@@ -103,6 +106,9 @@
 		37A3C5EC2711469800BFA8CC /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		37A3C5EE271147F400BFA8CC /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
 		37A3C5F12712115000BFA8CC /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		37A3C5F32712504400BFA8CC /* EditFWSsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFWSsView.swift; sourceTree = "<group>"; };
+		37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFWSView.swift; sourceTree = "<group>"; };
+		37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFixedWeightsView.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -161,8 +167,11 @@
 			isa = PBXGroup;
 			children = (
 				37A3C5E8270FD9CC00BFA8CC /* Exercises */,
+				37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */,
 				37A3C5E9270FDA0000BFA8CC /* EditExerciseView.swift */,
 				3718979C2708D40B00351C5A /* EditExercisesView.swift */,
+				37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */,
+				37A3C5F32712504400BFA8CC /* EditFWSsView.swift */,
 				371897922700DDA500351C5A /* EditProgramView.swift */,
 				3718979A2706BB2800351C5A /* EditTextView.swift */,
 				3718978E26F81B1A00351C5A /* EditWorkoutView.swift */,
@@ -406,6 +415,7 @@
 				37A3C5E3270D5EA400BFA8CC /* FixedRepsView.swift in Sources */,
 				37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */,
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
+				37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
 				37ECEA5B26EB0C6700D0AD8E /* Current.swift in Sources */,
 				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
@@ -423,6 +433,7 @@
 				37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */,
 				37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */,
 				37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */,
+				37A3C5F6271252DB00BFA8CC /* EditFWSView.swift in Sources */,
 				37A3C5EF271147F400BFA8CC /* Notes.swift in Sources */,
 				37ECEA5526EB07F500D0AD8E /* Apparatus.swift in Sources */,
 				3718978D26F6BFA500351C5A /* ProgramVM.swift in Sources */,
@@ -445,6 +456,7 @@
 				37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */,
 				37ECEA5926EB0C3300D0AD8E /* Expected.swift in Sources */,
 				37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */,
+				37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

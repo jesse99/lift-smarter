@@ -119,16 +119,16 @@ extension WorkoutVM {
         }
     }
 
-    func log(_ level: LogLevel, _ message: String) {
-        self.program.log(level, message)
-    }
-
     func recentlyCompleted(_ instance: InstanceVM) -> Bool {
         if let completed = self.lastCompleted(instance) {
             return Date().hoursSinceDate(completed) < RecentHours
         } else {
             return false
         }
+    }
+
+    func log(_ level: LogLevel, _ message: String) {
+        self.program.log(level, message)
     }
 }
 

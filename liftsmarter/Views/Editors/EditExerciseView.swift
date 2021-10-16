@@ -8,8 +8,10 @@ struct EditExerciseView: View {
     @State var formalName: String
     @State var weight: String
     @State var allowRest: Bool
+    @State var apparatus: Apparatus
     @State var formalNameModal = false
     @State var weightsModal = false
+    @State var apparatusModal = false
     @State var showHelp = false
     @State var helpText = ""
     @State var error = ""
@@ -23,10 +25,11 @@ struct EditExerciseView: View {
         self._formalName = State(initialValue: exercise.formalName)
         self._weight = State(initialValue: friendlyWeight(exercise.expectedWeight))
         self._allowRest = State(initialValue: exercise.allowRest)
+        self._apparatus = State(initialValue: exercise.apparatus)
     }
 
     // TODO:
-    // get aparatus editing working
+    // might want a titleLabel component
     // get sets editing working
     //    be sure to reset expected.sets
     var body: some View {
@@ -48,6 +51,9 @@ struct EditExerciseView: View {
                 self.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
                 
                 Toggle("Respect Rest Weeks", isOn: self.$allowRest).padding(.trailing).padding(.leading)
+                
+                self.exercise.apparatusView(self.$apparatus, self.$apparatusModal, self.onApparatusHelp)
+
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
@@ -133,6 +139,9 @@ struct EditExerciseView: View {
             if self.allowRest != self.exercise.allowRest {
                 self.exercise.setAllowRest(self.allowRest)
             }
+            if self.apparatus != self.exercise.apparatus {
+                self.exercise.setApparatus(self.apparatus)
+            }
         case .left(_):
             ASSERT(false, "onEdited should have caught this")
         }
@@ -152,6 +161,11 @@ struct EditExerciseView: View {
 
     private func onWeightHelp() {
         self.helpText = "An arbitrary weight. For stuff like barbells the app will use the closest supported weight below this weight."
+        self.showHelp = true
+    }
+
+    private func onApparatusHelp(_ text: String) {
+        self.helpText = text
         self.showHelp = true
     }
 }

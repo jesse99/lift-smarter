@@ -172,80 +172,9 @@ extension InstanceVM {
         self.willChange()
         self.instance.enabled = !self.instance.enabled
     }
-
-    // For rest between sets.
-    func implicitTimer() -> TimerView {
-        switch self.exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            return TimerView(title: self.getSetTimerTitle("Set"), duration: durations[self.setIndex].secs, secondDuration: self.restDuration())
-        case .fixedReps(let sets):
-            return TimerView(title: self.getSetTimerTitle("Set"), duration: sets[self.setIndex].restSecs)
-        default:
-            return TimerView(title: "not implemented", duration: 120)
-        }
-    }
-    
-    // User pressed the Start Timer button.
-    func explicitTimer() -> TimerView {
-        var title: String
-        if instance.current.setIndex < self.numSets() ?? 1000 {
-            title = getSetTimerTitle("On set")
-        } else {
-            title = "Finished"
-        }
-
-        let secs = self.restDuration()
-        return TimerView(title: title, duration: secs > 0 ? secs : 60)
-    }
-
-    func view() -> AnyView {
-        switch self.exercise.modality.sets {
-        case .durations(_, _):
-            return AnyView(DurationsView(self))
-
-        case .fixedReps(_):
-            return AnyView(FixedRepsView(self))
-
-        case .maxReps(_, _):
-            return AnyView(Text("not implemented"))
-
-        case .repRanges(_, _, _):
-            return AnyView(Text("not implemented"))
-
-        case .repTotal(total: _, rest: _):
-            return AnyView(Text("not implemented"))
-        }
-    }
-
-    fileprivate func restDuration() -> Int {
-        var secs = 0
-
-        switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            if instance.current.setIndex < durations.count {
-                secs = durations[instance.current.setIndex].restSecs
-            } else {
-                secs = durations.last!.restSecs
-            }
-        case .fixedReps(let sets):
-            if instance.current.setIndex < sets.count {
-                secs = sets[instance.current.setIndex].restSecs
-            } else {
-                secs = sets.last!.restSecs
-            }
-        case .maxReps(restSecs: _, targetReps: _):
-            ASSERT(false, "not implemented")
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
-            ASSERT(false, "not implemented")
-        case .repTotal(total: _, rest: _):
-            ASSERT(false, "not implemented")
-        }
-
-        return secs
-    }
 }
 
-// UI Labels
+// UI
 extension InstanceVM {
     func title() -> String {
         func text(numSets: Int) -> String {
@@ -408,6 +337,50 @@ extension InstanceVM {
             return "\(prefix) \(i+1)"
         }
     }
+
+    // For rest between sets.
+    func implicitTimer() -> TimerView {
+        switch self.exercise.modality.sets {
+        case .durations(let durations, targetSecs: _):
+            return TimerView(title: self.getSetTimerTitle("Set"), duration: durations[self.setIndex].secs, secondDuration: self.restDuration())
+        case .fixedReps(let sets):
+            return TimerView(title: self.getSetTimerTitle("Set"), duration: sets[self.setIndex].restSecs)
+        default:
+            return TimerView(title: "not implemented", duration: 120)
+        }
+    }
+    
+    // User pressed the Start Timer button.
+    func explicitTimer() -> TimerView {
+        var title: String
+        if instance.current.setIndex < self.numSets() ?? 1000 {
+            title = getSetTimerTitle("On set")
+        } else {
+            title = "Finished"
+        }
+
+        let secs = self.restDuration()
+        return TimerView(title: title, duration: secs > 0 ? secs : 60)
+    }
+
+    func view() -> AnyView {
+        switch self.exercise.modality.sets {
+        case .durations(_, _):
+            return AnyView(DurationsView(self))
+
+        case .fixedReps(_):
+            return AnyView(FixedRepsView(self))
+
+        case .maxReps(_, _):
+            return AnyView(Text("not implemented"))
+
+        case .repRanges(_, _, _):
+            return AnyView(Text("not implemented"))
+
+        case .repTotal(total: _, rest: _):
+            return AnyView(Text("not implemented"))
+        }
+    }
 }
 
 // Editing
@@ -478,6 +451,33 @@ extension InstanceVM {
         default:
             return .left("not implemented")
         }
+    }
+
+    private func restDuration() -> Int {
+        var secs = 0
+
+        switch exercise.modality.sets {
+        case .durations(let durations, targetSecs: _):
+            if instance.current.setIndex < durations.count {
+                secs = durations[instance.current.setIndex].restSecs
+            } else {
+                secs = durations.last!.restSecs
+            }
+        case .fixedReps(let sets):
+            if instance.current.setIndex < sets.count {
+                secs = sets[instance.current.setIndex].restSecs
+            } else {
+                secs = sets.last!.restSecs
+            }
+        case .maxReps(restSecs: _, targetReps: _):
+            ASSERT(false, "not implemented")
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            ASSERT(false, "not implemented")
+        case .repTotal(total: _, rest: _):
+            ASSERT(false, "not implemented")
+        }
+
+        return secs
     }
 
     private func restToStr(_ secs: Int) -> String {

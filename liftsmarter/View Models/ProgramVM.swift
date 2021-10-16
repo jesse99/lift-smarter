@@ -42,6 +42,10 @@ class ProgramVM: ObservableObject {
         return HistoryVM(self.model)
     }
     
+    func getFixedWeights() -> [String: FixedWeightSet] {
+        return self.model.fixedWeights
+    }
+
     func getFWS(_ name: String) -> FixedWeightSet? {
         return self.model.fixedWeights[name]
     }
@@ -157,6 +161,43 @@ extension ProgramVM {
     func toggleEnabled(_ vm: WorkoutVM) {
         self.willChange()
         vm.workout(self.model).enabled = !vm.workout(self.model).enabled
+    }
+    
+    func setFWS(_ name: String, _ fws: FixedWeightSet) {
+        self.willChange()
+        self.model.fixedWeights[name] = fws
+    }
+    
+    func addFWS(_ name: String) {
+        self.willChange()
+        self.model.fixedWeights[name] = FixedWeightSet()
+    }
+    
+    func delFWS(_ name: String) {
+        self.willChange()
+        self.model.fixedWeights[name] = nil
+    }
+    
+    func setFWS(_ weights: [String: FixedWeightSet]) {
+        self.willChange()
+        self.model.fixedWeights = weights
+    }
+    
+    func addFixedWeight(_ name: String, _ first: Double, _ step: Double, _ last: Double) {
+        self.willChange()
+
+        if self.model.fixedWeights[name] == nil {
+            self.model.fixedWeights[name] = FixedWeightSet([])
+        }
+        var fws = self.model.fixedWeights[name]!
+        
+        var weight = first
+        while weight <= last {
+            fws.weights.add(weight)
+            weight += step
+        }
+        
+        self.model.fixedWeights[name] = fws
     }
     
     func log(_ level: LogLevel, _ message: String) {
@@ -547,6 +588,44 @@ extension ProgramVM {
             return .left(errors.joined(separator: " "))
         } else {
             return .right((week!, rest))
+        }
+    }
+
+    func validateWeightRange(_ first: String, _ step: String, _ last: String) -> String? {
+        if first.isBlankOrEmpty() {
+            return "First must be a weight"
+        }
+        if !last.isBlankOrEmpty() && step.isBlankOrEmpty() {
+            return "If last is set then step must also be set"
+        }
+
+        if let f = Double(first) {
+            if f < 0.0 {                    // zero can be useful, e.g. rehab using light dumbbell or no dumbbell
+                return "First cannot be negative"
+            }
+
+            if last.isBlankOrEmpty() {
+                return nil                  // adding just first
+            } else {
+                if let m = Double(last) {
+                    if m < f {
+                        return "Last cannot be less than first"
+                    }
+
+                    if let s = Double(step) {
+                        if s <= 0.0 {
+                            return "Step should be larger than zero"
+                        }
+                        return nil
+                    } else {
+                        return "Step should be a floating point number"
+                    }
+                } else {
+                    return "Last should be a floating point number"
+                }
+            }
+        } else {
+            return "First should be a floating point number"
         }
     }
 }

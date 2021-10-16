@@ -21,7 +21,7 @@ extension LogsVM {
     }
 }
 
-// UI Labels
+// UI
 extension LogsVM {
     func tabImage() -> String {
         if self.model.logs.numErrors > 0 {

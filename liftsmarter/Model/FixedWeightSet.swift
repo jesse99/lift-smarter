@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 10/5/21.
 import Foundation
 
-class FixedWeights: Sequence {
+struct FixedWeights: Equatable, Sequence {
     init() {
         self.weights = []
     }
@@ -10,7 +10,7 @@ class FixedWeights: Sequence {
         self.weights = weights
     }
     
-    func add(_ weight: Double) {
+    mutating func add(_ weight: Double) {
         if let index = self.weights.firstIndex(where: {$0 >= weight}) {
             if self.weights[index] != weight {            // ValidateFixedWeightRange allows overlapping ranges so we need to test for dupes
                 self.weights.insert(weight, at: index)
@@ -20,7 +20,7 @@ class FixedWeights: Sequence {
         }
     }
     
-    func remove(at: Int) {
+    mutating func remove(at: Int) {
         self.weights.remove(at: at)
     }
     
@@ -51,14 +51,18 @@ class FixedWeights: Sequence {
         return self.weights.makeIterator()
     }
 
+    static func ==(lhs: FixedWeights, rhs: FixedWeights) -> Bool {
+        return lhs.weights == rhs.weights
+    }
+    
     private var weights: [Double]
 }
 
 /// List of arbitrary weights, e.g. for dumbbells or a cable machine.
-class FixedWeightSet {
+struct FixedWeightSet: Equatable {
     var weights: FixedWeights
     var extra: FixedWeights
-    var extraAdds: Int          // number of extra weights that can be added to the maiun weight
+    var extraAdds: Int          // number of extra weights that can be added to the main weight
 
     init() {
         self.weights = FixedWeights()
@@ -70,6 +74,10 @@ class FixedWeightSet {
         self.weights = FixedWeights(weights)
         self.extra = FixedWeights(extra)
         self.extraAdds = extraAdds
+    }
+    
+    static func ==(lhs: FixedWeightSet, rhs: FixedWeightSet) -> Bool {
+        return lhs.weights == rhs.weights && lhs.extra == rhs.extra && lhs.extraAdds == rhs.extraAdds
     }
     
     func getClosest(_ target: Double) -> Double {

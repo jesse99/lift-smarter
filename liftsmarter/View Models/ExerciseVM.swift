@@ -37,6 +37,21 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.expected.weight}
     }
     
+    var apparatus: Apparatus {
+        get {return self.exercise.modality.apparatus}
+    }
+    
+    var activeFWSName: String {
+        get {
+            if case .fixedWeights(let name) = self.exercise.modality.apparatus {
+                return name ?? ""
+            } else {
+                ASSERT(false, "should only be called for fixedWeights")
+                return ""
+            }
+        }
+    }
+    
     static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
         return lhs.name == rhs.name
     }
@@ -77,6 +92,17 @@ extension ExerciseVM {
     func setAllowRest(_ allow: Bool) {
         self.willChange()
         self.exercise.allowRest = allow
+    }
+    
+    func setActiveFixedWeight(_ name: String?) {
+        self.willChange()
+        print("activated with \(name ?? "no name")")
+        self.exercise.modality.apparatus = .fixedWeights(name: name)
+    }
+    
+    func setApparatus(_ apparatus: Apparatus) {
+        self.willChange()
+        self.exercise.modality.apparatus = apparatus
     }
 }
 
@@ -193,6 +219,56 @@ extension ExerciseVM {
             } else {
                 return weightField()
             }
+        }
+    }
+
+    func apparatusView(_ apparatus: Binding<Apparatus>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
+        func change(_ newValue: Apparatus) {
+            if newValue.caseIndex() != self.exercise.modality.apparatus.caseIndex() {
+                apparatus.wrappedValue = newValue
+            } else {
+                // If the user is swtching back to the original apparatus then use the original settings.
+                apparatus.wrappedValue = self.exercise.modality.apparatus
+            }
+        }
+        
+        switch apparatus.wrappedValue {
+        case .bodyWeight:
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout).disabled(true)
+                    Spacer()
+                
+                    Menu("Body Weight") {
+                        Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    
+                    Button("?", action: {onHelp("Includes an optional arbitrary weight.")}).font(.callout)
+                }.padding()
+            )
+
+        case .fixedWeights(_):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditFWSsView(self.program, apparatus)}
+                    Spacer()
+                
+                    Menu("Fixed Weights") {
+                        Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    
+                    Button("?", action: {onHelp("Dumbbells, kettlebells, cable machines, etc.")}).font(.callout)
+                }.padding()
+            )
         }
     }
 }
