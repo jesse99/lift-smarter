@@ -2,7 +2,8 @@
 import SwiftUI
 
 struct EditFixedRepsView: View {
-    let exercise: InstanceVM
+    let exerciseName: String
+    let sets: Binding<Sets>
     @State var reps: String
     @State var rest: String
     @State var showHelp = false
@@ -10,17 +11,18 @@ struct EditFixedRepsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exercise: InstanceVM) {
-        self.exercise = exercise
+    init(_ exerciseName: String, _ sets: Binding<Sets>) {
+        self.exerciseName = exerciseName
+        self.sets = sets
 
-        let table = exercise.render()
+        let table = sets.wrappedValue.render()
         self._reps = State(initialValue: table["reps"]!)
         self._rest = State(initialValue: table["rest"]!)
     }
     
     var body: some View {
         VStack() {
-            Text("Edit " + self.exercise.name).font(.largeTitle)
+            Text("Edit " + self.exerciseName).font(.largeTitle)
 
             VStack(alignment: .leading) {
                 numericishField("Reps", self.$reps, self.onEditedSets, self.onRepsHelp)
@@ -52,9 +54,9 @@ struct EditFixedRepsView: View {
 
     func onOK() {
         let table = ["reps": self.reps, "rest": self.rest]
-        switch exercise.parse(table) {
+        switch sets.wrappedValue.parse(table) {
         case .right(let sets):
-            self.exercise.setSets(sets)
+            self.sets.wrappedValue = sets
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
@@ -64,7 +66,7 @@ struct EditFixedRepsView: View {
 
     private func onEditedSets(_ text: String) {
         let table = ["reps": self.reps, "rest": self.rest]
-        switch exercise.parse(table) {
+        switch sets.wrappedValue.parse(table) {
         case .right(_):
             self.error = ""
         case .left(let err):
@@ -88,10 +90,9 @@ struct EditFixedRepsView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[1]
     static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
-    static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
-    static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
+    static var sets = Binding.constant(exercise.modality.sets)
 
     static var previews: some View {
-        EditFixedRepsView(vm)
+        EditFixedRepsView(exercise.name, sets)
     }
 }

@@ -1,6 +1,29 @@
 //  Created by Jesse Vorisek on 9/11/21.
 import Foundation
 
+func defaultDurations() -> Sets {
+    let set = DurationSet(secs: 120, restSecs: 0)
+    return .durations([set, set], targetSecs: [])
+}
+
+func defaultFixedReps() -> Sets {
+    let set = FixedRepsSet(reps: FixedReps(8), restSecs: 60)
+    return .fixedReps([set, set, set])
+}
+
+func defaultMaxReps() -> Sets {
+    return .maxReps(restSecs: [60, 60, 60], targetReps: 24)
+}
+
+func defaultRepRanges() -> Sets {
+    let set = RepsSet(reps: RepRange(min: 8, max: 12), restSecs: 120)
+    return .repRanges(warmups: [], worksets: [set, set, set], backoffs: [])
+}
+
+func defaultRepTotal() -> Sets {
+    return .repTotal(total: 24, rest: 60)
+}
+
 func mockProgram() -> Program {
     // https://www.defrancostraining.com/joe-ds-qlimber-11q-flexibility-routine/
     func foamRolling() -> Exercise {

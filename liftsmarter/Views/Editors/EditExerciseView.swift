@@ -9,9 +9,11 @@ struct EditExerciseView: View {
     @State var weight: String
     @State var allowRest: Bool
     @State var apparatus: Apparatus
+    @State var sets: Sets
     @State var formalNameModal = false
     @State var weightsModal = false
     @State var apparatusModal = false
+    @State var setsModal = false
     @State var showHelp = false
     @State var helpText = ""
     @State var error = ""
@@ -25,13 +27,10 @@ struct EditExerciseView: View {
         self._formalName = State(initialValue: exercise.formalName)
         self._weight = State(initialValue: friendlyWeight(exercise.expectedWeight))
         self._allowRest = State(initialValue: exercise.allowRest)
+        self._sets = State(initialValue: exercise.sets)
         self._apparatus = State(initialValue: exercise.apparatus)
     }
 
-    // TODO:
-    // might want a titleLabel component
-    // get sets editing working
-    //    be sure to reset expected.sets
     var body: some View {
         VStack() {
             Text("Edit Exercise").font(.largeTitle).padding()
@@ -52,7 +51,8 @@ struct EditExerciseView: View {
                 
                 Toggle("Respect Rest Weeks", isOn: self.$allowRest).padding(.trailing).padding(.leading)
                 
-                self.exercise.apparatusView(self.$apparatus, self.$apparatusModal, self.onApparatusHelp)
+                self.exercise.setsView(self.name, self.$sets, self.$setsModal, self.onHelpCallback)
+                self.exercise.apparatusView(self.$apparatus, self.$apparatusModal, self.onHelpCallback)
 
             }
             Spacer()
@@ -139,6 +139,9 @@ struct EditExerciseView: View {
             if self.allowRest != self.exercise.allowRest {
                 self.exercise.setAllowRest(self.allowRest)
             }
+            if self.sets != self.exercise.sets {
+                self.exercise.setSets(self.sets)
+            }
             if self.apparatus != self.exercise.apparatus {
                 self.exercise.setApparatus(self.apparatus)
             }
@@ -164,7 +167,7 @@ struct EditExerciseView: View {
         self.showHelp = true
     }
 
-    private func onApparatusHelp(_ text: String) {
+    private func onHelpCallback(_ text: String) {
         self.helpText = text
         self.showHelp = true
     }

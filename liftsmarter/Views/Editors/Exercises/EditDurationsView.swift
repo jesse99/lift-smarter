@@ -4,7 +4,8 @@ import SwiftUI
 let restHelpText = "The amount of time to rest after each set. Time units may be omitted so '1.5m 60s 30 0' is a minute and a half, 60 seconds, 30 seconds, and no rest time."
 
 struct EditDurationsView: View {
-    let exercise: InstanceVM
+    let exerciseName: String
+    let sets: Binding<Sets>
     @State var durations: String
     @State var target: String
     @State var rest: String
@@ -13,10 +14,11 @@ struct EditDurationsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exercise: InstanceVM) {
-        self.exercise = exercise
+    init(_ exerciseName: String, _ sets: Binding<Sets>) {
+        self.exerciseName = exerciseName
+        self.sets = sets
 
-        let table = exercise.render()
+        let table = sets.wrappedValue.render()
         self._durations = State(initialValue: table["durations"]!)
         self._rest = State(initialValue: table["rest"]!)
         self._target = State(initialValue: table["target"]!)
@@ -24,7 +26,7 @@ struct EditDurationsView: View {
     
     var body: some View {
         VStack() {
-            Text("Edit " + self.exercise.name).font(.largeTitle)
+            Text("Edit " + self.exerciseName).font(.largeTitle)
 
             VStack(alignment: .leading) {
                 numericishField("Durations", self.$durations, self.onEditedSets, self.onDurationsHelp)
@@ -57,9 +59,9 @@ struct EditDurationsView: View {
 
     func onOK() {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch exercise.parse(table) {
+        switch sets.wrappedValue.parse(table) {
         case .right(let sets):
-            self.exercise.setSets(sets)
+            self.sets.wrappedValue = sets
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
@@ -69,7 +71,7 @@ struct EditDurationsView: View {
 
     private func onEditedSets(_ text: String) {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch exercise.parse(table) {
+        switch sets.wrappedValue.parse(table) {
         case .right(_):
             self.error = ""
         case .left(let err):
@@ -98,10 +100,9 @@ struct EditDurationsView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
-    static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-    static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
+    static var sets = Binding.constant(exercise.modality.sets)
 
     static var previews: some View {
-        EditDurationsView(vm)
+        EditDurationsView(exercise.name, sets)
     }
 }

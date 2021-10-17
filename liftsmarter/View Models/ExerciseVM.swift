@@ -37,6 +37,10 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.expected.weight}
     }
     
+    var sets: Sets {
+        get {return self.exercise.modality.sets}
+    }
+    
     var apparatus: Apparatus {
         get {return self.exercise.modality.apparatus}
     }
@@ -100,8 +104,21 @@ extension ExerciseVM {
         self.exercise.modality.apparatus = .fixedWeights(name: name)
     }
     
+    func setSets(_ sets: Sets) {
+        self.willChange()
+        if sets.caseIndex() != self.exercise.modality.sets.caseIndex() {
+            // TODO: May want to change expected weight too, but have to be careful with
+            // the weight textbox in EditExercise.
+            self.exercise.expected.sets = defaultExpectedSets(sets)
+        }
+        self.exercise.modality.sets = sets
+    }
+
     func setApparatus(_ apparatus: Apparatus) {
         self.willChange()
+        if apparatus.caseIndex() != self.exercise.modality.apparatus.caseIndex() {
+            self.exercise.expected.sets = defaultExpectedSets(sets)
+        }
         self.exercise.modality.apparatus = apparatus
     }
 }
@@ -219,6 +236,68 @@ extension ExerciseVM {
             } else {
                 return weightField()
             }
+        }
+    }
+
+    func setsView(_ exerciseName: String, _ sets: Binding<Sets>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
+        func change(_ newValue: Sets) {
+            if newValue.caseIndex() != self.exercise.modality.sets.caseIndex() {
+                sets.wrappedValue = newValue
+            } else {
+                // If the user is swtching back to the original sets then use the original settings.
+                sets.wrappedValue = self.exercise.modality.sets
+            }
+        }
+        
+        switch sets.wrappedValue {
+        case .durations(_, targetSecs: _):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditDurationsView(exerciseName, sets)}
+                    Spacer()
+                    Menu("Durations") {     // TODO: should this (and apparatus) omit the menu item for the current selection
+                        Button("Durations", action: {change(defaultDurations())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("Each set is done for a time interval.")}).font(.callout)
+                }.padding()
+            )
+            
+        case .fixedReps(_):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditFixedRepsView(exerciseName, sets)}
+                    Spacer()
+                    Menu("Fixed Reps") {
+                        Button("Durations", action: {change(defaultDurations())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("Sets and reps are both fixed. No support for weight percentages.")}).font(.callout)
+                }.padding()
+            )
+
+        case .maxReps(restSecs: _, targetReps: _):
+            return AnyView(Text("not implemented"))
+            
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            return AnyView(Text("not implemented"))
+            
+        case .repTotal(total: _, rest: _):
+            return AnyView(Text("not implemented"))
         }
     }
 

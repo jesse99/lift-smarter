@@ -23,7 +23,7 @@ class Exercise {
     }
         
     convenience init(_ name: String, _ formalName: String, _ modality: Modality) {
-        self.init(name, formalName, modality, defaultExpected(modality))
+        self.init(name, formalName, modality, defaultExpected(modality.sets))
     }
         
     func isBodyWeight() -> Bool {
@@ -62,25 +62,29 @@ class Exercise {
 }
 
 
-fileprivate func defaultExpected(_ modality: Modality) -> Expected {
-    // TODO: if apparatus is a fixed weight set then default weight to the smallest weight
-    switch modality.sets {
+func defaultExpectedSets(_ sets: Sets) -> ExpectedSets {
+    switch sets {
     case .durations(_, _):
-        return Expected(weight: 0.0, sets: .durations)
+        return .durations
 
     case .fixedReps(_):
-        return Expected(weight: 0.0, sets: .fixedReps)
+        return .fixedReps
 
     case .maxReps(_, _):
-        return Expected(weight: 0.0, sets: .maxReps(reps: [8, 8, 8]))
+        return .maxReps(reps: [8, 8, 8])
 
     case .repRanges(warmups: let warmups, worksets: let worksets, backoffs: let backoff):
         let r1 = warmups.map({$0.reps.min})
         let r2 = worksets.map({$0.reps.min})
         let r3 = backoff.map({$0.reps.min})
-        return Expected(weight: 0.0, sets: .repRanges(warmupsReps: r1, worksetsReps: r2, backoffsReps: r3))
+        return .repRanges(warmupsReps: r1, worksetsReps: r2, backoffsReps: r3)
 
     case .repTotal(total: _, rest: _):
-        return Expected(weight: 0.0, sets: .repTotal(reps: [5, 5, 5]))
+        return .repTotal(reps: [5, 5, 5])
     }
+}
+
+func defaultExpected(_ sets: Sets) -> Expected {
+    // TODO: if apparatus is a fixed weight set then default weight to the smallest weight?
+    return Expected(weight: 0.0, sets: defaultExpectedSets(sets))
 }

@@ -42,6 +42,7 @@
 		37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
+		37D53893271CBE6C006B3833 /* SetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53892271CBE6C006B3833 /* SetsVM.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
@@ -111,6 +112,7 @@
 		37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFixedWeightsView.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
+		37D53892271CBE6C006B3833 /* SetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetsVM.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -253,8 +255,8 @@
 				3718978626F6955A00351C5A /* History.swift */,
 				37ECEA6626ED4A0F00D0AD8E /* Logs.swift */,
 				37ECEA5226EB07BE00D0AD8E /* Modality.swift */,
-				37ECEA4A26EAD85B00D0AD8E /* Model.swift */,
 				37ECEA6426ED2FE700D0AD8E /* Mocks.swift */,
+				37ECEA4A26EAD85B00D0AD8E /* Model.swift */,
 				37ECEA4826EAD74A00D0AD8E /* Program.swift */,
 				37ECEA5626EB0BAE00D0AD8E /* Sets.swift */,
 				37ECEA4C26EAD93900D0AD8E /* Workout.swift */,
@@ -284,6 +286,7 @@
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
 				371897982702C63F00351C5A /* Parsers.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
+				37D53892271CBE6C006B3833 /* SetsVM.swift */,
 				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
 			);
 			path = "View Models";
@@ -447,6 +450,7 @@
 				37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */,
 				37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */,
 				37A3C5ED2711469800BFA8CC /* PickerView.swift in Sources */,
+				37D53893271CBE6C006B3833 /* SetsVM.swift in Sources */,
 				37ECEA5126EAD9F200D0AD8E /* Exercise.swift in Sources */,
 				37A3C5EA270FDA0000BFA8CC /* EditExerciseView.swift in Sources */,
 				37A3C5E7270E8BAD00BFA8CC /* EditFixedRepsView.swift in Sources */,

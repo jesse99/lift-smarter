@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 9/27/21.
 import Foundation
 
-// IntList = Int (Space Int)*
+// IntList = Int (Space Int)* ('x' Int)?
 func parseIntList(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false) -> Either<String, [Int]> {
     var values: [Int] = []
     let scanner = Scanner(string: text)
@@ -13,6 +13,19 @@ func parseIntList(_ text: String, label: String, zeroOK: Bool = false, emptyOK: 
                 return .left("\(label.capitalized) is too large")
             }
             values.append(Int(value))
+            
+            if scanner.scanString("x") != nil {
+                if let n = scanner.scanUInt64(), n > 0 {
+                    if n < 1000 {
+                        values = values.duplicate(x: Int(n))
+                        break
+                    } else {
+                        return .left("repeat count is too large")
+                    }
+                } else {
+                    return .left("x should be followed by the number of times to duplicate")
+                }
+            }
         } else {
             return .left("Expected space separated integers for \(label)")
         }
