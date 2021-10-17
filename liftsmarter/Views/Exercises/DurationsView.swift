@@ -2,37 +2,40 @@
 import SwiftUI
 
 struct DurationsView: View {
+    let program: ProgramVM
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
-    @ObservedObject var exercise: InstanceVM
+    @ObservedObject var instance: InstanceVM
     @State var editModal = false
+    @State var noteModal = false
     @State var implicitTimerModal = false
     @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
 
-    init(_ exercise: InstanceVM) {
-        self.exercise = exercise
+    init(_ program: ProgramVM, _ instance: InstanceVM) {
+        self.program = program
+        self.instance = instance
     }
     
     var body: some View {
         VStack {
             Group {     // we're using groups to work around the 10 item limit in VStacks
-                Text(exercise.name).font(.largeTitle)   // Burpees
+                Text(instance.name).font(.largeTitle)   // Burpees
                 Spacer()
             
-                Text(exercise.title()).font(.title)          // Set 1 of 1
-                Text(exercise.subTitle()).font(.headline)    // 60s
-                Text(exercise.subSubTitle()).font(.headline) // 10 lbs
+                Text(instance.title()).font(.title)          // Set 1 of 1
+                Text(instance.subTitle()).font(.headline)    // 60s
+                Text(instance.subSubTitle()).font(.headline) // 10 lbs
                 Spacer()
 
                 Group {
-                    Button(exercise.nextLabel(), action: onNext)
+                    Button(instance.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
-                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {exercise.implicitTimer()}
+                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {instance.implicitTimer()}
                     Spacer().frame(height: 50)
 
                     Button("Start Timer", action: onStartTimer)
                         .font(.system(size: 20.0))
-                        .sheet(isPresented: self.$explicitTimerModal) {exercise.explicitTimer()}
+                        .sheet(isPresented: self.$explicitTimerModal) {instance.explicitTimer()}
                     Spacer()
                     Text(self.getNoteLabel()).font(.callout)   // Same previous x3
                 }
@@ -40,17 +43,17 @@ struct DurationsView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.exercise.inProgress())
+                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.instance.inProgress())
                 Button("History", action: onStartHistory)
                     .font(.callout)
 //                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
                 Spacer()
                 Button("Note", action: onStartNote)
                     .font(.callout)
-//                    .sheet(isPresented: self.$noteModal) {NoteView(self.display, formalName: self.exercise().formalName)}
+                    .sheet(isPresented: self.$noteModal) {NoteView(self.program, formalName: self.instance.formalName)}
                 Button("Edit", action: onEdit)
                     .font(.callout)
-                    .sheet(isPresented: self.$editModal) {EditExerciseView(self.exercise)}
+                    .sheet(isPresented: self.$editModal) {EditExerciseView(self.instance)}
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
@@ -60,21 +63,21 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        if exercise.incomplete() {
+        if instance.incomplete() {
             self.implicitTimerModal = true
         } else {
-            exercise.reset()
+            instance.reset()
 
             self.presentation.wrappedValue.dismiss()
         }
     }
     
     func onNextCompleted() {
-        exercise.appendCurrent()
+        instance.appendCurrent()
     }
     
     func onReset() {
-        self.exercise.reset()
+        self.instance.reset()
     }
     
     private func onStartTimer() {
@@ -90,12 +93,12 @@ struct DurationsView: View {
     }
     
     private func onStartNote() {
-//        self.noteModal = true
+        self.noteModal = true
     }
     
     private func resetIfNeeded() {
-        if exercise.shouldReset() {
-            exercise.reset()
+        if instance.shouldReset() {
+            instance.reset()
         }
     }
 
@@ -114,6 +117,6 @@ struct DurationsView_Previews: PreviewProvider {
     static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
-        DurationsView(vm)
+        DurationsView(program, vm)
     }
 }

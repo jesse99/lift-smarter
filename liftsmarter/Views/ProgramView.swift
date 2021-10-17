@@ -15,7 +15,7 @@ struct ProgramView: View {
             VStack {
                 List(self.program.workouts) {workout in
                     if workout.enabled {
-                        NavigationLink(destination: WorkoutView(workout)) {
+                        NavigationLink(destination: WorkoutView(self.program, workout)) {
                             VStack(alignment: .leading) {
                                 Text(program.label(workout)).font(.title)
                                 

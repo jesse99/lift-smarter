@@ -38,6 +38,10 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.instanceClipboard}
     }
     
+    func getUserNote(_ key: String) -> String? {
+        return self.model.userNotes[key]
+    }
+    
     func history() -> HistoryVM {
         return HistoryVM(self.model)
     }
@@ -161,6 +165,11 @@ extension ProgramVM {
     func toggleEnabled(_ vm: WorkoutVM) {
         self.willChange()
         vm.workout(self.model).enabled = !vm.workout(self.model).enabled
+    }
+    
+    func setUserNote(_ formalName: String, _ note: String?) {
+        self.willChange()
+        self.model.userNotes[formalName] = note
     }
     
     func setFWS(_ name: String, _ fws: FixedWeightSet) {

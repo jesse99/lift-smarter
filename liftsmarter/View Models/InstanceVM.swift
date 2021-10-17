@@ -26,6 +26,10 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.name}
     }
     
+    var formalName: String {
+        get {return self.exercise.formalName}
+    }
+    
     var enabled: Bool {
         get {return self.instance.enabled}
     }
@@ -363,13 +367,13 @@ extension InstanceVM {
         return TimerView(title: title, duration: secs > 0 ? secs : 60)
     }
 
-    func view() -> AnyView {
+    func view(_ program: ProgramVM) -> AnyView {
         switch self.exercise.modality.sets {
         case .durations(_, _):
-            return AnyView(DurationsView(self))
+            return AnyView(DurationsView(program, self))
 
         case .fixedReps(_):
-            return AnyView(FixedRepsView(self))
+            return AnyView(FixedRepsView(program, self))
 
         case .maxReps(_, _):
             return AnyView(Text("not implemented"))

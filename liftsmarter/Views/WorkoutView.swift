@@ -2,10 +2,12 @@
 import SwiftUI
 
 struct WorkoutView: View {  // TODO: might want a timer here (if time advances enough can fall into a rest week)
+    let program: ProgramVM
     @ObservedObject var workout: WorkoutVM
     @State var editModal = false
 
-    init(_ workout: WorkoutVM) {
+    init(_ program: ProgramVM, _ workout: WorkoutVM) {
+        self.program = program
         self.workout = workout
     }
 
@@ -13,7 +15,7 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
         VStack {
             List(self.workout.instances) {instance in
                 if instance.enabled {
-                    NavigationLink(destination: ExerciseView(instance)) {
+                    NavigationLink(destination: ExerciseView(program, instance)) {
                         VStack(alignment: .leading) {
                             let label = self.workout.label(instance)
                             let color = self.workout.color(instance)
@@ -52,6 +54,6 @@ struct WorkoutView_Previews: PreviewProvider {
     static let vm = WorkoutVM(program, model.program.workouts[0])
 
     static var previews: some View {
-        WorkoutView(vm)
+        WorkoutView(program, vm)
     }
 }
