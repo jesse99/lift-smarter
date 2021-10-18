@@ -32,6 +32,7 @@ struct NoteView: View {
             Text(self.formalName).font(.largeTitle)
             if #available(iOS 15.0, *) {
                 Text(self.markup())
+                    .font(.callout)
                     .padding()
             } else {
                 HTMLStringView(htmlContent: self.markup())
@@ -42,9 +43,9 @@ struct NoteView: View {
                 Button("Revert", action: onRevert)
                     .font(.body)
                     .disabled(!self.hasUserNote())
-//                Button("Edit", action: onEdit)
-//                    .font(.callout)
-//                    .sheet(isPresented: self.$editModal) {EditNoteView(self.display, formalName: self.formalName)}
+                Button("Edit", action: onEdit)
+                    .font(.callout)
+                    .sheet(isPresented: self.$editModal) {EditNoteView(self.program, self.formalName)}
                 Spacer()
                 Spacer()
                 Button("Done", action: onDone).font(.callout)
