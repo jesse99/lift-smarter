@@ -1,34 +1,31 @@
 //  Created by Jesse Vorisek on 10/8/21.
 import Foundation
 
-// TODO: ios 15 has a real markdown library
 private func noteToMarkdown(notes: [String], links: [String: String]) -> String {
     var text = ""
-    
-    text += "<ul>\n"
-    for note in notes {
-        text += "<li style='font-size:64px;'>\(note)</li>"
+
+    if #available(iOS 15.0, *) {
+        let ammended = notes.map {"- " + $0}
+        text = ammended.joined(separator: "\n")
+        text += "\n\n"
+
+        for (name, link) in links {
+            text += "[\(name)](\(link))  "
+        }
+    } else {
+        text += "<ul>\n"
+        for note in notes {
+            text += "<li style='font-size:64px;'>\(note)</li>"
+        }
+        text += "<p style='font-size:48px;'>  </p>"
+        for (label, url) in links {
+            text += "<p><a href='\(url)' style='font-size:64px;'>\(label)</a></p>\n"
+        }
+        text += "</ul>\n"
     }
-    text += "<p style='font-size:48px;'>  </p>"
-    for (label, url) in links {
-        text += "<p><a href='\(url)' style='font-size:64px;'>\(label)</a></p>\n"
-    }
-    text += "</ul>\n"
-    
+
     return text
 }
-
-//private func noteToMarkdown(notes: [String], links: [String: String]) -> String {
-//    let ammended = notes.map {"• " + $0}    // TODO: use * once we have a markdown library that supports lists
-//    var text = ammended.joined(separator: "\n")
-//    text += "\n\n"
-//
-//    for (name, link) in links {
-//        text += "[\(name)](\(link))"
-//    }
-//
-//    return text
-//}
 
 /// Key is the formal name for an exercise. Value is markdown describing how to do do the exercise
 /// and normally link(s) with more detaiuls.

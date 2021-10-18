@@ -30,8 +30,13 @@ struct NoteView: View {
     var body: some View {
         VStack {
             Text(self.formalName).font(.largeTitle)
-            HTMLStringView(htmlContent: self.markup())
-                .padding()
+            if #available(iOS 15.0, *) {
+                Text(self.markup())
+                    .padding()
+            } else {
+                HTMLStringView(htmlContent: self.markup())
+                    .padding()
+            }
             Spacer()
             HStack {
                 Button("Revert", action: onRevert)
@@ -48,6 +53,16 @@ struct NoteView: View {
         }
     }
     
+    @available(iOS 15, *)
+    private func markup() -> AttributedString {
+        do {
+            return try AttributedString(markdown: self.program.getUserNote(formalName) ?? defaultNotes[formalName] ?? "No note", options: AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace))
+        } catch {
+            return AttributedString("Error parsing markdown")
+        }
+    }
+    
+    @available(iOS 14, *)
     private func markup() -> String {
         return self.program.getUserNote(formalName) ?? defaultNotes[formalName] ?? "No note"
     }
