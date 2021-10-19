@@ -242,7 +242,7 @@ extension ProgramVM {
         
         for candidate in instances {
             let instance = candidate.instance(self.model)
-            if now.hoursSinceDate(instance.current.startDate) <= RecentHours && candidate.inProgress() {
+            if now.hoursSinceDate(instance.current.startDate) <= RecentHours && candidate.started {
                 // If any exercise has been started recently but not completed.
                 return ("in progress", .red)
             }

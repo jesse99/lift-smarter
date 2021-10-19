@@ -155,10 +155,9 @@ func mockProgram() -> Program {
     }
     
     func pushup() -> Exercise {
-        let work = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 150)
-        let sets = Sets.repRanges(warmups: [], worksets: [work, work, work], backoffs: [])
+        let sets = Sets.repTotal(total: 50, rest: 60)
         let modality = Modality(Apparatus.bodyWeight, sets)
-        return Exercise("Pushup", "Pushup", modality, Expected(weight: 0.0, sets: .repRanges(warmupsReps: [5,3], worksetsReps: [10,10,10], backoffsReps: [])))
+        return Exercise("Pushup", "Pushup", modality, Expected(weight: 0.0, sets: .repTotal(reps: [20, 20, 10])))
     }
 
     func reversePlank() -> Exercise { // TODO: this should be some sort of progression

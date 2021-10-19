@@ -290,7 +290,7 @@ extension WorkoutVM {
     func color(_ instance: InstanceVM) -> Color {
         if self.recentlyCompleted(instance) || self.isResting(instance) {
             return .gray
-        } else if instance.inProgress() {
+        } else if instance.started {
             return .blue
         } else {
             return .black

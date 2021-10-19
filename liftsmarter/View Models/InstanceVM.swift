@@ -68,6 +68,12 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
     }
 }
 
+enum Progress {
+    case notStarted
+    case started
+    case finished
+}
+
 // Misc Logic
 extension InstanceVM {
     func log(_ level: LogLevel, _ message: String) {
@@ -80,9 +86,9 @@ extension InstanceVM {
     }
     
     func shouldReset() -> Bool {
-        // 1) If it's been a long time since the user began the exercise then start over.
-        // 2) If setIndex has become whacked as a result of user edits then start over.
         if let numSets = self.numSets() {
+            // 1) If it's been a long time since the user began the exercise then start over.
+            // 2) If setIndex has become whacked as a result of user edits then start over.
             return Date().hoursSinceDate(self.instance.current.startDate) > RecentHours || self.setIndex > numSets
         } else {
             return Date().hoursSinceDate(self.instance.current.startDate) > RecentHours
@@ -94,38 +100,120 @@ extension InstanceVM {
         instance.current.reset(weight: exercise.expected.weight)
     }
     
-    func inProgress() -> Bool {
-        if let numSets = self.numSets() {
-            return self.setIndex > 0 && self.setIndex < numSets
-        } else {
-            return false        // TODO: this doesn't seem right
+    var notStarted: Bool {
+        get {
+            if case .notStarted = self.progress() {
+                return true
+            } else {
+                return false
+            }
         }
     }
-        
-    func incomplete() -> Bool {
-        switch self.exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            return self.setIndex < durations.count
-        case .fixedReps(let sets):
-            return self.setIndex < sets.count
-        case .maxReps(restSecs: let rests, targetReps: _):
-            return self.setIndex < rests.count
-        case .repRanges(warmups: let warmups, worksets: let worksets, backoffs: let backoffs):
-            return self.setIndex < (warmups.count + worksets.count + backoffs.count)
-        case .repTotal(total: let totalReps, rest: _):
-            let reps = self.instance.current.reps.reduce(0, {
-                switch $1 {
-                case .reps(count: let reps, percent: _):
+
+    var started: Bool {
+        get {
+            if case .started = self.progress() {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    var finished: Bool {
+        get {
+            if case .finished = self.progress() {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    func progress() -> Progress {
+        if case .repTotal(total: let totalReps, rest: _) = self.exercise.modality.sets {
+            let currentReps = self.instance.current.reps.reduce(0, {
+                if case .reps(count: let reps, percent: _) = $1 {
                     return $0 + reps
-                default:
-                    ASSERT(false, "expected reps")
-                    return 0
+                } else {
+                    ASSERT(false, "current should be using ,reps")
+                    return $0
                 }
             })
-            return reps < totalReps
+            if currentReps == 0 {
+                return .notStarted
+            } else if currentReps < totalReps {
+                return .started
+            } else {
+                return .finished
+            }
+        }
+        if let numSets = self.numSets() {
+            if self.setIndex == 0 {
+                return .notStarted
+            } else if self.setIndex < numSets {
+                return .started
+            } else {
+                return .finished
+            }
+        } else {
+            ASSERT(false, "shouldn't have landed here")
+            return .notStarted
         }
     }
     
+    func expectedReps() -> Int? {
+        switch self.exercise.expected.sets {
+        case .repTotal(reps: let repsArray):
+            return repsArray.at(self.instance.current.setIndex) ?? 1
+        case .maxReps(reps: let repsArray):
+            return repsArray.at(self.instance.current.setIndex) ?? 1
+        case .repRanges(warmupsReps: _, worksetsReps: let repsArray, backoffsReps: _):
+            return repsArray.at(self.instance.current.setIndex) ?? 1
+        case .durations, .fixedReps:
+            return nil
+        }
+    }
+        
+    func currentIsUnexpected() -> Bool {
+        let currentReps = self.instance.current.reps.reduce(0, {
+            if case .reps(count: let reps, percent: _) = $1 {
+                return $0 + reps
+            } else {
+                return $0
+            }
+        })
+
+        switch self.exercise.modality.sets {
+        case .durations(_, targetSecs: _), .fixedReps(_):
+            return false
+        case .maxReps(restSecs: _, targetReps: _):
+            if case .maxReps(reps: let repsArray) = self.exercise.expected.sets {
+                let expectedReps = repsArray.reduce(0, {$0 + $1})
+                return expectedReps != currentReps
+            } else {
+                ASSERT(false, "expected .maxReps")
+                return false
+            }
+        case .repRanges(warmups: _, worksets: _, backoffs: _):
+            if case .repRanges(warmupsReps: _, worksetsReps: let repsArray, backoffsReps: _) = self.exercise.expected.sets {
+                let expectedReps = repsArray.reduce(0, {$0 + $1})
+                return expectedReps != currentReps
+            } else {
+                ASSERT(false, "expected .repRanges")
+                return false
+            }
+        case .repTotal(total: _, rest: _):
+            if case .repTotal(reps: let repsArray) = self.exercise.expected.sets {
+                let expectedReps = repsArray.reduce(0, {$0 + $1})
+                return expectedReps != currentReps
+            } else {
+                ASSERT(false, "expected .repTotal")
+                return false
+            }
+        }
+    }
+        
     func appendCurrent(_ reps: Int? = nil, now: Date = Date()) {
         self.willChange()
 
@@ -135,7 +223,7 @@ extension InstanceVM {
 
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
-            ASSERT(reps == nil, "reps is for repRanges")
+            ASSERT(reps == nil, "reps is for repRanges and repTotal")
             let duration = durations[self.setIndex]
             instance.current.setIndex += 1
             instance.current.reps.append(.duration(secs: duration.secs, percent: 1.0))
@@ -149,7 +237,7 @@ extension InstanceVM {
             }
 
         case .fixedReps(let sets):
-            ASSERT(reps == nil, "reps is for repRanges")
+            ASSERT(reps == nil, "reps is for repRanges and repTotal")
             let reps = sets[self.setIndex].reps.reps
             instance.current.setIndex += 1
             instance.current.reps.append(.reps(count: reps, percent: 1.0))
@@ -161,6 +249,46 @@ extension InstanceVM {
                 let workout = workout.workout(self.instance)
                 workout.completed[self.name] = now
             }
+            
+        case .repTotal(total: _, rest: _):
+            ASSERT(reps != nil, "reps should be set")
+            instance.current.setIndex += 1
+            instance.current.reps.append(.reps(count: reps!, percent: 1.0))
+            
+            if self.finished {
+                let history = self.workout.program.history()
+                history.append(self.workout, self)
+                
+                let workout = workout.workout(self.instance)
+                workout.completed[self.name] = now
+            }
+
+        default:
+            ASSERT(false, "not implemented")
+        }
+    }
+    
+    func updateExpected() {
+        self.willChange()
+
+        switch self.exercise.modality.sets {
+        case .durations(_, targetSecs: _), .fixedReps(_):
+            ASSERT(false, "nonsensical")
+
+        case .repTotal(total: _, rest: let rest):
+            let repsArray: [Int] = self.instance.current.reps.map({
+                if case .reps(count: let reps, percent: _) = $0 {
+                    return reps
+                } else {
+                    ASSERT(false, "expected reps")
+                    return 0
+                }
+            })
+            self.exercise.expected.sets = .repTotal(reps: repsArray)
+            
+            let totalReps = repsArray.reduce(0, {$0 + $1})
+            let sets = Sets.repTotal(total: totalReps, rest: rest)
+            self.setSets(sets)
 
         default:
             ASSERT(false, "not implemented")
@@ -181,27 +309,31 @@ extension InstanceVM {
 // UI
 extension InstanceVM {
     func title() -> String {
-        func text(numSets: Int) -> String {
-            if instance.current.setIndex < numSets {
-                return "Set \(instance.current.setIndex+1) of \(numSets)"
-            } else if numSets == 1 {
-                return "Finished"
-            } else {
-                return "Finished all \(numSets) sets"
-            }
-        }
-
         switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):  // TODO: might be able to use numSets()
-            return text(numSets: durations.count)
-        case .fixedReps(let sets):
-            return text(numSets: sets.count)
-        case .maxReps(restSecs: _, targetReps: _):
-            return "not implemented"
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
-            return "not implemented"
         case .repTotal(total: _, rest: _):
-            return "not implemented"
+            switch self.progress() {
+            case .notStarted, .started:
+                return "Set \(instance.current.setIndex+1)"
+            case .finished:
+                if instance.current.setIndex == 1 {
+                    return "Finished"
+                } else {
+                    return "Finished using \(instance.current.setIndex) sets"
+                }
+            }
+        default:
+            let numSets = self.numSets()!
+            switch self.progress() {
+            case .notStarted, .started:
+                return "Set \(instance.current.setIndex+1) of \(numSets)"
+            case .finished:
+                if numSets == 1 {
+                    return "Finished"
+                } else {
+                    return "Finished all \(numSets) sets"
+                }
+            }
+
         }
     }
 
@@ -235,7 +367,19 @@ extension InstanceVM {
         case .repRanges(warmups: _, worksets: _, backoffs: _):
             text = "not implemented"
         case .repTotal(total: _, rest: _):
-            text = "not implemented"
+            if case .repTotal(reps: let repArray) = self.exercise.expected.sets {
+                if instance.current.setIndex < repArray.count {
+                    let reps = repArray[instance.current.setIndex]
+                    if reps == 1 {
+                        text = "Expecting 1 rep"
+                    } else {
+                        text = "Expecting \(reps) reps"
+                    }
+                }
+            } else {
+                ASSERT(false, "shouldn't land here")
+                text = "error"
+            }
         }
         
         let closest = exercise.getClosestBelow(self.workout.model(instance), weight*percent)
@@ -265,30 +409,24 @@ extension InstanceVM {
         case .repRanges(warmups: _, worksets: _, backoffs: _):
             return "not implemented"
         case .repTotal(total: _, rest: _):
-            return "not implemented"
+            return ""
         }
     }
 
     func nextLabel() -> String {
-        func text(numSets: Int) -> String {
-            if self.setIndex == numSets {
+        switch exercise.modality.sets {
+        case .durations(_, targetSecs: _):
+            if self.finished {
                 return "Done"
             } else {
                 return "Start"
             }
-        }
-
-        switch exercise.modality.sets {
-        case .durations(let durations, targetSecs: _):
-            return text(numSets: durations.count)
-        case .fixedReps(let sets):
-            return text(numSets: sets.count)
-        case .maxReps(restSecs: _, targetReps: _):
-            return "not implemented"
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
-            return "not implemented"
-        case .repTotal(total: _, rest: _):
-            return "not implemented"
+        default:
+            if self.finished {
+                return "Done"
+            } else {
+                return "Next"
+            }
         }
     }
 
@@ -326,8 +464,16 @@ extension InstanceVM {
         case .repRanges(warmups: _, worksets: _, backoffs: _):
             setStrs.append("not implemented")
 
-        case .repTotal(total: _, rest: _):
-            setStrs.append("not implemented")
+        case .repTotal(total: let totalReps, rest: _):
+            if case .repTotal(reps: let repArray) = self.exercise.expected.sets {
+                if repArray.isEmpty {
+                    setStrs = ["\(totalReps) reps"]
+                } else {
+                    setStrs = ["\(totalReps) reps over \(repArray.count) sets"]
+                }
+            } else {
+                ASSERT(false, "shouldn't have landed here")
+            }
         }
         
         return (setStrs, trailer, limit)
@@ -344,11 +490,14 @@ extension InstanceVM {
 
     // For rest between sets.
     func implicitTimer() -> TimerView {
+        let title = self.getSetTimerTitle("Set")
         switch self.exercise.modality.sets {
         case .durations(let durations, targetSecs: _):
-            return TimerView(title: self.getSetTimerTitle("Set"), duration: durations[self.setIndex].secs, secondDuration: self.restDuration())
+            return TimerView(title: title, duration: durations[self.setIndex].secs, secondDuration: self.restDuration())
         case .fixedReps(let sets):
-            return TimerView(title: self.getSetTimerTitle("Set"), duration: sets[self.setIndex].restSecs)
+            return TimerView(title: title, duration: sets[self.setIndex].restSecs)
+        case .repTotal(total: _, rest: let rest):
+            return TimerView(title: title, duration: rest)
         default:
             return TimerView(title: "not implemented", duration: 120)
         }
@@ -357,9 +506,10 @@ extension InstanceVM {
     // User pressed the Start Timer button.
     func explicitTimer() -> TimerView {
         var title: String
-        if instance.current.setIndex < self.numSets() ?? 1000 {
+        switch self.progress() {
+        case .notStarted, .started:
             title = getSetTimerTitle("On set")
-        } else {
+        case .finished:
             title = "Finished"
         }
 
@@ -382,11 +532,11 @@ extension InstanceVM {
             return AnyView(Text("not implemented"))
 
         case .repTotal(total: _, rest: _):
-            return AnyView(Text("not implemented"))
+            return AnyView(RepTotalView(program, self))
         }
     }
 
-    private func restDuration() -> Int {
+    func restDuration() -> Int {
         var secs = 0
 
         switch exercise.modality.sets {
@@ -406,8 +556,8 @@ extension InstanceVM {
             ASSERT(false, "not implemented")
         case .repRanges(warmups: _, worksets: _, backoffs: _):
             ASSERT(false, "not implemented")
-        case .repTotal(total: _, rest: _):
-            ASSERT(false, "not implemented")
+        case .repTotal(total: _, rest: let rest):
+            return rest
         }
 
         return secs
