@@ -178,7 +178,7 @@ extension InstanceVM {
         self.instance.enabled = !self.instance.enabled
     }
 
-    func reset() {
+    func resetCurrent() {
         self.willChange()
         switch self.instance.info {
         case .durations(let info):

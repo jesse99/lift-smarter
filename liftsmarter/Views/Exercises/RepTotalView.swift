@@ -88,7 +88,7 @@ struct RepTotalView: View {
     }
     
     private func popView() {
-        instance.reset()
+        instance.resetCurrent()
         self.presentation.wrappedValue.dismiss()
     }
     
@@ -103,7 +103,7 @@ struct RepTotalView: View {
     }
 
     func onReset() {
-        self.instance.reset()
+        self.instance.resetCurrent()
     }
     
     private func onStartTimer() {
@@ -124,7 +124,7 @@ struct RepTotalView: View {
     
     private func resetIfNeeded() {
         if instance.shouldReset() {
-            instance.reset()
+            instance.resetCurrent()
         }
     }
 

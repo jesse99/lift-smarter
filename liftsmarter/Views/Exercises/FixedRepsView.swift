@@ -64,7 +64,7 @@ struct FixedRepsView: View {
 
     private func onNext() {
         if instance.finished {
-            instance.reset()
+            instance.resetCurrent()
             self.presentation.wrappedValue.dismiss()
         } else if self.instance.restDuration() > 0 {
             self.implicitTimerModal = true
@@ -78,7 +78,7 @@ struct FixedRepsView: View {
     }
     
     func onReset() {
-        self.instance.reset()
+        self.instance.resetCurrent()
     }
     
     private func onStartTimer() {
@@ -99,7 +99,7 @@ struct FixedRepsView: View {
     
     private func resetIfNeeded() {
         if instance.shouldReset() {
-            instance.reset()
+            instance.resetCurrent()
         }
     }
 

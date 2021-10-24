@@ -64,7 +64,7 @@ struct DurationsView: View {
 
     private func onNext() {
         if instance.finished {
-            instance.reset()
+            instance.resetCurrent()
             self.presentation.wrappedValue.dismiss()
         } else {
             self.implicitTimerModal = true
@@ -76,7 +76,7 @@ struct DurationsView: View {
     }
     
     func onReset() {
-        self.instance.reset()
+        self.instance.resetCurrent()
     }
     
     private func onStartTimer() {
@@ -97,7 +97,7 @@ struct DurationsView: View {
     
     private func resetIfNeeded() {
         if instance.shouldReset() {
-            instance.reset()
+            instance.resetCurrent()
         }
     }
 
