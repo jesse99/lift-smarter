@@ -248,6 +248,21 @@ extension ExerciseVM {
             return weights.map({friendlyWeight($0)})
         }
         
+        func buttonColor(_ fws: FixedWeightSet) -> Color {
+            if let weight = Double(text.wrappedValue) {
+                let actual = fws.getClosest(weight)
+                if weight > 0.0 && abs(actual - weight) > 10.0 {
+                    return .red
+                } else if weight > 0.0 && abs(actual - weight) > 5.0 {
+                    return .orange
+                } else {
+                    return .black
+                }
+            } else {
+                return .red
+            }
+        }
+        
         func confirm(_ newText: String) {
             text.wrappedValue = newText
             onEdit(newText)
@@ -279,6 +294,7 @@ extension ExerciseVM {
                         Text("Weight:").font(.headline)
                         Button(text.wrappedValue, action: {modal.wrappedValue = true})
                             .font(.callout)
+                            .foregroundColor(buttonColor(fws))
                             .sheet(isPresented: modal) {
                                 PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, type: .decimalPad)
                             }
