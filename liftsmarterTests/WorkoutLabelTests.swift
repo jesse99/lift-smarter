@@ -21,8 +21,8 @@ class WorkoutLabelTests: XCTestCase {
     func testAllDisabled() throws {
         let (model, program, workout) = create(["Squat", "Lunge"])
 
-        for instance in workout.workout(model).instances {
-            instance.enabled = false
+        for exercise in workout.workout(model).exercises {
+            exercise.enabled = false
         }
 
         let (label, color) = program.subLabel(workout)
@@ -389,8 +389,9 @@ class WorkoutLabelTests: XCTestCase {
     }
 
     private func create(_ names: [String], _ schedule: Schedule = .anyDay, restWeeks: [Int] = []) -> (Model, ProgramVM, WorkoutVM) {
-        let exercises = names.map({Exercise($0, $0, Modality(Apparatus.bodyWeight, .durations([DurationSet(secs: 30), DurationSet(secs: 30)])))})
-        let workout = Workout("Workout", names, schedule: schedule)
+        let sets = [DurationSet(secs: 30), DurationSet(secs: 30)]
+        let exercises = names.map({Exercise($0, $0, .bodyWeight, .durations(DurationsInfo(sets: sets)))})
+        let workout = Workout("Workout", exercises.map({$0.clone()}), schedule: schedule)
         let program = Program("Program", [workout], exercises, weeksStart: Date())
         program.weeksStart = self.date(minutes: 0)
         program.restWeeks = restWeeks
