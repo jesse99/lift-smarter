@@ -40,17 +40,20 @@ extension ExerciseInfo {
             switch coalesce(parseTimes(table["durations"]!, label: "durations"),
                             parseTimes(table["target"]!, label: "target"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
-            case .right((let d, let t, let r)):
+            case .right((let d, let t, var r)):
                 let count1 = d.count
-                let count2 = r.count
-                let count3 = t.count
-                let match = count1 == count2 && (count3 == 0 || count1 == count3)
+                let count2 = t.count
+                let count3 = r.count
+                let match = (count2 == 0 || count1 == count2) && (count3 == 0 || count1 == count3)
 
                 if !match {
-                    return .left("Durations, target, and rest must have the same number of sets (although target can be empty)")
+                    return .left("Durations, target, and rest must have the same number of sets (although target and rest can be empty)")
                 } else if count1 == 0 {
-                    return .left("Durations and rest need at least one set")
+                    return .left("Durations needs at least one set")
                 } else {
+                    if r.isEmpty {
+                        r = Array(repeating: 0, count: count1)
+                    }
                     let z = zip(d, r)
                     let s = z.map({DurationSet(secs: $0.0, restSecs: $0.1)})
                     return .right(.durations(DurationsInfo(sets: s, targetSecs: t)))
@@ -62,16 +65,19 @@ extension ExerciseInfo {
         case .fixedReps(_):
             switch coalesce(parseIntList(table["reps"]!, label: "reps"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
-            case .right((let rr, let r)):
+            case .right((let rr, var r)):
                 let count1 = rr.count
                 let count2 = r.count
-                let match = count1 == count2
+                let match = count2 == 0 || count1 == count2
 
                 if !match {
-                    return .left("Reps and rest must have the same number of sets")
+                    return .left("Reps and rest must have the same number of sets (although rest can be empty)")
                 } else if count1 == 0 {
-                    return .left("Reps and rest need at least one set")
+                    return .left("Reps needs at least one set")
                 } else {
+                    if r.isEmpty {
+                        r = Array(repeating: 0, count: count1)
+                    }
                     let z = zip(rr, r)
                     let s = z.map({FixedRepsSet(reps: FixedReps($0.0), restSecs: $0.1)})
                     return .right(.fixedReps(FixedRepsInfo(reps: s)))

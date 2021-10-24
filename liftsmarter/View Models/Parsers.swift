@@ -3,7 +3,7 @@ import Foundation
 
 // Int = [0-9]+
 func parseInt(_ text: String, label: String, zeroOK: Bool = false) -> Either<String, Int> {
-    var value = 0
+    var value: Int? = nil
     let scanner = Scanner(string: text)
     while !scanner.isAtEnd {
         if let candidate = scanner.scanUInt64() {
@@ -18,11 +18,15 @@ func parseInt(_ text: String, label: String, zeroOK: Bool = false) -> Either<Str
         }
     }
     
+    if value == nil && !zeroOK {
+        return .left("Expected an integer for \(label)")
+    }
+    
     if !scanner.isAtEnd {
         return .left("Expected integer for \(label)")
     }
 
-    return .right(value)
+    return .right(value ?? 0)
 }
 
 // IntList = Int (Space Int)* ('x' Int)?
