@@ -1,12 +1,14 @@
-//  Created by Jesse Vorisek on 9/12/21.
+//  Created by Jesse Vorisek on 10/24/21.
 import SwiftUI
 
-struct DurationsView: View {
+struct MaxRepsView: View {
     let program: ProgramVM
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
     @ObservedObject var instance: InstanceVM
     @State var editModal = false
     @State var noteModal = false
+    @State var updateRepsModal = false
+    @State var updateExpectedAlert = false
     @State var implicitTimerModal = false
     @State var explicitTimerModal = false
     @Environment(\.presentationMode) var presentation
@@ -30,7 +32,15 @@ struct DurationsView: View {
                 Group {
                     Button(instance.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
-                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {instance.implicitTimer()}
+                        .sheet(isPresented: $updateRepsModal) {
+                            let expected = self.instance.expectedReps()!
+                            RepsPickerView(initial: expected, min: 1, dismissed: self.onRepsPressed)
+                        }
+                        .alert(isPresented: $updateExpectedAlert) { () -> Alert in
+                            Alert(title: Text("Do you want to update expected reps?"),
+                                primaryButton:   .default(Text("Yes"), action: self.onUpdateExpected),
+                                secondaryButton: .default(Text("No"),  action: self.popView))}
+                        .sheet(isPresented: self.$implicitTimerModal) {instance.implicitTimer(delta: -1)}
                     Spacer().frame(height: 50)
 
                     Button("Start Timer", action: onStartTimer)
@@ -63,18 +73,33 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        if instance.finished {
-            instance.resetCurrent()
-            self.presentation.wrappedValue.dismiss()
-        } else {
-            self.implicitTimerModal = true
+        switch self.instance.progress() {
+        case .notStarted, .started:
+            self.updateRepsModal = true
+        case .finished:
+            if self.instance.currentIsUnexpected() {
+                self.updateExpectedAlert = true
+            } else {
+                self.popView()
+            }
         }
     }
     
-    func onNextCompleted() {
-        instance.appendCurrent()
+    private func popView() {
+        instance.resetCurrent()
+        self.presentation.wrappedValue.dismiss()
     }
     
+    private func onRepsPressed(_ reps: Int) {
+        self.implicitTimerModal = self.instance.restDuration() > 0
+        self.instance.appendCurrent(reps)
+    }
+    
+    private func onUpdateExpected() {
+        self.instance.updateExpected()
+        self.popView()
+    }
+
     func onReset() {
         self.instance.resetCurrent()
     }
@@ -102,18 +127,18 @@ struct DurationsView: View {
     }
 
     private func getNoteLabel() -> String {
-//        return getPreviouslabel(self.display, workout(), exercise())
+//        return getPreviouslabel(self.display, workout(), instance())
         return "a note"
     }
 }
 
-struct DurationsView_Previews: PreviewProvider {
+struct MaxRepsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let workout = WorkoutVM(program, model.program.workouts[0])
-    static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
+    static let workout = WorkoutVM(program, model.program.workouts[4])
+    static let instance = workout.instances.first(where: {$0.name == "Curls"})!
 
     static var previews: some View {
-        DurationsView(program, instance)
+        MaxRepsView(program, instance)
     }
 }

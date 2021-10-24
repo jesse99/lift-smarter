@@ -78,8 +78,6 @@ struct RepTotalView: View {
             self.updateRepsModal = true
         case .finished:
             if self.instance.currentIsUnexpected() {
-//                self.updateRepsModal = false      // TODO: do we need this?
-//                self.startTimer = false       // TODO: do we need this?
                 self.updateExpectedAlert = true
             } else {
                 self.popView()
@@ -138,7 +136,6 @@ struct RepTotalView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
     static let workout = WorkoutVM(program, model.program.workouts[3])
-    static let exercise = model.program.exercises.first(where: {$0.name == "Pushup"})!
     static let instance = workout.instances.first(where: {$0.name == "Pushup"})!
 
     static var previews: some View {

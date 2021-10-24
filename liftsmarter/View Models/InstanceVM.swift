@@ -225,7 +225,10 @@ extension InstanceVM {
             if info.current.setIndex == 0 {
                 info.current.startDate = now
             }
-            ASSERT(false, "not implemented")
+
+            info.current.setIndex += 1
+            info.currentReps.append(reps!)
+            finished = info.current.setIndex == info.restSecs.count
 
         case .repRanges(let info):
             if info.current.setIndex == 0 {
@@ -260,8 +263,8 @@ extension InstanceVM {
         case .durations(_), .fixedReps(_):
             ASSERT(false, "nonsensical")
 
-        case .maxReps(_):
-            ASSERT(false, "not implemented")
+        case .maxReps(let info):
+            info.expectedReps = info.currentReps
 
         case .repRanges(_):
             ASSERT(false, "not implemented")
@@ -336,8 +339,16 @@ extension InstanceVM {
             }
 
         case .maxReps(let info):
-            weight = info.expectedWeight
-            text = "not implemented"
+            if info.current.setIndex < info.expectedReps.count {
+                weight = info.expectedWeight
+                let reps = info.expectedReps[info.current.setIndex]
+                text = "\(reps)+ reps"
+            } else if info.expectedReps.count == info.restSecs.count {
+                text = ""
+            } else {
+                weight = info.expectedWeight
+                text = "AMRAP"
+            }
 
         case .repRanges(let info):
             weight = info.expectedWeight
@@ -349,9 +360,9 @@ extension InstanceVM {
             if info.current.setIndex < info.expectedReps.count {
                 let reps = info.expectedReps[info.current.setIndex]
                 if reps == 1 {
-                    text = "Expecting 1 rep"
+                    text = "1 rep"
                 } else {
-                    text = "Expecting \(reps) reps"
+                    text = "\(reps) reps"
                 }
             } else {
                 let completed = info.currentReps.reduce(0, {$0 + $1})
@@ -417,17 +428,17 @@ extension InstanceVM {
     }
     
     // For rest between sets.
-    func implicitTimer() -> TimerView {
-        let title = self.getSetTimerTitle("Set")
+    func implicitTimer(delta: Int = 0) -> TimerView {
+        let title = self.getSetTimerTitle("Set", delta)
         switch self.instance.info {
         case .durations(let info):
-            return TimerView(title: title, duration: info.sets[self.setIndex].secs, secondDuration: self.restDuration())
+            return TimerView(title: title, duration: info.sets[self.setIndex + delta].secs, secondDuration: self.restDuration())
 
         case .fixedReps(let info):
-            return TimerView(title: title, duration: info.sets[self.setIndex].restSecs)
+            return TimerView(title: title, duration: info.sets[self.setIndex + delta].restSecs)
 
-        case .maxReps(_):
-            return TimerView(title: "not implemented", duration: 120)
+        case .maxReps(let info):
+            return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
         case .repRanges(_):
             return TimerView(title: "not implemented", duration: 120)
@@ -468,8 +479,12 @@ extension InstanceVM {
                 secs = info.sets.last!.restSecs
             }
 
-        case .maxReps(_):
-            ASSERT(false, "not implemented")
+        case .maxReps(let info):
+            if info.current.setIndex < info.restSecs.count {
+                secs = info.restSecs[info.current.setIndex]
+            } else {
+                secs = info.restSecs.last!
+            }
 
         case .repRanges(_):
             ASSERT(false, "not implemented")
@@ -489,7 +504,7 @@ extension InstanceVM {
         case .fixedReps(_):
             return AnyView(FixedRepsView(program, self))
         case .maxReps(_):
-            return AnyView(Text("not implemented"))
+            return AnyView(MaxRepsView(program, self))
         case .repRanges(_):
             return AnyView(Text("not implemented"))
         case .repTotal(_):
@@ -499,16 +514,11 @@ extension InstanceVM {
 
     // WorkoutView
     func workoutLabel() -> ([String], String, Int) {
-        func getFixedRepsLabel(_ reps: Int, _ expectedWeight: Double, _ percent: WeightPercent = WeightPercent(1.0)) -> String {
-            let suffix = weightSuffix(percent, expectedWeight)
-            if !suffix.isEmpty {
-                return "\(reps)\(suffix)"   // 5 @ 120 lbs
+        func getRepLabel(_ reps: Int) -> String {
+            if reps == 1 {
+                return "1 rep"
             } else {
-                if reps == 1 {
-                    return "1 rep"
-                } else {
-                    return "\(reps) reps"  // 5 reps
-                }
+                return "\(reps) reps"  // 5 reps
             }
         }
         
@@ -519,14 +529,20 @@ extension InstanceVM {
         switch self.instance.info {
         case .durations(let info):
             setStrs = info.sets.map({"\($0.secs)s"})
-            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)    // always the same for each set so we'll stick it at the end
+            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
 
         case .fixedReps(let info):
-            setStrs = info.sets.map({getFixedRepsLabel($0.reps.reps, info.expectedWeight)})
+            setStrs = info.sets.map({getRepLabel($0.reps.reps)})
+            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
             limit = 6
 
-        case .maxReps(_):
-            setStrs.append("not implemented")
+        case .maxReps(let info):
+            if info.expectedReps.isEmpty {
+                setStrs = ["\(info.restSecs.count)xAMRAP"]
+            } else {
+                setStrs = info.expectedReps.map({getRepLabel($0)})
+            }
+            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
 
         case .repRanges(_):
             setStrs.append("not implemented")
@@ -537,13 +553,14 @@ extension InstanceVM {
             } else {
                 setStrs = ["\(info.total) reps over \(info.expectedReps.count) sets"]
             }
+            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
         }
         
         return (setStrs, trailer, limit)
     }
     
-    private func getSetTimerTitle(_ prefix: String) -> String {
-        let i = self.setIndex
+    private func getSetTimerTitle(_ prefix: String, _ delta: Int = 0) -> String {
+        let i = self.setIndex + delta
         if let numSets = self.exercise.numSets() {
             return "\(prefix) \(i+1) of \(numSets)"
         } else {
