@@ -353,6 +353,13 @@ extension InstanceVM {
                 } else {
                     text = "Expecting \(reps) reps"
                 }
+            } else {
+                let completed = info.currentReps.reduce(0, {$0 + $1})
+                if completed < info.total {
+                    text = "Up to \(info.total - completed) reps"
+                } else {
+                    text = ""
+                }
             }
         }
 
