@@ -1,6 +1,30 @@
 //  Created by Jesse Vorisek on 9/27/21.
 import Foundation
 
+// Int = [0-9]+
+func parseInt(_ text: String, label: String, zeroOK: Bool = false) -> Either<String, Int> {
+    var value = 0
+    let scanner = Scanner(string: text)
+    while !scanner.isAtEnd {
+        if let candidate = scanner.scanUInt64() {
+            if !zeroOK && candidate == 0 {
+                return .left("\(label.capitalized) must be greater than zero")
+            } else if candidate > Int.max {
+                return .left("\(label.capitalized) is too large")
+            }
+            value = Int(candidate)
+        } else {
+            return .left("Expected integer for \(label)")
+        }
+    }
+    
+    if !scanner.isAtEnd {
+        return .left("Expected integer for \(label)")
+    }
+
+    return .right(value)
+}
+
 // IntList = Int (Space Int)* ('x' Int)?
 func parseIntList(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false) -> Either<String, [Int]> {
     var values: [Int] = []

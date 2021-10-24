@@ -26,9 +26,9 @@ extension ExerciseInfo {
             ASSERT(false, "not implemented")
             return [:]
 
-        case .repTotal(_):
-            ASSERT(false, "not implemented")
-            return [:]
+        case .repTotal(let info):
+            let e = info.expectedReps.map({$0.description})
+            return ["total": info.total.description, "rest": info.rest.description, "expected": joinedX(e)]
         }
     }
 
@@ -87,7 +87,16 @@ extension ExerciseInfo {
             return .left("not implemented")
 
         case .repTotal(_):
-            return .left("not implemented")
+            switch coalesce(parseInt(table["total"]!, label: "total"),
+                            parseInt(table["rest"]!, label: "rest", zeroOK: true),
+                            parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
+            case .right((let t, let r, let e)):
+                let info = RepTotalInfo(total: t, rest: r)
+                info.expectedReps = e
+                return .right(.repTotal(info))
+            case .left(let err):
+                return .left(err)
+            }
         }
     }
 

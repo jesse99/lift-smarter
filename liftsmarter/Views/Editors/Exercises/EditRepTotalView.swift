@@ -1,11 +1,12 @@
-//  Created by Jesse Vorisek on 10/6/21.
+//  Created by Jesse Vorisek on 10/24/21.
 import SwiftUI
 
-struct EditFixedRepsView: View {
+struct EditRepTotalView: View {
     let exerciseName: String
     let info: Binding<ExerciseInfo>
-    @State var reps: String
+    @State var total: String
     @State var rest: String
+    @State var expected: String
     @State var showHelp = false
     @State var helpText = ""
     @State var error = ""
@@ -16,8 +17,9 @@ struct EditFixedRepsView: View {
         self.info = info
 
         let table = info.wrappedValue.render()
-        self._reps = State(initialValue: table["reps"]!)
+        self._total = State(initialValue: table["total"]!)
         self._rest = State(initialValue: table["rest"]!)
+        self._expected = State(initialValue: table["expected"]!)
     }
     
     var body: some View {
@@ -25,8 +27,9 @@ struct EditFixedRepsView: View {
             Text("Edit " + self.exerciseName).font(.largeTitle)
 
             VStack(alignment: .leading) {
-                numericishField("Reps", self.$reps, self.onEditedInfo, self.onRepsHelp)
+                intField("Total Reps", self.$total, self.onEditedInfo, self.onTotalHelp)
                 numericishField("Rest", self.$rest, self.onEditedInfo, self.onRestHelp)
+                numericishField("Expected Reps", self.$expected, self.onEditedInfo, self.onExpectedHelp)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
@@ -53,7 +56,7 @@ struct EditFixedRepsView: View {
     }
 
     private func onOK() {
-        let table = ["reps": self.reps, "rest": self.rest]
+        let table = ["total": self.total, "rest": self.rest, "expected": self.expected]
         switch info.wrappedValue.parse(table) {
         case .right(let newInfo):
             self.info.wrappedValue = newInfo
@@ -65,7 +68,7 @@ struct EditFixedRepsView: View {
     }
 
     private func onEditedInfo(_ text: String) {
-        let table = ["reps": self.reps, "rest": self.rest]
+        let table = ["total": self.total, "rest": self.rest, "expected": self.expected]
         switch info.wrappedValue.parse(table) {
         case .right(_):
             self.error = ""
@@ -74,8 +77,8 @@ struct EditFixedRepsView: View {
         }
     }
     
-    private func onRepsHelp() {
-        self.helpText = "The number of reps to do for each set."
+    private func onTotalHelp() {
+        self.helpText = "Number of reps to do across arbitrary number of sets."
         self.showHelp = true
     }
 
@@ -83,15 +86,20 @@ struct EditFixedRepsView: View {
         self.helpText = restHelpText
         self.showHelp = true
     }
+    
+    private func onExpectedHelp() {
+        self.helpText = "The number of reps you expect to do for each set. Can be empty."
+        self.showHelp = true
+    }
 }
 
-struct EditFixedRepsView_Previews: PreviewProvider {
+struct EditRepTotalView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
     static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
     static var info = Binding.constant(exercise.info)
 
     static var previews: some View {
-        EditFixedRepsView(exercise.name, info)
+        EditRepTotalView(exercise.name, info)
     }
 }

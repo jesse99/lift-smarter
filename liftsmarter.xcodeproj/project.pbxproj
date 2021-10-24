@@ -20,6 +20,7 @@
 		3718979D2708D40B00351C5A /* EditExercisesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3718979C2708D40B00351C5A /* EditExercisesView.swift */; };
 		373AB0D1271F2AE700F9898B /* RepsPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373AB0D0271F2AE700F9898B /* RepsPickerView.swift */; };
 		373AB0D3271F486400F9898B /* ExerciseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373AB0D2271F486400F9898B /* ExerciseInfo.swift */; };
+		3742BFBD2725E970006D43E0 /* EditRepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -92,6 +93,7 @@
 		3718979C2708D40B00351C5A /* EditExercisesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExercisesView.swift; sourceTree = "<group>"; };
 		373AB0D0271F2AE700F9898B /* RepsPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepsPickerView.swift; sourceTree = "<group>"; };
 		373AB0D2271F486400F9898B /* ExerciseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfo.swift; sourceTree = "<group>"; };
+		3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRepTotalView.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 			children = (
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
 				37A3C5E6270E8BAD00BFA8CC /* EditFixedRepsView.swift */,
+				3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */,
 			);
 			path = Exercises;
 			sourceTree = "<group>";
@@ -454,6 +457,7 @@
 				377791C226EEAF8A00EC5028 /* EditDurationsView.swift in Sources */,
 				377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */,
 				371897932700DDA500351C5A /* EditProgramView.swift in Sources */,
+				3742BFBD2725E970006D43E0 /* EditRepTotalView.swift in Sources */,
 				37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */,
 				37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */,
 				373AB0D1271F2AE700F9898B /* RepsPickerView.swift in Sources */,

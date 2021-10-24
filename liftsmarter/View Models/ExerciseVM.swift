@@ -366,7 +366,24 @@ extension ExerciseVM {
             return AnyView(Text("not implemented"))
             
         case .repTotal(_):
-            return AnyView(Text("not implemented"))
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditRepTotalView(exerciseName, einfo)}
+                    Spacer()
+                    Menu("Rep Total") {
+                        Button("Durations", action: {change(defaultDurations())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("As many sets as required to do total reps.")}).font(.callout)
+                }.padding()
+            )
         }
     }
 

@@ -5,7 +5,7 @@ let restHelpText = "The amount of time to rest after each set. Time units may be
 
 struct EditDurationsView: View {
     let exerciseName: String
-    let sets: Binding<ExerciseInfo>
+    let info: Binding<ExerciseInfo>
     @State var durations: String
     @State var target: String
     @State var rest: String
@@ -14,11 +14,11 @@ struct EditDurationsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exerciseName: String, _ sets: Binding<ExerciseInfo>) {
+    init(_ exerciseName: String, _ info: Binding<ExerciseInfo>) {
         self.exerciseName = exerciseName
-        self.sets = sets
+        self.info = info
 
-        let table = sets.wrappedValue.render()
+        let table = info.wrappedValue.render()
         self._durations = State(initialValue: table["durations"]!)
         self._rest = State(initialValue: table["rest"]!)
         self._target = State(initialValue: table["target"]!)
@@ -29,9 +29,9 @@ struct EditDurationsView: View {
             Text("Edit " + self.exerciseName).font(.largeTitle)
 
             VStack(alignment: .leading) {
-                numericishField("Durations", self.$durations, self.onEditedSets, self.onDurationsHelp)
-                numericishField("Target", self.$target, self.onEditedSets, self.onTargetHelp)
-                numericishField("Rest", self.$rest, self.onEditedSets, self.onRestHelp)
+                numericishField("Durations", self.$durations, self.onEditedInfo, self.onDurationsHelp)
+                numericishField("Target", self.$target, self.onEditedInfo, self.onTargetHelp)
+                numericishField("Rest", self.$rest, self.onEditedInfo, self.onRestHelp)
             }
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
@@ -59,9 +59,9 @@ struct EditDurationsView: View {
 
     func onOK() {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch sets.wrappedValue.parse(table) {
-        case .right(let sets):
-            self.sets.wrappedValue = sets
+        switch info.wrappedValue.parse(table) {
+        case .right(let newInfo):
+            self.info.wrappedValue = newInfo
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
@@ -69,9 +69,9 @@ struct EditDurationsView: View {
         self.presentation.wrappedValue.dismiss()
     }
 
-    private func onEditedSets(_ text: String) {
+    private func onEditedInfo(_ text: String) {
         let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
-        switch sets.wrappedValue.parse(table) {
+        switch info.wrappedValue.parse(table) {
         case .right(_):
             self.error = ""
         case .left(let err):
@@ -98,7 +98,6 @@ struct EditDurationsView: View {
 struct EditDurationsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static var info = Binding.constant(exercise.info)
 
