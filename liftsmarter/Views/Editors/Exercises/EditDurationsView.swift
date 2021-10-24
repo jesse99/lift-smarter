@@ -5,7 +5,7 @@ let restHelpText = "The amount of time to rest after each set. Time units may be
 
 struct EditDurationsView: View {
     let exerciseName: String
-    let sets: Binding<Sets>
+    let sets: Binding<ExerciseInfo>
     @State var durations: String
     @State var target: String
     @State var rest: String
@@ -14,7 +14,7 @@ struct EditDurationsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exerciseName: String, _ sets: Binding<Sets>) {
+    init(_ exerciseName: String, _ sets: Binding<ExerciseInfo>) {
         self.exerciseName = exerciseName
         self.sets = sets
 
@@ -100,9 +100,9 @@ struct EditDurationsView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
-    static var sets = Binding.constant(exercise.modality.sets)
+    static var info = Binding.constant(exercise.info)
 
     static var previews: some View {
-        EditDurationsView(exercise.name, sets)
+        EditDurationsView(exercise.name, info)
     }
 }

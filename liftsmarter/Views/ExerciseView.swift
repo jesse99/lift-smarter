@@ -18,12 +18,11 @@ struct ExerciseView: View {
 struct ExerciseView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let workout = model.program.workouts[0]
+    static let workout = WorkoutVM(program, model.program.workouts[0])
     static let exercise = model.program.exercises.first(where: {$0.name == "Sleeper Stretch"})!
     static let instance = workout.instances.first(where: {$0.name == "Sleeper Stretch"})!
-    static let vm = WorkoutVM(ProgramVM(model), workout)
     
     static var previews: some View {
-        ExerciseView(program, InstanceVM(vm, exercise, instance))
+        ExerciseView(program, instance)
     }
 }

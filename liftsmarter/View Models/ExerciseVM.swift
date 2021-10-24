@@ -2,7 +2,13 @@
 import Foundation
 import SwiftUI
 
-// Typically InstanceVM is used instead of this.
+enum Progress {
+    case notStarted
+    case started
+    case finished
+}
+
+// This is used with exercises in a global context, i.e. for exercise state that isn't associated with a workout.
 class ExerciseVM: Equatable, Identifiable, ObservableObject {
     let program: ProgramVM
     private let exercise: Exercise
@@ -33,21 +39,31 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.allowRest}
     }
     
-    var expectedWeight: Double {
-        get {return self.exercise.expected.weight}
-    }
-    
-    var sets: Sets {
-        get {return self.exercise.modality.sets}
-    }
-    
     var apparatus: Apparatus {
-        get {return self.exercise.modality.apparatus}
+        get {return self.exercise.apparatus}
     }
-    
+
+    func getClosestBelow(_ target: Double) -> Either<String, Double> {
+        switch self.exercise.apparatus {
+        case .fixedWeights(name: let name):
+            if let name = name {
+                let model = self.program.model(self.exercise)
+                if let fws = model.fixedWeights[name] {
+                    return .right(fws.getClosestBelow(target))
+                } else {
+                    return .left("There is no fixed weight set named \(name)")
+                }
+            } else {
+                return .left("No fixed weights activated")
+            }
+        default:
+            return .right(target)
+        }
+    }
+
     var activeFWSName: String {
         get {
-            if case .fixedWeights(let name) = self.exercise.modality.apparatus {
+            if case .fixedWeights(let name) = self.exercise.apparatus {
                 return name ?? ""
             } else {
                 ASSERT(false, "should only be called for fixedWeights")
@@ -56,6 +72,40 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
     
+    var info: ExerciseInfo {
+        get {return self.exercise.info}
+    }
+
+    func numSets() -> Int? {
+        switch self.exercise.info {
+        case .durations(let info):
+            return info.sets.count
+        case .fixedReps(let info):
+            return info.sets.count
+        case .maxReps(let info):
+            return info.restSecs.count
+        case .repRanges(let info):
+            return info.warmups.count + info.worksets.count + info.backoffs.count
+        case .repTotal(_):
+            return nil
+        }
+    }
+
+    var expectedWeight: Double {
+        switch self.exercise.info {
+        case .durations(let info):
+            return info.expectedWeight
+        case .fixedReps(let info):
+            return info.expectedWeight
+        case .maxReps(let info):
+            return info.expectedWeight
+        case .repRanges(let info):
+            return info.expectedWeight
+        case .repTotal(let info):
+            return info.expectedWeight
+        }
+    }
+
     static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
         return lhs.name == rhs.name
     }
@@ -67,64 +117,70 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
     }
 }
 
-// Misc Logic
+// Mutators
 extension ExerciseVM {
     func setName(_ name: String) {
-        self.willChange()
-        
-        for workout in self.program.workouts {
-            for instance in workout.instances {
-                if instance.name == self.exercise.name {
-                    instance.setName(name)
-                }
-            }
-        }
-
-        self.exercise.name = name
+        self.program.modify(self.exercise, callback: {$0.name = name})
     }
     
     func setFormalName(_ name: String) {
-        self.willChange()
-        self.exercise.formalName = name
-    }
-    
-    func setWeight(_ weight: Double) {
-        self.willChange()
-        self.exercise.expected.weight = weight
+        self.program.modify(self.exercise, callback: {$0.formalName = name})
     }
     
     func setAllowRest(_ allow: Bool) {
-        self.willChange()
-        self.exercise.allowRest = allow
-    }
-    
-    func setActiveFixedWeight(_ name: String?) {
-        self.willChange()
-        print("activated with \(name ?? "no name")")
-        self.exercise.modality.apparatus = .fixedWeights(name: name)
-    }
-    
-    func setSets(_ sets: Sets) {
-        self.willChange()
-        if sets.caseIndex() != self.exercise.modality.sets.caseIndex() {
-            // TODO: May want to change expected weight too, but have to be careful with
-            // the weight textbox in EditExercise.
-            self.exercise.expected.sets = defaultExpectedSets(sets)
-        }
-        self.exercise.modality.sets = sets
+        self.program.modify(self.exercise, callback: {$0.allowRest = allow})
     }
 
     func setApparatus(_ apparatus: Apparatus) {
         self.willChange()
-        if apparatus.caseIndex() != self.exercise.modality.apparatus.caseIndex() {
-            self.exercise.expected.sets = defaultExpectedSets(sets)
+        if apparatus.caseIndex() != self.exercise.apparatus.caseIndex() {
+            self.program.modify(self.exercise, callback: {
+                switch $0.info {
+                case .durations(let info):
+                    info.resetExpected()
+                case .fixedReps(let info):
+                    info.resetExpected()
+                case .maxReps(let info):
+                    info.resetExpected()
+                case .repRanges(let info):
+                    info.resetExpected()
+                case .repTotal(let info):
+                    info.resetExpected()
+                }
+            })
         }
-        self.exercise.modality.apparatus = apparatus
+        self.exercise.apparatus = apparatus
+    }
+
+    func setActiveFixedWeight(_ name: String?) {
+        self.program.modify(self.exercise, callback: {$0.apparatus = .fixedWeights(name: name)})
+    }
+    
+    func setInfo(_ info: ExerciseInfo) { 
+        self.program.modify(self.exercise, callback: {$0.info = info})
+    }
+    
+    func setWeight(_ weight: Double) {
+        self.program.modify(self.exercise, callback: {
+            switch $0.info {
+            case .durations(let info):
+                info.expectedWeight = weight
+            case .fixedReps(let info):
+                info.expectedWeight = weight
+            case .maxReps(let info):
+                info.expectedWeight = weight
+            case .repRanges(let info):
+                info.expectedWeight = weight
+            case .repTotal(let info):
+                info.expectedWeight = weight
+            }
+        })
     }
 }
 
 // UI
 extension ExerciseVM {
+    // EditExerciseView
     func label() -> String {
         return self.name
     }
@@ -215,7 +271,7 @@ extension ExerciseVM {
         }
         
         // This isn't currently shared but it's complex enough that we define it here to hide it away.
-        switch self.exercise.modality.apparatus {
+        switch self.exercise.apparatus {
         case .bodyWeight:
             return weightField()
             
@@ -239,23 +295,23 @@ extension ExerciseVM {
         }
     }
 
-    func setsView(_ exerciseName: String, _ sets: Binding<Sets>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
-        func change(_ newValue: Sets) {
-            if newValue.caseIndex() != self.exercise.modality.sets.caseIndex() {
-                sets.wrappedValue = newValue
+    func infoView(_ exerciseName: String, _ einfo: Binding<ExerciseInfo>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
+        func change(_ newValue: ExerciseInfo) {
+            if newValue.caseIndex() != self.exercise.info.caseIndex() {
+                einfo.wrappedValue = newValue
             } else {
                 // If the user is swtching back to the original sets then use the original settings.
-                sets.wrappedValue = self.exercise.modality.sets
+                einfo.wrappedValue = self.exercise.info
             }
         }
         
-        switch sets.wrappedValue {
-        case .durations(_, targetSecs: _):
+        switch einfo.wrappedValue {
+        case .durations(_):
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
                         .font(.callout)
-                        .sheet(isPresented: modal) {EditDurationsView(exerciseName, sets)}
+                        .sheet(isPresented: modal) {EditDurationsView(exerciseName, einfo)}
                     Spacer()
                     Menu("Durations") {     // TODO: should this (and apparatus) omit the menu item for the current selection
                         Button("Durations", action: {change(defaultDurations())})
@@ -275,7 +331,7 @@ extension ExerciseVM {
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
                         .font(.callout)
-                        .sheet(isPresented: modal) {EditFixedRepsView(exerciseName, sets)}
+                        .sheet(isPresented: modal) {EditFixedRepsView(exerciseName, einfo)}
                     Spacer()
                     Menu("Fixed Reps") {
                         Button("Durations", action: {change(defaultDurations())})
@@ -290,24 +346,24 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .maxReps(restSecs: _, targetReps: _):
+        case .maxReps(_):
             return AnyView(Text("not implemented"))
             
-        case .repRanges(warmups: _, worksets: _, backoffs: _):
+        case .repRanges(_):
             return AnyView(Text("not implemented"))
             
-        case .repTotal(total: _, rest: _):
+        case .repTotal(_):
             return AnyView(Text("not implemented"))
         }
     }
 
     func apparatusView(_ apparatus: Binding<Apparatus>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
         func change(_ newValue: Apparatus) {
-            if newValue.caseIndex() != self.exercise.modality.apparatus.caseIndex() {
+            if newValue.caseIndex() != self.exercise.apparatus.caseIndex() {
                 apparatus.wrappedValue = newValue
             } else {
                 // If the user is swtching back to the original apparatus then use the original settings.
-                apparatus.wrappedValue = self.exercise.modality.apparatus
+                apparatus.wrappedValue = self.exercise.apparatus
             }
         }
         
@@ -389,12 +445,8 @@ extension ExerciseVM {
         return self.exercise
     }
 
-//    func instance(_ model: Model) -> ExerciseInstance {
-//        return self.instance
-//    }
-//
-//    func instance(_ workout: Workout) -> ExerciseInstance {
-//        return self.instance
-//    }
+    func exercise(_ workout: Workout) -> Exercise {
+        return self.exercise
+    }
 }
 

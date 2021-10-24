@@ -44,7 +44,7 @@
 		37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
-		37D53893271CBE6C006B3833 /* SetsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53892271CBE6C006B3833 /* SetsVM.swift */; };
+		37D53893271CBE6C006B3833 /* ExerciseInfoVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */; };
 		37D53895271CDEBF006B3833 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53894271CDEBF006B3833 /* NoteView.swift */; };
 		37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53896271D21E8006B3833 /* EditNoteView.swift */; };
 		37D53899271E5A57006B3833 /* RepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53898271E5A57006B3833 /* RepTotalView.swift */; };
@@ -58,11 +58,8 @@
 		37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4C26EAD93900D0AD8E /* Workout.swift */; };
 		37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4E26EAD9DB00D0AD8E /* Asserts.swift */; };
 		37ECEA5126EAD9F200D0AD8E /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5026EAD9F200D0AD8E /* Exercise.swift */; };
-		37ECEA5326EB07BE00D0AD8E /* Modality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5226EB07BE00D0AD8E /* Modality.swift */; };
 		37ECEA5526EB07F500D0AD8E /* Apparatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5426EB07F500D0AD8E /* Apparatus.swift */; };
 		37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5626EB0BAE00D0AD8E /* Sets.swift */; };
-		37ECEA5926EB0C3300D0AD8E /* Expected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5826EB0C3300D0AD8E /* Expected.swift */; };
-		37ECEA5B26EB0C6700D0AD8E /* Current.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5A26EB0C6700D0AD8E /* Current.swift */; };
 		37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */; };
 		37ECEA6026EB0D2400D0AD8E /* SequenceExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */; };
 		37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6426ED2FE700D0AD8E /* Mocks.swift */; };
@@ -119,7 +116,7 @@
 		37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFixedWeightsView.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
-		37D53892271CBE6C006B3833 /* SetsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetsVM.swift; sourceTree = "<group>"; };
+		37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfoVM.swift; sourceTree = "<group>"; };
 		37D53894271CDEBF006B3833 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		37D53896271D21E8006B3833 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
 		37D53898271E5A57006B3833 /* RepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepTotalView.swift; sourceTree = "<group>"; };
@@ -135,11 +132,8 @@
 		37ECEA4C26EAD93900D0AD8E /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
 		37ECEA4E26EAD9DB00D0AD8E /* Asserts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asserts.swift; sourceTree = "<group>"; };
 		37ECEA5026EAD9F200D0AD8E /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
-		37ECEA5226EB07BE00D0AD8E /* Modality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modality.swift; sourceTree = "<group>"; };
 		37ECEA5426EB07F500D0AD8E /* Apparatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apparatus.swift; sourceTree = "<group>"; };
 		37ECEA5626EB0BAE00D0AD8E /* Sets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sets.swift; sourceTree = "<group>"; };
-		37ECEA5826EB0C3300D0AD8E /* Expected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expected.swift; sourceTree = "<group>"; };
-		37ECEA5A26EB0C6700D0AD8E /* Current.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Current.swift; sourceTree = "<group>"; };
 		37ECEA5D26EB0CEF00D0AD8E /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		37ECEA5F26EB0D2400D0AD8E /* SequenceExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceExtension.swift; sourceTree = "<group>"; };
 		37ECEA6426ED2FE700D0AD8E /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
@@ -260,13 +254,11 @@
 			isa = PBXGroup;
 			children = (
 				37ECEA5426EB07F500D0AD8E /* Apparatus.swift */,
-				37ECEA5A26EB0C6700D0AD8E /* Current.swift */,
 				37ECEA5026EAD9F200D0AD8E /* Exercise.swift */,
-				37ECEA5826EB0C3300D0AD8E /* Expected.swift */,
+				373AB0D2271F486400F9898B /* ExerciseInfo.swift */,
 				37A3C5E4270D62D500BFA8CC /* FixedWeightSet.swift */,
 				3718978626F6955A00351C5A /* History.swift */,
 				37ECEA6626ED4A0F00D0AD8E /* Logs.swift */,
-				37ECEA5226EB07BE00D0AD8E /* Modality.swift */,
 				37ECEA6426ED2FE700D0AD8E /* Mocks.swift */,
 				37ECEA4A26EAD85B00D0AD8E /* Model.swift */,
 				37ECEA4826EAD74A00D0AD8E /* Program.swift */,
@@ -292,14 +284,13 @@
 		37ECEA6126ED24B300D0AD8E /* View Models */ = {
 			isa = PBXGroup;
 			children = (
-				373AB0D2271F486400F9898B /* ExerciseInfo.swift */,
 				37A3C5DE2708D65700BFA8CC /* ExerciseVM.swift */,
+				37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */,
 				3718978826F69F8F00351C5A /* HistoryVM.swift */,
 				377791CB26F0367900EC5028 /* InstanceVM.swift */,
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
 				371897982702C63F00351C5A /* Parsers.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
-				37D53892271CBE6C006B3833 /* SetsVM.swift */,
 				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
 			);
 			path = "View Models";
@@ -436,7 +427,6 @@
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
 				37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
-				37ECEA5B26EB0C6700D0AD8E /* Current.swift in Sources */,
 				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
@@ -464,12 +454,11 @@
 				377791C226EEAF8A00EC5028 /* EditDurationsView.swift in Sources */,
 				377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */,
 				371897932700DDA500351C5A /* EditProgramView.swift in Sources */,
-				37ECEA5326EB07BE00D0AD8E /* Modality.swift in Sources */,
 				37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */,
 				37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */,
 				373AB0D1271F2AE700F9898B /* RepsPickerView.swift in Sources */,
 				37A3C5ED2711469800BFA8CC /* PickerView.swift in Sources */,
-				37D53893271CBE6C006B3833 /* SetsVM.swift in Sources */,
+				37D53893271CBE6C006B3833 /* ExerciseInfoVM.swift in Sources */,
 				37ECEA5126EAD9F200D0AD8E /* Exercise.swift in Sources */,
 				37A3C5EA270FDA0000BFA8CC /* EditExerciseView.swift in Sources */,
 				37A3C5E7270E8BAD00BFA8CC /* EditFixedRepsView.swift in Sources */,
@@ -478,7 +467,6 @@
 				37ECEA6C26ED5B1F00D0AD8E /* LogView.swift in Sources */,
 				3718979126F96DE800351C5A /* StringExtension.swift in Sources */,
 				37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */,
-				37ECEA5926EB0C3300D0AD8E /* Expected.swift in Sources */,
 				37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */,
 				37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */,
 			);

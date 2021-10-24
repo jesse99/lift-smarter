@@ -4,29 +4,39 @@ import Foundation
 // TODO: Should we make this a real VM?
 
 // Editing
-extension Sets {
+extension ExerciseInfo {
     func render() -> [String: String] {
         switch self {
-        case .durations(let durations, targetSecs: let target): // ["durations: "60s x3", "rest": "0s x3", "target": "90s x3"]
-            let d = durations.map({restToStr($0.secs)})
-            let r = durations.map({restToStr($0.restSecs)})
-            let t = target.map({restToStr($0)})
+        case .durations(let info):
+            let d = info.sets.map({restToStr($0.secs)})
+            let r = info.sets.map({restToStr($0.restSecs)})
+            let t = info.targetSecs.map({restToStr($0)})
             return ["durations": joinedX(d), "rest": joinedX(r), "target": joinedX(t)]
-        case .fixedReps(let sets):
-            let rr = sets.map({$0.reps.reps.description})
-            let r = sets.map({restToStr($0.restSecs)})
+
+        case .fixedReps(let info):
+            let rr = info.sets.map({$0.reps.reps.description})
+            let r = info.sets.map({restToStr($0.restSecs)})
             return ["reps": joinedX(rr), "rest": joinedX(r)]
-        default:
+
+        case .maxReps(_):
+            ASSERT(false, "not implemented")
+            return [:]
+
+        case .repRanges(_):
+            ASSERT(false, "not implemented")
+            return [:]
+
+        case .repTotal(_):
             ASSERT(false, "not implemented")
             return [:]
         }
     }
 
-    func parse(_ table: [String: String]) -> Either<String, Sets> {
+    func parse(_ table: [String: String]) -> Either<String, ExerciseInfo> {
         // Note that we don't use comma separated lists because that's more visual noise and
         // because some locales use commas for the decimal points.
         switch self {
-        case .durations(_, targetSecs: _):
+        case .durations(_):
             switch coalesce(parseTimes(table["durations"]!, label: "durations"),
                             parseTimes(table["target"]!, label: "target"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
@@ -43,11 +53,12 @@ extension Sets {
                 } else {
                     let z = zip(d, r)
                     let s = z.map({DurationSet(secs: $0.0, restSecs: $0.1)})
-                    return .right(.durations(s, targetSecs: t))
+                    return .right(.durations(DurationsInfo(sets: s, targetSecs: t)))
                 }
             case .left(let err):
                 return .left(err)
             }
+
         case .fixedReps(_):
             switch coalesce(parseIntList(table["reps"]!, label: "reps"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
@@ -63,12 +74,19 @@ extension Sets {
                 } else {
                     let z = zip(rr, r)
                     let s = z.map({FixedRepsSet(reps: FixedReps($0.0), restSecs: $0.1)})
-                    return .right(.fixedReps(s))
+                    return .right(.fixedReps(FixedRepsInfo(reps: s)))
                 }
             case .left(let err):
                 return .left(err)
             }
-        default:
+
+        case .maxReps(_):
+            return .left("not implemented")
+
+        case .repRanges(_):
+            return .left("not implemented")
+
+        case .repTotal(_):
             return .left("not implemented")
         }
     }

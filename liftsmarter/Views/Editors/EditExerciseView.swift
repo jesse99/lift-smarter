@@ -2,33 +2,31 @@
 import SwiftUI
 
 struct EditExerciseView: View {
-    let exercise: ExerciseVM
     let instance: InstanceVM
     @State var name: String
     @State var formalName: String
     @State var weight: String
     @State var allowRest: Bool
     @State var apparatus: Apparatus
-    @State var sets: Sets
+    @State var info: ExerciseInfo
     @State var formalNameModal = false
     @State var weightsModal = false
     @State var apparatusModal = false
-    @State var setsModal = false
+    @State var infoModal = false
     @State var showHelp = false
     @State var helpText = ""
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
     init(_ instance: InstanceVM) {
-        self.exercise = instance.exerciseVM
         self.instance = instance
 
-        self._name = State(initialValue: exercise.name)
-        self._formalName = State(initialValue: exercise.formalName)
-        self._weight = State(initialValue: friendlyWeight(exercise.expectedWeight))
-        self._allowRest = State(initialValue: exercise.allowRest)
-        self._sets = State(initialValue: exercise.sets)
-        self._apparatus = State(initialValue: exercise.apparatus)
+        self._name = State(initialValue: instance.name)
+        self._formalName = State(initialValue: instance.formalName)
+        self._weight = State(initialValue: friendlyWeight(instance.exercise.expectedWeight))
+        self._allowRest = State(initialValue: instance.exercise.allowRest)
+        self._info = State(initialValue: instance.exercise.info)
+        self._apparatus = State(initialValue: instance.exercise.apparatus)
     }
 
     var body: some View {
@@ -47,12 +45,12 @@ struct EditExerciseView: View {
                     Button("?", action: self.onFormalNameHelp).font(.callout).padding(.trailing)
                 }.padding(.leading)
                 
-                self.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
+                self.instance.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
                 
                 Toggle("Respect Rest Weeks", isOn: self.$allowRest).padding(.trailing).padding(.leading)
                 
-                self.exercise.setsView(self.name, self.$sets, self.$setsModal, self.onHelpCallback)
-                self.exercise.apparatusView(self.$apparatus, self.$apparatusModal, self.onHelpCallback)
+                self.instance.exercise.infoView(self.name, self.$info, self.$infoModal, self.onHelpCallback)
+                self.instance.exercise.apparatusView(self.$apparatus, self.$apparatusModal, self.onHelpCallback)
 
             }
             Spacer()
@@ -76,7 +74,7 @@ struct EditExerciseView: View {
     }
 
     private func onEdited(_ text: String) {
-        switch exercise.parseExercise(self.name, self.weight) {
+        switch instance.exercise.parseExercise(self.name, self.weight) {
         case .right(_):
             self.error = ""
         case .left(let err):
@@ -95,7 +93,7 @@ struct EditExerciseView: View {
         let needle = inText.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
 
         // First match any custom names defined by the user.
-        for candidate in self.exercise.userNoteKeys {
+        for candidate in self.instance.exercise.userNoteKeys {
             if defaultNotes[candidate] == nil {
                 let haystack = candidate.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
                 if haystack.contains(needle) {
@@ -125,25 +123,25 @@ struct EditExerciseView: View {
     }
 
     func onOK() {
-        switch exercise.parseExercise(self.name, self.weight) {
+        switch instance.exercise.parseExercise(self.name, self.weight) {
         case .right(let weight):
-            if self.name != self.exercise.name {
-                self.exercise.setName(self.name)
+            if self.name != self.instance.name {
+                self.instance.exercise.setName(self.name)
             }
-            if self.formalName != self.exercise.formalName {
-                self.exercise.setFormalName(self.formalName)
+            if self.formalName != self.instance.formalName {
+                self.instance.exercise.setFormalName(self.formalName)
             }
-            if weight != self.exercise.expectedWeight {
-                self.exercise.setWeight(weight)
+            if self.allowRest != self.instance.exercise.allowRest {
+                self.instance.exercise.setAllowRest(self.allowRest)
             }
-            if self.allowRest != self.exercise.allowRest {
-                self.exercise.setAllowRest(self.allowRest)
+            if self.info != self.instance.exercise.info {   // note that this ignores current
+                self.instance.exercise.setInfo(self.info)
+                self.instance.exercise.setWeight(weight)
+            } else if weight != self.instance.exercise.expectedWeight {
+                self.instance.exercise.setWeight(weight)
             }
-            if self.sets != self.exercise.sets {
-                self.exercise.setSets(self.sets)
-            }
-            if self.apparatus != self.exercise.apparatus {
-                self.exercise.setApparatus(self.apparatus)
+            if self.apparatus != self.instance.exercise.apparatus {
+                self.instance.exercise.setApparatus(self.apparatus)
             }
         case .left(_):
             ASSERT(false, "onEdited should have caught this")
@@ -176,12 +174,10 @@ struct EditExerciseView: View {
 struct EditExerciseView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let workout = model.program.workouts[1]
-    static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
+    static let workout = WorkoutVM(program, model.program.workouts[1])
     static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
-    static let vm = InstanceVM(WorkoutVM(program, workout), exercise, instance)
 
     static var previews: some View {
-        EditExerciseView(vm)
+        EditExerciseView(instance)
     }
 }

@@ -34,8 +34,11 @@ class ProgramVM: ObservableObject {
         get {return self.model.program.restWeeks}
     }
     
-    var instanceClipboard: [ExerciseInstance] {
-        get {return self.model.program.instanceClipboard}
+    var instanceClipboard: [ExerciseVM] {
+        get {
+            let program = ProgramVM(self.model)
+            return self.model.program.exerciseClipboard.map({ExerciseVM(program, $0)})
+        }
     }
     
     func getUserNote(_ key: String) -> String? {
@@ -59,7 +62,7 @@ class ProgramVM: ObservableObject {
     }
 }
 
-// Misc logic
+// Mutators
 extension ProgramVM {
     func setName(_ name: String) {
         self.willChange()
@@ -79,9 +82,8 @@ extension ProgramVM {
     
     func addExercise(_ name: String) {
         let work = FixedRepsSet(reps: FixedReps(10), restSecs: 60)
-        let sets = Sets.fixedReps([work, work, work])
-        let modality = Modality(Apparatus.bodyWeight, sets)
-        let exercise = Exercise(name, "", modality, Expected(weight: 0.0, sets: .fixedReps))
+        let info = ExerciseInfo.fixedReps(FixedRepsInfo(reps: [work, work, work]))
+        let exercise = Exercise(name, "", .bodyWeight, info)
 
         self.willChange()
         self.model.program.exercises.append(exercise)
@@ -95,9 +97,9 @@ extension ProgramVM {
         self.model.program.exercises.remove(at: index)
     }
 
-    func copyInstances(_ exercises: [InstanceVM]) {
+    func copyExercises(_ exercises: [ExerciseVM]) {
         self.willChange()
-        self.model.program.instanceClipboard = exercises.map({$0.instance(self.model)})
+        self.model.program.exerciseClipboard = exercises.map({$0.exercise(self.model)})
     }
     
     /// Returns 1 if date falls within program.weeksStart, 2 if the date is the week after
@@ -241,8 +243,7 @@ extension ProgramVM {
         }
         
         for candidate in instances {
-            let instance = candidate.instance(self.model)
-            if now.hoursSinceDate(instance.current.startDate) <= RecentHours && candidate.started {
+            if now.hoursSinceDate(candidate.startDate) <= RecentHours && candidate.started {
                 // If any exercise has been started recently but not completed.
                 return ("in progress", .red)
             }
@@ -507,7 +508,7 @@ extension ProgramVM {
     private func pruneRestWeeks(_ workout: Workout, _ weeks: [Int]) -> [Int] {
         var result: [Int] = []
         
-        let filterIn = {(exercise: Exercise) -> Bool in workout.instances.contains(where: {$0.name == exercise.name})}
+        let filterIn = {(exercise: Exercise) -> Bool in workout.exercises.contains(where: {$0.name == exercise.name})}
         let exercises = self.model.program.exercises.filter(filterIn)
         let allWillRest = exercises.all({$0.allowRest})
         if allWillRest {
@@ -646,20 +647,34 @@ extension ProgramVM {
         return self.model
     }
 
-    func exercises(_ workout: Workout) -> [InstanceVM] {
-        let vm = WorkoutVM(self, workout)
-        return self.model.program.exercises.map({
-            return InstanceVM(vm, $0, ExerciseInstance($0.name))
-        })
+    func model(_ exercise: Exercise) -> Model {
+        return self.model
     }
 
-    func instances(_ workout: Workout) -> [InstanceVM] {
-        let vm = WorkoutVM(self, workout)
-        return workout.instances.map({
-            let name = $0.name
-            let exercise = self.model.program.exercises.first(where: {$0.name == name})!
-            return InstanceVM(vm, exercise, $0)
-        })
+//    func exercises(_ workout: Workout) -> [InstanceVM] {
+//        let vm = WorkoutVM(self, workout)
+//        return self.model.program.exercises.map({
+//            return InstanceVM(self, vm, $0)
+//        })
+//    }
+
+//    func exercises(_ workout: Workout) -> [ExerciseVM] {
+//        return workout.exercises.map({ExerciseVM(self, $0)})
+//    }
+
+    func modify(_ exercise: Exercise, callback: (Exercise) -> Void) {
+        self.willChange()
+        let canonical = self.model.program.exercises.first(where: {$0.name == exercise.name})!
+        callback(canonical)
+        
+        for workout in self.workouts {
+            for candidate in workout.instances {
+                if candidate.name == exercise.name {
+                    candidate.willChange()
+                    callback(candidate.exercise(self.model))
+                }
+            }
+        }
     }
 }
 

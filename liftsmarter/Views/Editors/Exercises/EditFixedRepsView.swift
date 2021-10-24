@@ -3,7 +3,7 @@ import SwiftUI
 
 struct EditFixedRepsView: View {
     let exerciseName: String
-    let sets: Binding<Sets>
+    let sets: Binding<ExerciseInfo>
     @State var reps: String
     @State var rest: String
     @State var showHelp = false
@@ -11,7 +11,7 @@ struct EditFixedRepsView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ exerciseName: String, _ sets: Binding<Sets>) {
+    init(_ exerciseName: String, _ sets: Binding<ExerciseInfo>) {
         self.exerciseName = exerciseName
         self.sets = sets
 
@@ -90,9 +90,9 @@ struct EditFixedRepsView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[1]
     static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
-    static var sets = Binding.constant(exercise.modality.sets)
+    static var info = Binding.constant(exercise.info)
 
     static var previews: some View {
-        EditFixedRepsView(exercise.name, sets)
+        EditFixedRepsView(exercise.name, info)
     }
 }

@@ -15,17 +15,16 @@ extension HistoryVM {
         self.model.logs.log(level, message)
     }
 
-    @discardableResult func append(_ workout: WorkoutVM, _ exercise: InstanceVM) -> History.Record {
+    @discardableResult func append(_ workout: WorkoutVM, _ exercise: InstanceVM, _ startDate: Date) -> History.Record {
         self.objectWillChange.send()
         workout.willChange()
         
         let workout = workout.workout(self.model)
-        let instance = exercise.instance(self.model)
         let exercise = exercise.exercise(self.model)
         
-        let record = History.Record(workout, exercise, instance)
+        let record = History.Record(workout, exercise)
         self.model.history.records[exercise.name, default: []].append(record)
-        workout.completed[exercise.name] = instance.current.startDate
+        workout.completed[exercise.name] = startDate
         return record
     }
     

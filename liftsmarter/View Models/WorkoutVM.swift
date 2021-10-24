@@ -25,7 +25,7 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
     }
     
     var instances: [InstanceVM] {
-        get {return self.program.instances(self.workout)}
+        get {return self.workout.exercises.map({InstanceVM(self.program, self, $0)})}
     }
     
     // TODO: do we need this?
@@ -44,7 +44,7 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
     }
 }
 
-// Misc logic
+// Mutators
 extension WorkoutVM {
     func setName(_ name: String) {
         // Note that we don't update History records because it is supposed to be a historical record.
@@ -56,7 +56,7 @@ extension WorkoutVM {
     
     func setInstances(_ instances: [InstanceVM]) {
         self.willChange()
-        self.workout.instances = instances.map({$0.instance(self.workout)})
+        self.workout.exercises = instances.map({$0.exercise(self.workout)})
     }
     
     func setSchedule(_ schedule: Schedule) {
@@ -68,32 +68,33 @@ extension WorkoutVM {
         self.willChange()
 
         let index = self.instances.firstIndex(where: {$0.name == instance.name})!
-        let instance = self.workout.instances.remove(at: index)
-        self.workout.instances.insert(instance, at: index + by)
+        let instance = self.workout.exercises.remove(at: index)
+        self.workout.exercises.insert(instance, at: index + by)
     }
 
     func delete(_ instance: InstanceVM) {
         self.willChange()
 
         let index = self.instances.firstIndex(where: {$0.name == instance.name})!
-        self.workout.instances.remove(at: index)
+        self.workout.exercises.remove(at: index)
     }
 
     func deleteAll() {
         self.willChange()
-        self.workout.instances.removeAll()
+        self.workout.exercises.removeAll()
     }
 
     func copy(_ instance: InstanceVM) {
-        self.program.copyInstances([instance])
+        self.program.copyExercises([instance.exercise])
     }
 
     func copyAll() {
-        self.program.copyInstances(self.instances)
+        let exercises = self.instances.map({$0.exercise})
+        self.program.copyExercises(exercises)
     }
 
     func cut(_ instance: InstanceVM) {
-        self.program.copyInstances([instance])
+        self.program.copyExercises([instance.exercise])
         self.delete(instance)
     }
     
@@ -106,16 +107,17 @@ extension WorkoutVM {
         return false
     }
 
-    func append(_ instance: ExerciseInstance) {
+    func append(_ instance: InstanceVM) {
         if self.instances.firstIndex(where: {$0.name == instance.name}) == nil {
             self.willChange()
-            self.workout.instances.append(instance)
+            self.workout.exercises.append(instance.exercise(self.workout))
         }
     }
 
     func paste() {
         for candidate in self.program.instanceClipboard {
-            self.append(candidate)
+            let instance = InstanceVM(self.program, self, candidate.exercise(self.workout))
+            self.append(instance)
         }
     }
 
@@ -255,9 +257,9 @@ extension WorkoutVM {
     func addButton() -> AnyView {
         let button = Menu("Add") {
             Button("Cancel", action: {})
-            ForEach(self.program.exercises(self.workout).reversed()) {exercise in
+            ForEach(self.instances.reversed()) {exercise in
                 if self.instances.firstIndex(where: {$0.name == exercise.name}) == nil {
-                    Button(exercise.name, action: {self.append(exercise.instance(self.workout))})
+                    Button(exercise.name, action: {self.append(exercise)})
                 }
             }
         }.font(.callout)
@@ -475,11 +477,11 @@ extension WorkoutVM {
         return self.workout
     }
 
-    func workout(_ instance: ExerciseInstance) -> Workout {
+    func workout(_ instance: Exercise) -> Workout {
         return self.workout
     }
 
-    func model(_ instance: ExerciseInstance) -> Model {
+    func model(_ instance: Exercise) -> Model {
         return self.program.model(self.workout)
     }
 }

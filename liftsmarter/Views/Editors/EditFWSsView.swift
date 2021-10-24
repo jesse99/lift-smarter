@@ -121,7 +121,7 @@ struct EditFWSsView: View {
 
             for workout in self.program.workouts {
                 for instance in workout.instances {
-                    if case .fixedWeights(let iname) = instance.exerciseVM.apparatus, iname == name {
+                    if case .fixedWeights(let iname) = instance.exercise.apparatus, iname == name {
                         uses.append(instance.name)
                     }
                 }
@@ -185,8 +185,7 @@ struct EditFWSsView_Previews: PreviewProvider {
     static let program = ProgramVM(model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Triceps Press"})!
-    static let vm = ExerciseVM(program, exercise)
-    static var apparatus = Binding.constant(exercise.modality.apparatus)
+    static var apparatus = Binding.constant(exercise.apparatus)
 
     static var previews: some View {
         EditFWSsView(program, apparatus)
