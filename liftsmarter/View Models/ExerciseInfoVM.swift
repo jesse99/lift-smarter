@@ -97,9 +97,14 @@ extension ExerciseInfo {
                             parseInt(table["rest"]!, label: "rest", zeroOK: true),
                             parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
             case .right((let t, let r, let e)):
-                let info = RepTotalInfo(total: t, rest: r)
-                info.expectedReps = e
-                return .right(.repTotal(info))
+                let expected = e.reduce(0, {$0 + $1})
+                if expected == t {
+                    let info = RepTotalInfo(total: t, rest: r)
+                    info.expectedReps = e
+                    return .right(.repTotal(info))
+                } else {
+                    return .left("Expected reps is \(expected) which doesn't match total")
+                }
             case .left(let err):
                 return .left(err)
             }
