@@ -56,7 +56,7 @@ extension WorkoutVM {
     
     func setInstances(_ instances: [InstanceVM]) {
         self.willChange()
-        self.workout.exercises = instances.map({$0.exercise(self.workout)})
+        self.workout.exercises = instances.map({$0.exercise(self.workout).clone()})
     }
     
     func setSchedule(_ schedule: Schedule) {
@@ -107,17 +107,9 @@ extension WorkoutVM {
         return false
     }
 
-    func append(_ instance: InstanceVM) {
-        if self.instances.firstIndex(where: {$0.name == instance.name}) == nil {
-            self.willChange()
-            self.workout.exercises.append(instance.exercise(self.workout))
-        }
-    }
-
     func paste() {
         for candidate in self.program.instanceClipboard {
-            let instance = InstanceVM(self.program, self, candidate.exercise(self.workout))
-            self.append(instance)
+            self.append(candidate.exercise(self.workout))
         }
     }
 
@@ -257,8 +249,9 @@ extension WorkoutVM {
     func addButton() -> AnyView {
         let button = Menu("Add") {
             Button("Cancel", action: {})
-            ForEach(self.instances.reversed()) {exercise in
+            ForEach(self.program.exercises.reversed()) {exercise in
                 if self.instances.firstIndex(where: {$0.name == exercise.name}) == nil {
+                    let exercise = exercise.exercise(self.workout)
                     Button(exercise.name, action: {self.append(exercise)})
                 }
             }
@@ -483,6 +476,13 @@ extension WorkoutVM {
 
     func model(_ instance: Exercise) -> Model {
         return self.program.model(self.workout)
+    }
+
+    func append(_ exercise: Exercise) {
+        if self.instances.firstIndex(where: {$0.name == exercise.name}) == nil {
+            self.willChange()
+            self.workout.exercises.append(exercise.clone())
+        }
     }
 }
 

@@ -188,21 +188,26 @@ func mockProgram() -> Program {
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
     let mobilityExercises = [foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
-    let lowerExercises = [splitSquats(), lunge()]
-    let upperExercises = [planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
+    let lowerExercises = [foamRolling(), splitSquats(), lunge()]
+    let upperExercises = [foamRolling(), planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     
     let rehab = Workout("Rehab", rehabExercises, schedule: .days([.saturday, .sunday, .tuesday, .thursday, .friday]))
     let mobility = Workout("Mobility", mobilityExercises, schedule: .days([.saturday, .sunday, .tuesday, .thursday, .friday]))
-    let lower = Workout("Lower", lowerExercises, schedule: .days([.tuesday, .thursday, .saturday]))
-    let upper = Workout("Upper", upperExercises, schedule: .days([.friday, .sunday]))
+    let lower1 = Workout("Lower 1", lowerExercises, schedule: .days([.tuesday]))
+    let lower2 = Workout("Lower 2", lowerExercises, schedule: .days([.thursday]))
+    let upper = Workout("Upper", upperExercises, schedule: .days([.sunday]))
 
-    let workouts = [rehab, mobility, lower, upper]
-    let exercises = rehabExercises + mobilityExercises + lowerExercises + upperExercises
+    let workouts = [rehab, mobility, lower1, lower2, upper]
 
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy/MM/dd HH:mm"
     let date = formatter.date(from: "2021/09/06 09:00")!
 
+    let exercises = [
+        shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch(),
+        foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis(),
+        splitSquats(), lunge(),
+        planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     return Program("Home", workouts, exercises, weeksStart: date)
 
 }

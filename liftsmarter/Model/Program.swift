@@ -17,6 +17,13 @@ class Program {
 
         let names2 = exercises.map {$0.name}
         ASSERT_EQ(names2.count, Set(names2).count)
+        
+        for workout in workouts {
+            for exercise in workout.exercises {
+                ASSERT(exercises.contains(where: {$0.name == exercise.name}), "program is missing workout exercise \(exercise.name)")
+                ASSERT(!exercises.contains(where: {$0 === exercise}), "workout should have a cloned version of exercise \(exercise.name)")
+            }
+        }
 
         self.name = name
         self.workouts = workouts

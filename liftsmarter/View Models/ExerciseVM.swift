@@ -132,24 +132,21 @@ extension ExerciseVM {
     }
 
     func setApparatus(_ apparatus: Apparatus) {
-        self.willChange()
-        if apparatus.caseIndex() != self.exercise.apparatus.caseIndex() {
-            self.program.modify(self.exercise, callback: {
-                switch $0.info {
-                case .durations(let info):
-                    info.resetExpected()
-                case .fixedReps(let info):
-                    info.resetExpected()
-                case .maxReps(let info):
-                    info.resetExpected()
-                case .repRanges(let info):
-                    info.resetExpected()
-                case .repTotal(let info):
-                    info.resetExpected()
-                }
-            })
-        }
-        self.exercise.apparatus = apparatus
+        self.program.modify(self.exercise, callback: {
+            switch $0.info {
+            case .durations(let info):
+                info.resetExpected()        // TODO: don't reset expected for minor edits (like adding a magnet)
+            case .fixedReps(let info):
+                info.resetExpected()
+            case .maxReps(let info):
+                info.resetExpected()
+            case .repRanges(let info):
+                info.resetExpected()
+            case .repTotal(let info):
+                info.resetExpected()
+            }
+            $0.apparatus = apparatus
+        })
     }
 
     func setActiveFixedWeight(_ name: String?) {
