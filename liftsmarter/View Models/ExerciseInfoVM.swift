@@ -18,9 +18,11 @@ extension ExerciseInfo {
             let r = info.sets.map({restToStr($0.restSecs)})
             return ["reps": joinedX(rr), "rest": joinedX(r)]
 
-        case .maxReps(_):
-            ASSERT(false, "not implemented")
-            return [:]
+        case .maxReps(let info):
+            let r = info.restSecs.map({restToStr($0)})
+            let t = info.targetReps != nil ? info.targetReps!.description : ""
+            let e = info.expectedReps.map({$0.description})
+            return ["rest": joinedX(r), "target": t, "expected": joinedX(e)]
 
         case .repRanges(_):
             ASSERT(false, "not implemented")
@@ -87,7 +89,20 @@ extension ExerciseInfo {
             }
 
         case .maxReps(_):
-            return .left("not implemented")
+            switch coalesce(parseTimes(table["rest"]!, label: "rest", zeroOK: true),
+                            parseOptionalInt(table["target"]!, label: "target reps"),
+                            parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
+            case .right((let r, let t, let e)):
+                if !r.isEmpty {
+                    let info = MaxRepsInfo(restSecs: r, targetReps: t)
+                    info.expectedReps = e
+                    return .right(.maxReps(info))
+                } else {
+                    return .left("Rest cannot be empty")
+                }
+            case .left(let err):
+                return .left(err)
+            }
 
         case .repRanges(_):
             return .left("not implemented")
@@ -101,6 +116,9 @@ extension ExerciseInfo {
                 if expected == t {
                     let info = RepTotalInfo(total: t, rest: r)
                     info.expectedReps = e
+                    return .right(.repTotal(info))
+                } else if e.isEmpty {
+                    let info = RepTotalInfo(total: t, rest: r)
                     return .right(.repTotal(info))
                 } else {
                     return .left("Expected reps is \(expected) which doesn't match total")

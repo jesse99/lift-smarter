@@ -343,7 +343,7 @@ extension InstanceVM {
                 weight = info.expectedWeight
                 let reps = info.expectedReps[info.current.setIndex]
                 text = "\(reps)+ reps"
-            } else if info.expectedReps.count == info.restSecs.count {
+            } else if info.currentReps.count == info.restSecs.count {
                 text = ""
             } else {
                 weight = info.expectedWeight

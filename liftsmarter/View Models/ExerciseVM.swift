@@ -360,10 +360,28 @@ extension ExerciseVM {
             )
 
         case .maxReps(_):
-            return AnyView(Text("not implemented"))
-            
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditMaxRepsView(exerciseName, einfo)}
+                    Spacer()
+                    Menu("Max Reps") {
+                        Button("Durations", action: {change(defaultDurations())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("As many reps as possible for each set.")}).font(.callout)
+                }.padding()
+            )
+
         case .repRanges(_):
             return AnyView(Text("not implemented"))
+            // "Has optional warmup and backoff sets. Reps are within a specified range and weight percentages can be used."
             
         case .repTotal(_):
             return AnyView(

@@ -22,6 +22,7 @@
 		373AB0D3271F486400F9898B /* ExerciseInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373AB0D2271F486400F9898B /* ExerciseInfo.swift */; };
 		3742BFBD2725E970006D43E0 /* EditRepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */; };
 		3742BFBF27261018006D43E0 /* MaxRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFBE27261018006D43E0 /* MaxRepsView.swift */; };
+		3742BFC12726210D006D43E0 /* EditMaxRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -96,6 +97,7 @@
 		373AB0D2271F486400F9898B /* ExerciseInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfo.swift; sourceTree = "<group>"; };
 		3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRepTotalView.swift; sourceTree = "<group>"; };
 		3742BFBE27261018006D43E0 /* MaxRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaxRepsView.swift; sourceTree = "<group>"; };
+		3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMaxRepsView.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 			children = (
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
 				37A3C5E6270E8BAD00BFA8CC /* EditFixedRepsView.swift */,
+				3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */,
 				3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */,
 			);
 			path = Exercises;
@@ -433,6 +436,7 @@
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
 				37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
+				3742BFC12726210D006D43E0 /* EditMaxRepsView.swift in Sources */,
 				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,

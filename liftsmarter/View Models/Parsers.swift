@@ -29,6 +29,34 @@ func parseInt(_ text: String, label: String, zeroOK: Bool = false) -> Either<Str
     return .right(value ?? 0)
 }
 
+// Int = [0-9]*
+func parseOptionalInt(_ text: String, label: String, zeroOK: Bool = false) -> Either<String, Int?> {
+    var value: Int? = nil
+    let scanner = Scanner(string: text)
+    while !scanner.isAtEnd {
+        if let candidate = scanner.scanUInt64() {
+            if !zeroOK && candidate == 0 {
+                return .left("\(label.capitalized) must be greater than zero")
+            } else if candidate > Int.max {
+                return .left("\(label.capitalized) is too large")
+            }
+            value = Int(candidate)
+        } else {
+            return .left("Expected integer for \(label)")
+        }
+    }
+    
+    if value == nil {
+        return .right(nil)
+    }
+    
+    if !scanner.isAtEnd {
+        return .left("Expected integer for \(label)")
+    }
+
+    return .right(value!)
+}
+
 // IntList = Int (Space Int)* ('x' Int)?
 func parseIntList(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false) -> Either<String, [Int]> {
     var values: [Int] = []
