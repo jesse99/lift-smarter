@@ -23,6 +23,7 @@
 		3742BFBD2725E970006D43E0 /* EditRepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */; };
 		3742BFBF27261018006D43E0 /* MaxRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFBE27261018006D43E0 /* MaxRepsView.swift */; };
 		3742BFC12726210D006D43E0 /* EditMaxRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */; };
+		3742BFC3272654F0006D43E0 /* RepRangesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3742BFC2272654F0006D43E0 /* RepRangesView.swift */; };
 		377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B426ED725D00EC5028 /* UIColorExtension.swift */; };
 		377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791B726ED98AA00EC5028 /* ProgramView.swift */; };
 		377791BB26EE642A00EC5028 /* DurationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377791BA26EE642A00EC5028 /* DurationsView.swift */; };
@@ -98,6 +99,7 @@
 		3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRepTotalView.swift; sourceTree = "<group>"; };
 		3742BFBE27261018006D43E0 /* MaxRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaxRepsView.swift; sourceTree = "<group>"; };
 		3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMaxRepsView.swift; sourceTree = "<group>"; };
+		3742BFC2272654F0006D43E0 /* RepRangesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepRangesView.swift; sourceTree = "<group>"; };
 		377791B426ED725D00EC5028 /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		377791B726ED98AA00EC5028 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		377791BA26EE642A00EC5028 /* DurationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationsView.swift; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				377791BA26EE642A00EC5028 /* DurationsView.swift */,
 				37A3C5E2270D5EA400BFA8CC /* FixedRepsView.swift */,
 				3742BFBE27261018006D43E0 /* MaxRepsView.swift */,
+				3742BFC2272654F0006D43E0 /* RepRangesView.swift */,
 				37D53898271E5A57006B3833 /* RepTotalView.swift */,
 			);
 			path = Exercises;
@@ -428,6 +431,7 @@
 				37A3C5F22712115000BFA8CC /* Components.swift in Sources */,
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,
+				3742BFC3272654F0006D43E0 /* RepRangesView.swift in Sources */,
 				3718979B2706BB2800351C5A /* EditTextView.swift in Sources */,
 				37D53895271CDEBF006B3833 /* NoteView.swift in Sources */,
 				3718978726F6955A00351C5A /* History.swift in Sources */,

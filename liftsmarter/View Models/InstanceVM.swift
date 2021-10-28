@@ -160,6 +160,28 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
         }
     }
 
+    func canAdvanceWeight() -> Bool {
+        switch self.instance.info {
+        case .repRanges(let info):
+            if self.exercise.advancedWeight() != nil && info.currentReps.count >= info.worksets.count {
+                for i in 0..<info.worksets.count {
+                    if let maxReps = info.worksets[i].reps.max {
+                        if info.currentReps[i].reps < maxReps {
+                            return false
+                        }
+                    } else {
+                        return false    // set is min to inf
+                    }
+                }
+                return true
+            }
+            
+            return false
+        default:
+            return false
+        }
+    }
+
     static func ==(lhs: InstanceVM, rhs: InstanceVM) -> Bool {
         return lhs.name == rhs.name
     }
@@ -234,14 +256,17 @@ extension InstanceVM {
             if info.current.setIndex == 0 {
                 info.current.startDate = now
             }
-            ASSERT(false, "not implemented")
+
+            let set = info.currentSet()
+            info.current.setIndex += 1
+            info.currentReps.append(ActualRepRange(reps: reps!, percent: set.percent.value))
+            finished = self.finished
 
         case .repTotal(let info):
             if info.current.setIndex == 0 {
                 info.current.startDate = now
             }
 
-            ASSERT(reps != nil, "reps should be set")
             info.current.setIndex += 1
             info.currentReps.append(reps!)
             finished = self.finished
@@ -266,8 +291,8 @@ extension InstanceVM {
         case .maxReps(let info):
             info.expectedReps = info.currentReps
 
-        case .repRanges(_):
-            ASSERT(false, "not implemented")
+        case .repRanges(let info):
+            info.expectedReps = info.currentReps
 
         case .repTotal(let info):
             info.expectedReps = info.currentReps
@@ -293,6 +318,25 @@ extension InstanceVM {
                 } else {
                     return "Finished using \(info.current.setIndex) sets"
                 }
+            }
+        case .repRanges(let info):
+            switch self.progress() {
+            case .notStarted, .started:
+                var index = info.current.setIndex
+                
+                if index < info.warmups.count {
+                    return "Warmup \(index + 1) of \(info.warmups.count)"
+                }
+                index -= info.warmups.count
+
+                if index < info.worksets.count {
+                    return "Workset \(index + 1) of \(info.worksets.count)"
+                }
+                index -= info.worksets.count
+
+                return "Backoff \(index + 1) of \(info.backoffs.count)"
+            case .finished:
+                return "Finished"
             }
         default:
             let numSets = self.exercise.numSets()!
@@ -351,10 +395,23 @@ extension InstanceVM {
             }
 
         case .repRanges(let info):
-            weight = info.expectedWeight
-            percent = WeightPercent(1.0)
-            text = "not implemented"
-
+            if info.current.setIndex < info.expectedReps.count {
+                let set = info.currentSet()
+                weight = info.expectedWeight
+                percent = set.percent
+                
+                if let max = set.reps.max {
+                    let min = info.expectedReps.at(info.current.setIndex)?.reps ?? set.reps.min
+                    text = "\(min)-\(max) reps"
+                } else {
+                    if set.reps.min == 1 {
+                        text = "1 rep"
+                    } else {
+                        text = "\(set.reps.min) reps"
+                    }
+                }
+            }
+            
         case .repTotal(let info):
             weight = info.expectedWeight
             if info.current.setIndex < info.expectedReps.count {
@@ -440,8 +497,9 @@ extension InstanceVM {
         case .maxReps(let info):
             return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
-        case .repRanges(_):
-            return TimerView(title: "not implemented", duration: 120)
+        case .repRanges(let info):
+            let set = info.currentSet(delta)
+            return TimerView(title: title, duration: set.restSecs)
 
         case .repTotal(let info):
             return TimerView(title: title, duration: info.rest)
@@ -486,8 +544,9 @@ extension InstanceVM {
                 secs = info.restSecs.last!
             }
 
-        case .repRanges(_):
-            ASSERT(false, "not implemented")
+        case .repRanges(let info):
+            let set = info.currentSet()
+            return set.restSecs
 
         case .repTotal(let info):
             return info.rest
@@ -506,7 +565,7 @@ extension InstanceVM {
         case .maxReps(_):
             return AnyView(MaxRepsView(program, self))
         case .repRanges(_):
-            return AnyView(Text("not implemented"))
+            return AnyView(RepRangesView(program, self))
         case .repTotal(_):
             return AnyView(RepTotalView(program, self))
         }
@@ -519,6 +578,33 @@ extension InstanceVM {
                 return "1 rep"
             } else {
                 return "\(reps) reps"  // 5 reps
+            }
+        }
+        
+        func getRepRangeLabel(_ info: RepRangesInfo, _ index: Int, _ workset: RepsSet) -> String {
+            let min = info.expectedReps.at(index + info.warmups.count)?.reps ?? workset.reps.min
+            let max = workset.reps.max ?? min
+            let suffix = weightSuffix(workset.percent, info.expectedWeight)
+            if !suffix.isEmpty {
+                if min == max {
+                    if min == 1 {
+                        return "1\(suffix)"
+                    } else {
+                        return "\(min)\(suffix)"
+                    }
+                } else {
+                    return "\(min)-\(max)\(suffix)"
+                }
+            } else {
+                if min == max {
+                    if min == 1 {
+                        return "1 rep"
+                    } else {
+                        return "\(min) reps"
+                    }
+                } else {
+                    return "\(min)-\(max) reps"
+                }
             }
         }
         
@@ -544,8 +630,8 @@ extension InstanceVM {
             }
             trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
 
-        case .repRanges(_):
-            setStrs.append("not implemented")
+        case .repRanges(let info):
+            setStrs = info.worksets.mapi({getRepRangeLabel(info, $0, $1)})
 
         case .repTotal(let info):
             if info.expectedReps.isEmpty {

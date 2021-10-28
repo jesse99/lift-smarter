@@ -187,6 +187,22 @@ final class RepRangesInfo: Equatable {
         return copy
     }
     
+    func currentSet(_ delta: Int = 0) -> RepsSet {
+        var index = self.current.setIndex + delta
+        
+        if index < self.warmups.count {
+            return self.warmups[index]
+        }
+        index -= self.warmups.count
+
+        if index < self.worksets.count {
+            return self.worksets[index]
+        }
+        index -= self.worksets.count
+
+        return self.backoffs[index]
+    }
+    
     func resetCurrent(weight: Double) {
         self.current.reset(weight: weight)
         self.currentReps = []

@@ -106,6 +106,19 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
 
+    func advancedWeight() -> Double? {
+        switch self.exercise.apparatus {
+        case .bodyWeight:
+            return nil
+            
+        case .fixedWeights(name: let name):
+            if let name = name, let fws = self.program.getFixedWeights()[name] {
+                return fws.getClosestAbove(self.expectedWeight)
+            }
+            return nil
+        }
+    }
+
     static func ==(lhs: ExerciseVM, rhs: ExerciseVM) -> Bool {
         return lhs.name == rhs.name
     }
@@ -157,6 +170,25 @@ extension ExerciseVM {
         self.program.modify(self.exercise, callback: {$0.info = info})
     }
     
+    func advanceWeight() {
+        let weight = self.advancedWeight()!
+        self.program.modify(self.exercise, callback: {
+            switch $0.info {
+            case .durations(let info):
+                info.expectedWeight = weight
+            case .fixedReps(let info):
+                info.expectedWeight = weight
+            case .maxReps(let info):
+                info.expectedWeight = weight
+            case .repRanges(let info):
+                info.expectedWeight = weight
+                info.expectedReps = info.worksets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value)})
+            case .repTotal(let info):
+                info.expectedWeight = weight
+            }
+        })
+    }
+
     func setWeight(_ weight: Double) {
         self.program.modify(self.exercise, callback: {
             switch $0.info {
