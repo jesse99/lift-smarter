@@ -28,7 +28,7 @@ struct ProgramView: View {
                     }
                 }
                 .navigationBarTitle(Text("\(self.program.name) Workouts"))
-                .onAppear {self.timer.restart(); self.program.willChange()}
+                .onAppear {self.timer.restart(); self.program.willChange(); self.program.validate()}
                 .onDisappear {self.timer.stop()}
                 .onReceive(self.timer.timer) {_ in self.program.willChange()}
 

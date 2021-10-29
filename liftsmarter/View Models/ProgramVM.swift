@@ -11,6 +11,10 @@ class ProgramVM: ObservableObject {
         self.model = model
     }
     
+    func validate() {
+        self.model.program.validate()
+    }
+
     var name: String {
         get {return self.model.program.name}
     }
@@ -650,17 +654,6 @@ extension ProgramVM {
     func model(_ exercise: Exercise) -> Model {
         return self.model
     }
-
-//    func exercises(_ workout: Workout) -> [InstanceVM] {
-//        let vm = WorkoutVM(self, workout)
-//        return self.model.program.exercises.map({
-//            return InstanceVM(self, vm, $0)
-//        })
-//    }
-
-//    func exercises(_ workout: Workout) -> [ExerciseVM] {
-//        return workout.exercises.map({ExerciseVM(self, $0)})
-//    }
 
     func modify(_ exercise: Exercise, callback: (Exercise) -> Void) {
         self.willChange()
