@@ -17,3 +17,15 @@ extension Array {
         return result
     }
 }
+
+func zip3<A, B, C>(_ a1: Array<A>, _ a2: Array<B>, _ a3: Array<C>) -> Array<(A, B, C)> {
+    ASSERT(a1.count == a2.count && a1.count == a3.count, "counts must match")
+    
+    var result = Array<(A, B, C)>()
+    result.reserveCapacity(a1.count)
+    for i in 0..<a1.count {
+        result.append((a1[i], a2[i], a3[i]))
+    }
+    
+    return result
+}

@@ -536,6 +536,11 @@ func friendlyFloat(_ str: String) -> String {
     return result
 }
 
+func friendlyPercent(_ percent: Double) -> String {
+    let p = Int(percent*100.0)
+    return p.description
+}
+
 func friendlyWeight(_ weight: Double) -> String {
     var result: String
     

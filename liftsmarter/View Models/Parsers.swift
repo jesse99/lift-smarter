@@ -98,10 +98,87 @@ func parseIntList(_ text: String, label: String, zeroOK: Bool = false, emptyOK: 
     return .right(values)
 }
 
+// RepRanges = RepRange+ ('x' Int)?
+// RepRange = UnboundedReps | BoundedReps
+// UnboundedReps = Int '+'
+// BoundedReps = Int ('-' Int)?
+func parseRepRanges(_ text: String, label: String, emptyOK: Bool) -> Either<String, [RepRange]> {
+    func parseRepRange(_ scanner: Scanner) -> Either<String, RepRange> {
+        let min = scanner.scanUInt64()
+        if min == nil {
+            return .left("Expected a number for \(label) followed by optional '+' or '-INT'")
+        }
+        if min! == 0 {
+            return .left("\(label.capitalized) must be greater than zero")
+        } else if min! > Int.max {
+            return .left("\(label.capitalized) is too large")
+        }
+
+        if scanner.scanString("+") != nil {
+            return .right(RepRange(min: Int(min!), max: nil))
+        }
+
+        if scanner.scanString("-") != nil {
+            let max = scanner.scanUInt64()
+            if max == nil {
+                return .left("Expected a number for \(label) followed by optional '-max'")
+            }
+            if min! > max! {
+                return .left("\(label.capitalized) min reps cannot be greater than max reps")
+            } else if max! > Int.max {
+                return .left("\(label.capitalized) is too large")
+            }
+            return .right(RepRange(min: Int(min!), max: Int(max!)))
+        }
+
+        return .right(RepRange(min: Int(min!), max: Int(min!)))
+    }
+    
+    if text.isBlankOrEmpty() {
+        if emptyOK {
+            return .right([])
+        } else {
+            return .left("Expected reps of the form 5, 4-8, or 5+")
+        }
+    }
+    
+    var reps: [RepRange] = []
+    let scanner = Scanner(string: text)
+    while !scanner.isAtEnd {
+        switch parseRepRange(scanner) {
+        case .right(let rep): reps.append(rep)
+        case .left(let err): return .left(err)
+        }
+        
+        if scanner.scanString("x") != nil {
+            if let n = scanner.scanUInt64(), n > 0 {
+                if n < 1000 {
+                    reps = reps.duplicate(x: Int(n))
+                    break
+                } else {
+                    return .left("repeat count is too large")
+                }
+            } else {
+                return .left("x should be followed by the number of times to duplicate")
+            }
+        }
+    }
+    
+    if !scanner.isAtEnd {
+        return .left("\(label.capitalized) should be rep ranges followed by an optional xN to repeat")
+    }
+
+    if reps.isEmpty {
+        return .left("\(label.capitalized) needs at least one rep")
+    }
+    
+    return .right(reps)
+}
+
 // Times = Time+ ('x' Int)?
 // Time = Int ('s' | 'm' | 'h')?    if units are missing seconds are assumed
 // Int = [0-9]+
-func parseTimes(_ text: String, label: String, zeroOK: Bool = false) -> Either<String, [Int]> {
+func parseTimes(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false) -> Either<String, [Int]> {
     func parseTime(_ scanner: Scanner) -> Either<String, Int> {
         let time = scanner.scanDouble()
         if time == nil {
@@ -131,6 +208,14 @@ func parseTimes(_ text: String, label: String, zeroOK: Bool = false) -> Either<S
         }
 
         return .right(Int(secs))
+    }
+    
+    if text.isBlankOrEmpty() {
+        if emptyOK {
+            return .right([])
+        } else {
+            return .left("\(label.capitalized) cannot be empty")
+        }
     }
     
     var times: [Int] = []

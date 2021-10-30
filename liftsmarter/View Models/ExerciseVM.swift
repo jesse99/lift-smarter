@@ -85,12 +85,26 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.restSecs.count
         case .repRanges(let info):
-            return info.warmups.count + info.worksets.count + info.backoffs.count
+            return info.sets.count
         case .repTotal(_):
             return nil
         }
     }
 
+    func fixedRep() -> Int? {
+        switch self.exercise.info {
+        case .repRanges(let info):
+            let set = info.currentSet()
+            if let max = set.reps.max, set.reps.min == max {
+                return set.reps.min
+            } else {
+                return nil  // m-n or m+
+            }
+        default:
+            return nil
+        }
+    }
+        
     var expectedWeight: Double {
         switch self.exercise.info {
         case .durations(let info):
@@ -182,7 +196,7 @@ extension ExerciseVM {
                 info.expectedWeight = weight
             case .repRanges(let info):
                 info.expectedWeight = weight
-                info.expectedReps = info.worksets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value)})
+                info.expectedReps = []
             case .repTotal(let info):
                 info.expectedWeight = weight
             }
@@ -412,8 +426,24 @@ extension ExerciseVM {
             )
 
         case .repRanges(_):
-            return AnyView(Text("not implemented"))
-            // "Has optional warmup and backoff sets. Reps are within a specified range and weight percentages can be used."
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditRepRangesView(exerciseName, einfo)}
+                    Spacer()
+                    Menu("Rep Ranges") {
+                        Button("Durations", action: {change(defaultDurations())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("Has optional warmup and backoff sets. Reps are within a specified range and weight percentages can be used.")}).font(.callout)
+                }.padding()
+            )
             
         case .repTotal(_):
             return AnyView(

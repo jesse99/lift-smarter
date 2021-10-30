@@ -25,12 +25,65 @@ extension ExerciseInfo {
             return ["rest": joinedX(r), "target": t, "expected": joinedX(e)]
 
         case .repRanges(_):
-            ASSERT(false, "not implemented")
+            ASSERT(false, "use the other editing method")
             return [:]
 
         case .repTotal(let info):
             let e = info.expectedReps.map({$0.description})
             return ["total": info.total.description, "rest": info.rest.description, "expected": joinedX(e)]
+        }
+    }
+    
+    func render(_ editing: RepRangeStage) -> (reps: String, percents: String, rest: String, expected: String) {
+        switch self {
+        case .repRanges(let info):
+            let warmups = info.sets.filter({$0.stage == .warmup})
+            let worksets = info.sets.filter({$0.stage == .workset})
+            let backoffs = info.sets.filter({$0.stage == .backoff})
+
+            var reps, percents, rest, expected: [String]
+            switch editing {
+            case .warmup:
+                reps = warmups.map({repRangeLabel($0.reps.min, $0.reps.max, suffix: nil)})
+                percents = warmups.map({friendlyPercent($0.percent.value)})
+                rest = warmups.map({restToStr($0.restSecs)})
+                
+                if !info.expectedReps.isEmpty {
+                    let slice = info.expectedReps.filter({$0.stage == .warmup})
+                    expected = slice.map({$0.reps.description})
+                } else {
+                    expected = []
+                }
+
+            case .workset:
+                reps = worksets.map({repRangeLabel($0.reps.min, $0.reps.max, suffix: nil)})
+                percents = worksets.map({friendlyPercent($0.percent.value)})
+                rest = worksets.map({restToStr($0.restSecs)})
+                
+                if !info.expectedReps.isEmpty {
+                    let slice = info.expectedReps.filter({$0.stage == .workset})
+                    expected = slice.map({$0.reps.description})
+                } else {
+                    expected = []
+                }
+
+            case .backoff:
+                reps = backoffs.map({repRangeLabel($0.reps.min, $0.reps.max, suffix: nil)})
+                percents = backoffs.map({friendlyPercent($0.percent.value)})
+                rest = backoffs.map({restToStr($0.restSecs)})
+                
+                if !info.expectedReps.isEmpty {
+                    let slice = info.expectedReps.filter({$0.stage == .backoff})
+                    expected = slice.map({$0.reps.description})
+                } else {
+                    expected = []
+                }
+            }
+            return (reps: joinedX(reps), percents: joinedX(percents), rest: joinedX(rest), expected: joinedX(expected))
+
+        default:
+            ASSERT(false, "use the other editing method")
+            return (reps: "", percents: "", rest: "", expected: "")
         }
     }
 
@@ -41,7 +94,7 @@ extension ExerciseInfo {
         case .durations(_):
             switch coalesce(parseTimes(table["durations"]!, label: "durations"),
                             parseTimes(table["target"]!, label: "target"),
-                            parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
+                            parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true)) {
             case .right((let d, let t, var r)):
                 let count1 = d.count
                 let count2 = t.count
@@ -66,7 +119,7 @@ extension ExerciseInfo {
 
         case .fixedReps(_):
             switch coalesce(parseIntList(table["reps"]!, label: "reps"),
-                            parseTimes(table["rest"]!, label: "rest", zeroOK: true)) {
+                            parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true)) {
             case .right((let rr, var r)):
                 let count1 = rr.count
                 let count2 = r.count
@@ -89,8 +142,8 @@ extension ExerciseInfo {
             }
 
         case .maxReps(_):
-            switch coalesce(parseTimes(table["rest"]!, label: "rest", zeroOK: true),
-                            parseOptionalInt(table["target"]!, label: "target reps"),
+            switch coalesce(parseTimes(table["rest"]!, label: "rest", zeroOK: true),    // this controls how many sets there are so it cannot be empty
+                            parseOptionalInt(table["target"]!, label: "target reps"),   // TODO: should the edit view have an explicit num sets text field?
                             parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
             case .right((let r, let t, let e)):
                 if !r.isEmpty {
@@ -105,7 +158,7 @@ extension ExerciseInfo {
             }
 
         case .repRanges(_):
-            return .left("not implemented")
+            return .left("use the other parse function")
 
         case .repTotal(_):
             switch coalesce(parseInt(table["total"]!, label: "total"),
@@ -126,6 +179,39 @@ extension ExerciseInfo {
             case .left(let err):
                 return .left(err)
             }
+        }
+    }
+
+
+    func parse(_ reps: String, _ percents: String, _ rest: String, _ expected: String, _ stage: RepRangeStage, emptyRepsOK: Bool) -> Either<String, ([RepsSet], [ActualRepRange])> {
+        switch coalesce(parseRepRanges(reps, label: "reps", emptyOK: emptyRepsOK),
+                        parseIntList(percents, label: "percents", zeroOK: true, emptyOK: true),
+                        parseTimes(rest, label: "rest", zeroOK: true, emptyOK: true),
+                        parseIntList(expected, label: "expected reps", emptyOK: true)) {
+        case .right((let repsList, var percentsList, var restList, var expectedList)):
+            if percentsList.isEmpty {   // percents can (rarely) be larger than 100, TODO: but maybe we should disallow really large percents
+                percentsList = Array(repeating: 100, count: repsList.count)
+            }
+            if restList.isEmpty {
+                restList = Array(repeating: 0, count: repsList.count)
+            }
+            if expectedList.isEmpty {
+                expectedList = repsList.map({$0.min})
+            }
+            if repsList.count == percentsList.count && repsList.count == restList.count && repsList.count == expectedList.count {
+                let percents = percentsList.map({WeightPercent(Double($0)/100.0)})
+                let x = zip3(repsList, percents, restList)
+                let reps = x.map({RepsSet(reps: $0.0, percent: $0.1, restSecs: $0.2, stage: stage)})
+                
+                let y = zip(expectedList, percents)
+                let expected = y.map({ActualRepRange(reps: $0.0, percent: $0.1.value, stage: stage)})
+                return .right((reps, expected))
+
+            } else {
+                return .left("Number of reps must match percents, rest, and expected (although the later can be empty)")
+            }
+        case .left(let err):
+            return .left(err)
         }
     }
 

@@ -22,7 +22,7 @@ func wordsField(_ label: String,_ text: Binding<String>, _ onEdit: @escaping (St
     )
 }
 
-/// Used for text fields that are mostly numeric, e.g. "30s" or "8 x3".
+/// Used for text fields that are mostly numeric, e.g. "30s" or "8x3".
 func numericishField(_ label: String, _ text: Binding<String>, _ onEdit: @escaping (String) -> Void, _ onHelp: HelpFunc? = nil) -> AnyView {
     return AnyView(
         HStack {

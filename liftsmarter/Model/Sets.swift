@@ -41,15 +41,19 @@ struct FixedRepsSet: Equatable {
     }
 }
 
+enum RepRangeStage {case warmup, workset, backoff}
+
 struct RepsSet: Equatable {
     let reps: RepRange
     let percent: WeightPercent
     let restSecs: Int
+    let stage: RepRangeStage
     
-    init(reps: RepRange, percent: WeightPercent = WeightPercent(1.0), restSecs: Int = 0) {
+    init(reps: RepRange, percent: WeightPercent = WeightPercent(1.0), restSecs: Int = 0, stage: RepRangeStage) {
         self.reps = reps
         self.percent = percent
         self.restSecs = restSecs
+        self.stage = stage
     }
 }
 

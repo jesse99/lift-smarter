@@ -2,6 +2,34 @@
 import Foundation
 import SwiftUI
 
+// Suffix is normally either empty or something like " @ 10 lbs", or nil for no suffix at all.
+func repRangeLabel(_ min: Int, _ max: Int?, suffix inSuffix: String?) -> String {
+    var prefix: String
+    if let max = max {
+        if min == max {
+            prefix = "\(min)"
+        } else {
+            prefix = "\(min)-\(max)"
+        }
+    } else {
+        prefix = "\(min)+"
+    }
+    
+    if var suffix = inSuffix {
+        if suffix.isEmpty {
+            if prefix == "1" {
+                suffix = " rep"
+            } else {
+                suffix = " reps"
+            }
+        }
+        
+        return prefix + suffix
+    } else {
+        return prefix
+    }
+}
+
 // This is used with exercises that are part of a particular workout.
 class InstanceVM: Equatable, Identifiable, ObservableObject {
     let program: ProgramVM
@@ -163,14 +191,16 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
     func canAdvanceWeight() -> Bool {
         switch self.instance.info {
         case .repRanges(let info):
-            if self.exercise.advancedWeight() != nil && info.currentReps.count >= info.worksets.count {
-                for i in 0..<info.worksets.count {
-                    if let maxReps = info.worksets[i].reps.max {
-                        if info.currentReps[i].reps < maxReps {
-                            return false
+            if self.exercise.advancedWeight() != nil && info.currentReps.count >= info.sets.count {
+                for i in 0..<info.sets.count {
+                    if info.sets[i].stage == .workset {
+                        if let maxReps = info.sets[i].reps.max {
+                            if info.currentReps[i].reps < maxReps {
+                                return false
+                            }
+                        } else {
+                            return false    // set is min to inf
                         }
-                    } else {
-                        return false    // set is min to inf
                     }
                 }
                 return true
@@ -259,7 +289,7 @@ extension InstanceVM {
 
             let set = info.currentSet()
             info.current.setIndex += 1
-            info.currentReps.append(ActualRepRange(reps: reps!, percent: set.percent.value))
+            info.currentReps.append(ActualRepRange(reps: reps!, percent: set.percent.value, stage: set.stage))
             finished = self.finished
 
         case .repTotal(let info):
@@ -322,19 +352,20 @@ extension InstanceVM {
         case .repRanges(let info):
             switch self.progress() {
             case .notStarted, .started:
-                var index = info.current.setIndex
-                
-                if index < info.warmups.count {
-                    return "Warmup \(index + 1) of \(info.warmups.count)"
-                }
-                index -= info.warmups.count
+                let index = info.current.setIndex
+                let numWarmups = info.sets.filter({$0.stage == .warmup}).count
+                let numWorksets = info.sets.filter({$0.stage == .workset}).count
+                let numBackoff = info.sets.filter({$0.stage == .backoff}).count
 
-                if index < info.worksets.count {
-                    return "Workset \(index + 1) of \(info.worksets.count)"
+                switch info.sets[index].stage {
+                case .warmup:
+                    return "Warmup \(index + 1) of \(numWarmups)"
+                case .workset:
+                    return "Workset \(index - numWarmups + 1) of \(numWorksets)"
+                case .backoff:
+                    return "Backoff \(index - numWarmups - numWorksets + 1) of \(numBackoff)"
                 }
-                index -= info.worksets.count
 
-                return "Backoff \(index + 1) of \(info.backoffs.count)"
             case .finished:
                 return "Finished"
             }
@@ -395,21 +426,13 @@ extension InstanceVM {
             }
 
         case .repRanges(let info):
-            if info.current.setIndex < info.expectedReps.count {
+            if info.current.setIndex < info.sets.count {
                 let set = info.currentSet()
                 weight = info.expectedWeight
                 percent = set.percent
                 
-                if let max = set.reps.max {
-                    let min = info.expectedReps.at(info.current.setIndex)?.reps ?? set.reps.min
-                    text = "\(min)-\(max) reps"
-                } else {
-                    if set.reps.min == 1 {
-                        text = "1 rep"
-                    } else {
-                        text = "\(set.reps.min) reps"
-                    }
-                }
+                let min = info.expectedReps.at(info.current.setIndex)?.reps ?? set.reps.min
+                text = repRangeLabel(min, set.reps.max, suffix: "")
             }
             
         case .repTotal(let info):
@@ -581,31 +604,11 @@ extension InstanceVM {
             }
         }
         
-        func getRepRangeLabel(_ info: RepRangesInfo, _ index: Int, _ workset: RepsSet) -> String {
-            let min = info.expectedReps.at(index + info.warmups.count)?.reps ?? workset.reps.min
-            let max = workset.reps.max ?? min
-            let suffix = weightSuffix(workset.percent, info.expectedWeight)
-            if !suffix.isEmpty {
-                if min == max {
-                    if min == 1 {
-                        return "1\(suffix)"
-                    } else {
-                        return "\(min)\(suffix)"
-                    }
-                } else {
-                    return "\(min)-\(max)\(suffix)"
-                }
-            } else {
-                if min == max {
-                    if min == 1 {
-                        return "1 rep"
-                    } else {
-                        return "\(min) reps"
-                    }
-                } else {
-                    return "\(min)-\(max) reps"
-                }
-            }
+        func getRepRangeLabel(_ info: RepRangesInfo, _ index: Int, _ workset: RepsSet, ignoreWeight: Bool = false) -> String {
+            let numWarmups = info.sets.filter({$0.stage == .warmup}).count
+            let min = info.expectedReps.at(index + numWarmups)?.reps ?? workset.reps.min
+            let suffix = ignoreWeight ? "" : weightSuffix(workset.percent, info.expectedWeight)
+            return repRangeLabel(min, workset.reps.max, suffix: suffix)
         }
         
         var setStrs: [String] = []
@@ -631,7 +634,13 @@ extension InstanceVM {
             trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
 
         case .repRanges(let info):
-            setStrs = info.worksets.mapi({getRepRangeLabel(info, $0, $1)})
+            let worksets = info.sets.filter({$0.stage == .workset})
+            if worksets.all({abs($0.percent.value - worksets.first!.percent.value) < 0.01}) {
+                trailer = weightSuffix(worksets.first!.percent, info.expectedWeight)
+                setStrs = worksets.mapi({getRepRangeLabel(info, $0, $1, ignoreWeight: true)})
+            } else {
+                setStrs = worksets.mapi({getRepRangeLabel(info, $0, $1)})
+            }
 
         case .repTotal(let info):
             if info.expectedReps.isEmpty {

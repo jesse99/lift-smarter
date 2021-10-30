@@ -102,12 +102,17 @@ class Program {
             ASSERT(info.current.setIndex <= info.restSecs.count, "setIndex must match sets")
             
         case .repRanges(let info):
-            ASSERT(info.worksets.count > 0, "must have at least one workset")
+            ASSERT(info.sets.first(where: {$0.stage == .workset}) != nil, "must have at least one workset")
             
-            let count = info.warmups.count + info.worksets.count + info.backoffs.count
-            ASSERT(info.expectedReps.isEmpty || info.expectedReps.count == count, "expectedReps must match sets")
-            ASSERT(info.currentReps.count <= count, "currentReps must match sets")
-            ASSERT(info.current.setIndex <= count, "setIndex must match sets")
+            ASSERT(info.expectedReps.isEmpty || info.expectedReps.count == info.sets.count, "expectedReps must match sets")
+            if !info.expectedReps.isEmpty {
+                for i in 0..<info.sets.count {
+                    ASSERT(info.expectedReps[i].stage == info.sets[i].stage, "expected must match sets")
+                }
+            }
+            
+            ASSERT(info.currentReps.count <= info.sets.count, "currentReps must match sets")
+            ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
             
         case .repTotal(let info):
             ASSERT(info.total > 0, "at least one rep is required")
@@ -189,9 +194,7 @@ class Program {
     }
 
     private func validateInfos(_ info: RepRangesInfo, _ parent: RepRangesInfo) {
-        ASSERT(info.warmups == parent.warmups, "warmups must match")
-        ASSERT(info.worksets == parent.worksets, "worksets must match")
-        ASSERT(info.backoffs == parent.backoffs, "backoffs must match")
+        ASSERT(info.sets == parent.sets, "sets must match")
         ASSERT(info.expectedWeight == parent.expectedWeight, "expectedWeight must match")
         ASSERT(info.expectedReps == parent.expectedReps, "expectedReps must match")
     }

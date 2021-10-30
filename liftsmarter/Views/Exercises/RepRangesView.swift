@@ -82,7 +82,11 @@ struct RepRangesView: View {
     private func onNext() {
         switch self.instance.progress() {
         case .notStarted, .started:
-            self.updateRepsModal = true
+            if let reps = self.instance.exercise.fixedRep() {
+                self.onRepsPressed(reps)
+            } else {
+                self.updateRepsModal = true
+            }
         case .finished:
             if self.instance.currentIsUnexpected() {
                 // TODO: If can also advance weight may want to add an extra button to update

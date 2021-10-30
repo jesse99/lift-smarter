@@ -155,31 +155,28 @@ final class MaxRepsInfo: Equatable {
 struct ActualRepRange: Equatable {
     let reps: Int
     let percent: Double
+    let stage: RepRangeStage
 }
 
 /// Number of sets are fixed. Reps can be fixed or an inclusive range. Useful for stuff like 3x5 squat
 /// or 3x8-12 lat pulldown
 final class RepRangesInfo: Equatable {
-    var warmups: [RepsSet]
-    var worksets: [RepsSet]
-    var backoffs: [RepsSet]
+    var sets: [RepsSet]
     
     var expectedWeight = 0.0
-    var expectedReps: [ActualRepRange] = []   // includes warmup, work, and backoff sets
+    var expectedReps: [ActualRepRange]   // includes warmup, work, and backoff sets
     
     var current = Current()
     var currentReps: [ActualRepRange] = []   // includes warmup, work, and backoff sets
 
-    init(warmups: [RepsSet], worksets: [RepsSet], backoffs: [RepsSet]) {
-        ASSERT(!worksets.isEmpty, "should not have zero worksets")
-        self.warmups = warmups
-        self.worksets = worksets
-        self.backoffs = backoffs
-        self.resetExpected()
+    init(sets: [RepsSet]) {
+        ASSERT(sets.first(where: {$0.stage == .workset}) != nil, "should not have zero worksets")
+        self.sets = sets
+        self.expectedReps = []
     }
     
     func clone() -> RepRangesInfo {
-        let copy = RepRangesInfo(warmups: self.warmups, worksets: self.worksets, backoffs: self.backoffs)
+        let copy = RepRangesInfo(sets: self.sets)
         copy.expectedWeight = self.expectedWeight
         copy.expectedReps = self.expectedReps
         copy.current = self.current.clone()
@@ -188,19 +185,8 @@ final class RepRangesInfo: Equatable {
     }
     
     func currentSet(_ delta: Int = 0) -> RepsSet {
-        var index = self.current.setIndex + delta
-        
-        if index < self.warmups.count {
-            return self.warmups[index]
-        }
-        index -= self.warmups.count
-
-        if index < self.worksets.count {
-            return self.worksets[index]
-        }
-        index -= self.worksets.count
-
-        return self.backoffs[index]
+        let index = self.current.setIndex + delta
+        return self.sets[index]
     }
     
     func resetCurrent(weight: Double) {
@@ -209,14 +195,11 @@ final class RepRangesInfo: Equatable {
     }
     
     func resetExpected() {
-        self.expectedReps =
-            self.warmups.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value)}) +
-            self.worksets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value)}) +
-            self.backoffs.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value)})
+        self.expectedReps = []
     }
 
     static func == (lhs: RepRangesInfo, rhs: RepRangesInfo) -> Bool {
-        return lhs.warmups == rhs.warmups && lhs.worksets == rhs.worksets && lhs.backoffs == rhs.backoffs && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01 && lhs.expectedReps == rhs.expectedReps
+        return lhs.sets == rhs.sets && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01 && lhs.expectedReps == rhs.expectedReps
     }
 }
 
@@ -227,7 +210,7 @@ final class RepTotalInfo: Equatable {
     var rest: Int
     
     var expectedWeight = 0.0
-    var expectedReps: [Int] = []
+    var expectedReps: [Int] = []           // this can be empty since we can't properly reset it, for the sake of consistency we allow the other info's to also be empty
     
     var current = Current()
     var currentReps: [Int] = []           // what the user has done so far

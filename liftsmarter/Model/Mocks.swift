@@ -19,8 +19,8 @@ func defaultMaxReps() -> ExerciseInfo {
 }
 
 func defaultRepRanges() -> ExerciseInfo {
-    let set = RepsSet(reps: RepRange(min: 8, max: 12), restSecs: 120)
-    let info = RepRangesInfo(warmups: [], worksets: [set, set, set], backoffs: [])
+    let set = RepsSet(reps: RepRange(min: 8, max: 12), restSecs: 120, stage: .workset)
+    let info = RepRangesInfo(sets: [set, set, set])
     return .repRanges(info)
 }
 
@@ -122,21 +122,18 @@ func mockProgram() -> Program {
     // Lower
     // progression: https://old.reddit.com/r/bodyweightfitness/wiki/exercises/squat
     func splitSquats() -> Exercise {
-        let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.0), restSecs: 90)
-        let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60)
-        let info = RepRangesInfo(warmups: [warmup], worksets: [work, work, work], backoffs: [])
+        let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.0), restSecs: 90, stage: .warmup)
+        let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60, stage: .workset)
+        let info = RepRangesInfo(sets: [warmup] + [work, work, work])
         info.expectedWeight = 16.4
-        info.expectedReps = [ActualRepRange(reps: 4, percent: 0.5),
-                            ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0)]
         return Exercise("Split Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .repRanges(info))
     }
 
     func lunge() -> Exercise {
-        let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 150)
-        let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0)
-        let info = RepRangesInfo(warmups: [], worksets: [work, work, work2], backoffs: [])
+        let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 150, stage: .workset)
+        let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0, stage: .workset)
+        let info = RepRangesInfo(sets: [work, work, work2])
         info.expectedWeight = 16.4
-        info.expectedReps = [ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0)]
         return Exercise("Lunge", "Dumbbell Lunge", .fixedWeights(name: "Dumbbells"), .repRanges(info))
     }
 
@@ -152,7 +149,6 @@ func mockProgram() -> Program {
     
     func pushup() -> Exercise {
         let info = RepTotalInfo(total: 50, rest: 60)
-        info.expectedReps = [20, 20, 10]
         return Exercise("Pushup", "Pushup", .bodyWeight, .repTotal(info))
     }
 
@@ -168,15 +164,13 @@ func mockProgram() -> Program {
     func curls() -> Exercise {
         let info = MaxRepsInfo(restSecs: [90, 90, 90], targetReps: nil)
         info.expectedWeight = 16.4
-        info.expectedReps = [10,10,10]
         return Exercise("Curls", "Hammer Curls", .fixedWeights(name: "Dumbbells"), .maxReps(info))
      }
 
     func latRaise() -> Exercise {
-        let work = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 120)
-        let info = RepRangesInfo(warmups: [], worksets: [work, work, work], backoffs: [])
+        let work = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 120, stage: .workset)
+        let info = RepRangesInfo(sets: [work, work, work])
         info.expectedWeight = 8.2
-        info.expectedReps = [ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0), ActualRepRange(reps: 4, percent: 1.0)]
         return Exercise("Lateral Raise", "Side Lateral Raise", .fixedWeights(name: "Dumbbells"), .repRanges(info))
     }
 
