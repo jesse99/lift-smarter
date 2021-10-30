@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct MaxRepsView: View {
-    let program: ProgramVM
+    @ObservedObject var program: ProgramVM
     let timer = RestartableTimer(every: TimeInterval.hours(RecentHours/2))
     @ObservedObject var instance: InstanceVM
     @State var editModal = false

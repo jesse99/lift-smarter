@@ -275,32 +275,50 @@ extension ExerciseVM {
     }
 
     func weightPicker(_ text: Binding<String>, _ modal: Binding<Bool>, _ onEdit: @escaping (String) -> Void, _ onHelp: @escaping HelpFunc) -> AnyView {
-        func populate(_ text: String, _ fws: FixedWeightSet) -> [String] {
-            var weights: [Double] = []
-            
-            if let weight = Double(text) {
-                let middle = fws.getClosest(weight)
-                if let below = fws.getBelow(middle) {
-                    weights.append(below)
-                }
-                weights.append(middle)
-                if let above = fws.getAbove(middle) {
-                    weights.append(above)
-                }
+        // Some apparatus can have large jumps (10 lbs is common for dumbbells, 15 can happen on cable machines).
+        // But if the weight the user wants to use is way off what they can do then we'll highlight that.
+        let badWeight = 20.0
+        
+        func populate(_ text: String, _ fws: FixedWeightSet) -> [(String, Color)] {
+            if let desired = Double(text) {
+                let actual = fws.getClosestBelow(desired)    // for worksets we use closest below
+                return fws.getAll().map({
+                    if abs($0 - actual) < 0.01 {
+                        if abs(desired - actual) > badWeight {
+                            return (friendlyWeight($0), .red)
+                        } else {
+                            return (friendlyWeight($0), .blue)
+                        }
+                    } else {
+                        return (friendlyWeight($0), .black)
+                    }
+                })
             } else {
-                weights = fws.getAll()
+                return fws.getAll().map({return (friendlyWeight($0), .black)})
             }
-
-            return weights.map({friendlyWeight($0)})
+        }
+        
+        func select(_ text: String, _ fws: FixedWeightSet) -> Int? {
+            if let desired = Double(text) {
+                let actual = fws.getClosestBelow(desired)
+                let entries = fws.getAll()
+                for i in 0..<entries.count {
+                    let candidate = entries[i]
+                    if abs(candidate - actual) < 0.01 {
+                        if abs(desired - actual) < badWeight {
+                            return i
+                        }
+                    }
+                }
+            }
+            return nil
         }
         
         func buttonColor(_ fws: FixedWeightSet) -> Color {
             if let weight = Double(text.wrappedValue) {
-                let actual = fws.getClosest(weight)
-                if weight > 0.0 && abs(actual - weight) > 10.0 {
+                let actual = fws.getClosestBelow(weight)
+                if weight > 0.0 && abs(actual - weight) > badWeight {
                     return .red
-                } else if weight > 0.0 && abs(actual - weight) > 5.0 {
-                    return .orange
                 } else {
                     return .black
                 }
@@ -342,7 +360,7 @@ extension ExerciseVM {
                             .font(.callout)
                             .foregroundColor(buttonColor(fws))
                             .sheet(isPresented: modal) {
-                                PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, type: .decimalPad)
+                                PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, selected: {text in select(text, fws)}, type: .decimalPad)
                             }
                         Spacer()
                         Button("?", action: onHelp).font(.callout).padding(.trailing)

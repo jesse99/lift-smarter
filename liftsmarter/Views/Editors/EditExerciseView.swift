@@ -86,8 +86,8 @@ struct EditExerciseView: View {
         self.formalName = text      // no need for validation here
     }
 
-    private func matchFormalName(_ inText: String) -> [String] {
-        var names: [String] = []
+    private func matchFormalName(_ inText: String) -> [(String, Color)] {
+        var entries: [(String, Color)] = []
         
         // TODO: better to do a proper fuzzy search
         let needle = inText.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
@@ -97,7 +97,7 @@ struct EditExerciseView: View {
             if defaultNotes[candidate] == nil {
                 let haystack = candidate.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
                 if haystack.contains(needle) {
-                    names.append(candidate)
+                    entries.append((candidate, .black))
                 }
             }
         }
@@ -106,16 +106,16 @@ struct EditExerciseView: View {
         for candidate in defaultNotes.keys {
             let haystack = candidate.filter({!$0.isWhitespace}).filter({!$0.isPunctuation}).lowercased()
             if haystack.contains(needle) {
-                names.append(candidate)
+                entries.append((candidate, .black))
             }
             
             // Not much point in showing the user a huge list of names.
-            if names.count >= 100 {
+            if entries.count >= 100 {
                 break
             }
         }
 
-        return names
+        return entries
     }
 
     func onCancel() {
