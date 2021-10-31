@@ -93,7 +93,7 @@ extension ExerciseInfo {
         switch self {
         case .durations(_):
             switch coalesce(parseTimes(table["durations"]!, label: "durations"),
-                            parseTimes(table["target"]!, label: "target"),
+                            parseTimes(table["target"]!, label: "target", emptyOK: true),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true)) {
             case .right((let d, let t, var r)):
                 let count1 = d.count
