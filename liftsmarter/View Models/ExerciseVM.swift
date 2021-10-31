@@ -360,7 +360,7 @@ extension ExerciseVM {
                     HStack {
                         Text("Weight:").font(.headline)
                         Button(text.wrappedValue, action: {modal.wrappedValue = true})
-                            .font(.callout)
+                            .font(.body)
                             .foregroundColor(buttonColor(fws))
                             .sheet(isPresented: modal) {
                                 PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, selected: {text in select(text, fws)}, type: .decimalPad)
