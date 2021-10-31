@@ -167,7 +167,7 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.expectedReps.at(info.current.setIndex) ?? 1
         case .repRanges(let info):
-            return info.expectedReps.at(info.current.setIndex)?.reps ?? 1
+            return info.expectedReps.at(info.current.setIndex)?.reps ?? info.sets[info.current.setIndex].reps.min
         case .repTotal(let info):
             return info.expectedReps.at(info.current.setIndex) ?? 1
         case .durations, .fixedReps:
