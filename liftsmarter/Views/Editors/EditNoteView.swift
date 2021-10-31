@@ -44,6 +44,7 @@ struct EditNoteView: View {
                 self.program.setUserNote(self.formalName, self.text)
             }
         }
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 }

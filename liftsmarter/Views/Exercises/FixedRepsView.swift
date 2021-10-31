@@ -65,6 +65,7 @@ struct FixedRepsView: View {
     private func onNext() {
         if instance.finished {
             instance.resetCurrent()
+            app.saveState()
             self.presentation.wrappedValue.dismiss()
         } else if self.instance.restDuration() > 0 {
             self.implicitTimerModal = true

@@ -5,7 +5,7 @@ typealias LogFunc = (String) -> Void
 
 var logError: LogFunc? = nil
 
-fileprivate func logErr(_ mesg: String) {
+func logErr(_ mesg: String) {
     if let log = logError {
         log(mesg)
     } else {

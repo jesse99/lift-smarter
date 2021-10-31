@@ -61,6 +61,7 @@ struct EditFixedRepsView: View {
             ASSERT(false, "validate should have prevented this from executing")
         }
         
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 

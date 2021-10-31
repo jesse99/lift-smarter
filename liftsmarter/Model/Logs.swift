@@ -8,7 +8,7 @@ enum LogLevel: Int {
     case Debug
 }
 
-struct LogLine: Identifiable {
+struct LogLine: Identifiable, Storable {
     let seconds: TimeInterval   // since program started
     let level: LogLevel
     let line: String
@@ -22,9 +22,25 @@ struct LogLine: Identifiable {
         self.current = current
         self.id = id
     }
+
+    init(from store: Store) {
+        self.seconds = store.getDbl("seconds")
+        self.level = store.getObj("level")
+        self.line = store.getStr("line")
+        self.current = store.getBool("current")
+        self.id = store.getInt("id")
+    }
+
+    func save(_ store: Store) {
+        store.addDbl("seconds", seconds)
+        store.addObj("level", level)
+        store.addStr("line", line)
+        store.addBool("current", current)
+        store.addInt("id", id)
+    }
 }
 
-class Logs {
+class Logs: Storable {
     var lines: [LogLine] = []   // newest are at end
     var numErrors = 0
     var numWarnings = 0
@@ -41,6 +57,24 @@ class Logs {
 #if !targetEnvironment(simulator)
         logError = nil
 #endif
+    }
+
+    required init(from store: Store) {
+        self.lines = store.getObjArray("lines")
+        self.numErrors = store.getInt("numErrors")
+        self.numWarnings = store.getInt("numWarnings")
+        self.maxLines = store.getInt("maxLines")
+        self.nextID = store.getInt("nextID")
+        self.startTime = store.getDbl("startTime")
+    }
+
+    func save(_ store: Store) {
+        store.addObjArray("lines", lines)
+        store.addInt("numErrors", numErrors)
+        store.addInt("numWarnings", numWarnings)
+        store.addInt("maxLines", maxLines)
+        store.addInt("nextID", nextID)
+        store.addDbl("startTime", startTime)
     }
 
     // This sort of logic would normally go into a view model but we want to allow logging
@@ -105,5 +139,15 @@ extension LogLine {
         case .Debug:
             return "DBG "
         }
+    }
+}
+
+extension LogLevel: Storable {
+    init(from store: Store) {
+        self = LogLevel(rawValue: store.getInt("level"))!
+    }
+    
+    func save(_ store: Store) {
+        store.addInt("level", self.rawValue)
     }
 }

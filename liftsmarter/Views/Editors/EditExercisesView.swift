@@ -77,6 +77,7 @@ struct EditExercisesView: View {
     }
 
     private func onOK() {
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 }

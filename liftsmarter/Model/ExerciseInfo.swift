@@ -3,7 +3,7 @@ import Foundation
 
 /// Where the user is now with respect to a timed exercise. This will be reset if it's been
 /// too long since the user has done the exercise.
-final class Current {
+final class Current: Storable {
     var startDate: Date       // date exercise was started
     var weight: Double        // may be 0.0, this is from expected.weight
     var setIndex: Int         // if this is sets.count then the user has finished those sets
@@ -20,14 +20,25 @@ final class Current {
         self.setIndex = 0
     }
     
-    func clone() -> Current {
-        let copy = Current()
-        copy.startDate = self.startDate
-        copy.weight = self.weight
-        copy.setIndex = self.setIndex
-        return copy
+    required init(from store: Store) {
+        self.startDate = store.getDate("startDate")
+        self.weight = store.getDbl("weight")
+        self.setIndex = store.getInt("setIndex")
     }
-    
+
+    func save(_ store: Store) {
+        store.addDate("startDate", startDate)
+        store.addDbl("weight", weight)
+        store.addInt("setIndex", setIndex)
+    }
+
+    func clone() -> Current {
+        let store = Store()
+        store.addObj("self", self)
+        let result: Current = store.getObj("self")
+        return result
+    }
+
     fileprivate func reset(weight: Double) {
         self.startDate = Date()
         self.weight = weight
@@ -37,7 +48,7 @@ final class Current {
 
 /// Used for stuff like 3x60s planks. Target is used to signal the user to increase difficulty
 /// (typically by switching to a harder variant of the exercise or adding weight).
-final class DurationsInfo: Equatable {
+final class DurationsInfo: Equatable, Storable {
     var sets: [DurationSet]
     var targetSecs: [Int]
 
@@ -53,14 +64,29 @@ final class DurationsInfo: Equatable {
         self.targetSecs = targetSecs
     }
     
-    func clone() -> DurationsInfo {
-        let copy = DurationsInfo(sets: self.sets, targetSecs: self.targetSecs)
-        copy.expectedWeight = self.expectedWeight
-        copy.current = self.current.clone()
-        copy.currentSecs = self.currentSecs
-        return copy
+    required init(from store: Store) {
+        self.sets = store.getObjArray("sets")
+        self.targetSecs = store.getIntArray("targetSecs")
+        self.expectedWeight = store.getDbl("expectedWeight")
+        self.current = store.getObj("current")
+        self.currentSecs = store.getIntArray("currentSecs")
     }
-    
+
+    func save(_ store: Store) {
+        store.addObjArray("sets", sets)
+        store.addIntArray("targetSecs", targetSecs)
+        store.addDbl("expectedWeight", expectedWeight)
+        store.addObj("current", current)
+        store.addIntArray("currentSecs", currentSecs)
+    }
+
+    func clone() -> DurationsInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: DurationsInfo = store.getObj("self")
+        return result
+    }
+
     func resetCurrent(weight: Double) {
         self.current.reset(weight: weight)
         self.currentSecs = []
@@ -76,7 +102,7 @@ final class DurationsInfo: Equatable {
 }
 
 /// Number of sets and reps are both fixed. Useful for things like 3x10 quad stretch.
-final class FixedRepsInfo: Equatable {
+final class FixedRepsInfo: Equatable, Storable {
     var sets: [FixedRepsSet]
     
     var expectedWeight = 0.0
@@ -89,14 +115,27 @@ final class FixedRepsInfo: Equatable {
         self.sets = reps
     }
     
-    func clone() -> FixedRepsInfo {
-        let copy = FixedRepsInfo(reps: self.sets)
-        copy.expectedWeight = self.expectedWeight
-        copy.current = self.current.clone()
-        copy.currentReps = self.currentReps
-        return copy
+    required init(from store: Store) {
+        self.sets = store.getObjArray("sets")
+        self.expectedWeight = store.getDbl("expectedWeight")
+        self.current = store.getObj("current")
+        self.currentReps = store.getIntArray("currentReps")
     }
-    
+
+    func save(_ store: Store) {
+        store.addObjArray("sets", sets)
+        store.addDbl("expectedWeight", expectedWeight)
+        store.addObj("current", current)
+        store.addIntArray("currentReps", currentReps)
+    }
+
+    func clone() -> FixedRepsInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: FixedRepsInfo = store.getObj("self")
+        return result
+    }
+
     func resetCurrent(weight: Double) {
         self.current.reset(weight: weight)
         self.currentReps = []
@@ -113,7 +152,7 @@ final class FixedRepsInfo: Equatable {
 
 /// Numbers of sets are fixed. Reps in each set are AMRAP. Useful for things like curls to exhaustion.
 /// targetReps is used to signal the user to increase difficulty (typically by adding weight).
-final class MaxRepsInfo: Equatable {
+final class MaxRepsInfo: Equatable, Storable {
     var restSecs: [Int]
     var targetReps: Int?
     
@@ -129,15 +168,37 @@ final class MaxRepsInfo: Equatable {
         self.targetReps = targetReps
     }
     
-    func clone() -> MaxRepsInfo {
-        let copy = MaxRepsInfo(restSecs: self.restSecs, targetReps: self.targetReps)
-        copy.expectedWeight = self.expectedWeight
-        copy.expectedReps = self.expectedReps
-        copy.current = self.current.clone()
-        copy.currentReps = self.currentReps
-        return copy
+    required init(from store: Store) {
+        self.restSecs = store.getIntArray("restSecs")
+        if store.hasKey("targetReps") {
+            self.targetReps = store.getInt("targetReps")
+        } else {
+            self.targetReps = nil
+        }
+        self.expectedWeight = store.getDbl("expectedWeight")
+        self.expectedReps = store.getIntArray("expectedReps")
+        self.current = store.getObj("current")
+        self.currentReps = store.getIntArray("currentReps")
     }
-    
+
+    func save(_ store: Store) {
+        store.addIntArray("restSecs", restSecs)
+        if let target = self.targetReps {
+            store.addInt("targetReps", target)
+        }
+        store.addDbl("expectedWeight", expectedWeight)
+        store.addIntArray("expectedReps", expectedReps)
+        store.addObj("current", current)
+        store.addIntArray("currentReps", currentReps)
+    }
+
+    func clone() -> MaxRepsInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: MaxRepsInfo = store.getObj("self")
+        return result
+    }
+
     func resetCurrent(weight: Double) {
         self.current.reset(weight: weight)
         self.currentReps = []
@@ -152,15 +213,33 @@ final class MaxRepsInfo: Equatable {
     }
 }
 
-struct ActualRepRange: Equatable {
+struct ActualRepRange: Equatable, Storable {
     let reps: Int
     let percent: Double
     let stage: RepRangeStage
+    
+    init(reps: Int, percent: Double, stage: RepRangeStage) {
+        self.reps = reps
+        self.percent = percent
+        self.stage = stage
+    }
+
+    init(from store: Store) {
+        self.reps = store.getInt("reps")
+        self.percent = store.getDbl("percent")
+        self.stage = RepRangeStage(rawValue: store.getInt("stage"))!
+    }
+
+    func save(_ store: Store) {
+        store.addInt("reps", reps)
+        store.addDbl("percent", percent)
+        store.addInt("stage", stage.rawValue)
+    }
 }
 
 /// Number of sets are fixed. Reps can be fixed or an inclusive range. Useful for stuff like 3x5 squat
 /// or 3x8-12 lat pulldown
-final class RepRangesInfo: Equatable {
+final class RepRangesInfo: Equatable, Storable {
     var sets: [RepsSet]
     
     var expectedWeight = 0.0
@@ -175,15 +254,29 @@ final class RepRangesInfo: Equatable {
         self.expectedReps = []
     }
     
-    func clone() -> RepRangesInfo {
-        let copy = RepRangesInfo(sets: self.sets)
-        copy.expectedWeight = self.expectedWeight
-        copy.expectedReps = self.expectedReps
-        copy.current = self.current.clone()
-        copy.currentReps = self.currentReps
-        return copy
+    required init(from store: Store) {
+        self.sets = store.getObjArray("sets")
+        self.expectedWeight = store.getDbl("expectedWeight")
+        self.expectedReps = store.getObjArray("expectedReps")
+        self.current = store.getObj("current")
+        self.currentReps = store.getObjArray("currentReps")
     }
-    
+
+    func save(_ store: Store) {
+        store.addObjArray("sets", sets)
+        store.addDbl("expectedWeight", expectedWeight)
+        store.addObjArray("expectedReps", expectedReps)
+        store.addObj("current", current)
+        store.addObjArray("currentReps", currentReps)
+    }
+
+    func clone() -> RepRangesInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: RepRangesInfo = store.getObj("self")
+        return result
+    }
+
     func currentSet(_ delta: Int = 0) -> RepsSet {
         let index = self.current.setIndex + delta
         return self.sets[index]
@@ -205,7 +298,7 @@ final class RepRangesInfo: Equatable {
 
 /// Both number of sets and reps can vary. Useful for things like 30 pullups spread across as many sets
 /// as neccesary.
-final class RepTotalInfo: Equatable {
+final class RepTotalInfo: Equatable, Storable {
     var total: Int
     var rest: Int
     
@@ -221,15 +314,31 @@ final class RepTotalInfo: Equatable {
         self.rest = rest
     }
     
-    func clone() -> RepTotalInfo {
-        let copy = RepTotalInfo(total: self.total, rest: self.rest)
-        copy.expectedWeight = self.expectedWeight
-        copy.expectedReps = self.expectedReps
-        copy.current = self.current.clone()
-        copy.currentReps = self.currentReps
-        return copy
+    required init(from store: Store) {
+        self.total = store.getInt("total")
+        self.rest = store.getInt("rest")
+        self.expectedWeight = store.getDbl("expectedWeight")
+        self.expectedReps = store.getIntArray("expectedReps")
+        self.current = store.getObj("current")
+        self.currentReps = store.getIntArray("currentReps")
     }
-    
+
+    func save(_ store: Store) {
+        store.addInt("total", total)
+        store.addInt("rest", rest)
+        store.addDbl("expectedWeight", expectedWeight)
+        store.addIntArray("expectedReps", expectedReps)
+        store.addObj("current", current)
+        store.addIntArray("currentReps", currentReps)
+    }
+
+    func clone() -> RepTotalInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: RepTotalInfo = store.getObj("self")
+        return result
+    }
+
     func resetCurrent(weight: Double) {
         self.current.reset(weight: weight)
         self.currentReps = []
@@ -254,6 +363,62 @@ enum ExerciseInfo: Equatable {
     // TODO:   case untimed(restSecs: [Int])
 }
 
+extension ExerciseInfo: Storable {
+    init(from store: Store) {
+        let tname = store.getStr("type")
+        switch tname {
+        case "durations":
+            self = .durations(store.getObj("info"))
+            
+        case "fixedReps":
+            self = .fixedReps(store.getObj("info"))
+            
+        case "maxReps":
+            self = .maxReps(store.getObj("info"))
+            
+        case "repRanges":
+            self = .repRanges(store.getObj("info"))
+
+        case "repTotal":
+            self = .repTotal(store.getObj("info"))
+            
+        default:
+            ASSERT(false, "loading apparatus had unknown type: \(tname)"); abort()
+        }
+    }
+    
+    func save(_ store: Store) {
+        switch self {
+        case .durations(let info):
+            store.addStr("type", "durations")
+            store.addObj("info", info)
+
+        case .fixedReps(let info):
+            store.addStr("type", "fixedReps")
+            store.addObj("info", info)
+
+        case .maxReps(let info):
+            store.addStr("type", "maxReps")
+            store.addObj("info", info)
+
+        case .repRanges(let info):
+            store.addStr("type", "repRanges")
+            store.addObj("info", info)
+
+        case .repTotal(let info):
+            store.addStr("type", "repTotal")
+            store.addObj("info", info)
+        }
+    }
+
+    func clone() -> ExerciseInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: ExerciseInfo = store.getObj("self")
+        return result
+    }
+}
+
 extension ExerciseInfo {
     func caseIndex() -> Int {
         switch self {
@@ -267,21 +432,6 @@ extension ExerciseInfo {
             return 3
         case .repTotal(_):
             return 4
-        }
-    }
-    
-    func clone() -> ExerciseInfo {
-        switch self {
-        case .durations(let info):
-            return .durations(info.clone())
-        case .fixedReps(let info):
-            return .fixedReps(info.clone())
-        case .maxReps(let info):
-            return .maxReps(info.clone())
-        case .repRanges(let info):
-            return .repRanges(info.clone())
-        case .repTotal(let info):
-            return .repTotal(info.clone())
         }
     }
 }

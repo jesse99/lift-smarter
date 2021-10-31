@@ -6,8 +6,9 @@ struct EditRepRangesView: View {
     let info: Binding<ExerciseInfo>
     @State var showHelp = false
     @State var helpText = ""
-    @State var repsModal = false
-    @State var editing = RepRangeStage.warmup
+    @State var warmupModal = false
+    @State var worksetModal = false
+    @State var backoffModal = false
     @Environment(\.presentationMode) private var presentation
 
     init(_ exerciseName: String, _ info: Binding<ExerciseInfo>) {
@@ -19,36 +20,36 @@ struct EditRepRangesView: View {
         VStack() {
             Text("Edit " + self.exerciseName).font(.largeTitle).padding()
 
-            VStack(alignment: .leading) {
-                VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Button("Warmups", action: self.onWarmups).font(.callout)
-                        Spacer()
-                        Button("?", action: {
-                            self.helpText = "Optional sets to be done with a lighter weight."
-                            self.showHelp = true
-                        }).font(.callout).padding(.trailing)
-                    }.padding(.leading)
-                    Divider()
-                    HStack {
-                        Button("Work Sets", action: self.onWorkSets).font(.callout)
-                        Spacer()
-                        Button("?", action: {
-                            self.helpText = "Sets to be done with 100% or so of the weight."
-                            self.showHelp = true
-                        }).font(.callout).padding(.trailing)
-                    }.padding(.leading)
-                    Divider()
-                    HStack {
-                        Button("Backoff", action: self.onBackoff).font(.callout)
-                        Spacer()
-                        Button("?", action: {
-                            self.helpText = "Optional sets to be done with a reduced weight."
-                            self.showHelp = true
-                        }).font(.callout).padding(.trailing)
-                    }.padding(.leading)
-                        .sheet(isPresented: self.$repsModal) {EditRepsSetView(self.exerciseName, self.info, self.editing)}
-                }
+            VStack(alignment: .leading, spacing: 20) {
+                HStack {
+                    Button("Warmups", action: {self.warmupModal = true}).font(.callout)
+                    Spacer()
+                    Button("?", action: {
+                        self.helpText = "Optional sets to be done with a lighter weight."
+                        self.showHelp = true
+                    }).font(.callout).padding(.trailing)
+                }.padding(.leading)
+                Divider()
+                HStack {
+                    Button("Work Sets", action: {self.worksetModal = true}).font(.callout)
+                    Spacer()
+                    Button("?", action: {
+                        self.helpText = "Sets to be done with 100% or so of the weight."
+                        self.showHelp = true
+                    }).font(.callout).padding(.trailing)
+                }.padding(.leading)
+                Divider()
+                HStack {
+                    Button("Backoff", action: {self.backoffModal = true}).font(.callout)
+                    Spacer()
+                    Button("?", action: {
+                        self.helpText = "Optional sets to be done with a reduced weight."
+                        self.showHelp = true
+                    }).font(.callout).padding(.trailing)
+                }.padding(.leading)
+                    .sheet(isPresented: self.$warmupModal) {EditRepsSetView(self.exerciseName, self.info, .warmup)}
+                    .sheet(isPresented: self.$worksetModal) {EditRepsSetView(self.exerciseName, self.info, .workset)}
+                    .sheet(isPresented: self.$backoffModal) {EditRepsSetView(self.exerciseName, self.info, .backoff)}
             }
             Spacer()
 
@@ -69,26 +70,12 @@ struct EditRepRangesView: View {
         }
     }
     
-    private func onWarmups() {
-        self.repsModal = true
-        self.editing = .warmup
-    }
-    
-    private func onWorkSets() {
-        self.repsModal = true
-        self.editing = .workset
-    }
-    
-    private func onBackoff() {
-        self.repsModal = true
-        self.editing = .backoff
-    }
-    
     private func onCancel() {
         self.presentation.wrappedValue.dismiss()
     }
 
     private func onOK() {
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 }

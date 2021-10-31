@@ -2,7 +2,7 @@
 import Foundation
 
 /// Used to manage the workouts the user is expected to perform on some schedule.
-class Program {
+class Program: Storable {
     var name: String
     var workouts: [Workout]    // workout names must be unique
     var exercises: [Exercise]  // exercise names must be unique
@@ -35,6 +35,26 @@ class Program {
         self.validate()
     }
     
+    required init(from store: Store) {
+        self.name = store.getStr("name")
+        self.workouts = store.getObjArray("workouts")
+        self.exercises = store.getObjArray("exercises")
+        self.restWeeks = store.getIntArray("restWeeks")
+        self.weeksStart = store.getDate("weeksStart")
+        self.exerciseClipboard = store.getObjArray("exerciseClipboard")
+        
+        self.validate()
+    }
+
+    func save(_ store: Store) {
+        store.addStr("name", name)
+        store.addObjArray("workouts", workouts)
+        store.addObjArray("exercises", exercises)
+        store.addIntArray("restWeeks", restWeeks)
+        store.addDate("weeksStart", weeksStart)
+        store.addObjArray("exerciseClipboard", exerciseClipboard)
+    }
+
     // TODO: can we put this behind a flag? or maybe only when run on a sim or one of my devices? Use #if DEBUG?
     func validate() {
         ASSERT(!self.name.isBlankOrEmpty(), "program name cannot be empty")

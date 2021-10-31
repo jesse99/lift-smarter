@@ -6,9 +6,9 @@ enum ActualRep {    // note that this represents a single rep
     case duration(secs: Int, percent: Double)
 }
 
-class History {
+class History: Storable {
     // Note that this is associated with the exercise: to know when an instance has been completed check the workout.
-    class Record {
+    class Record: Storable {
         var completed: Date     // date exercise was finished
         var weight: Double      // may be 0.0, this is from current.weight
         var reps: [ActualRep]
@@ -43,7 +43,70 @@ class History {
                 self.reps = info.currentReps.map({.reps(count: $0, percent: 1.0)})
             }
         }
+
+        required init(from store: Store) {
+            self.completed = store.getDate("completed")
+            self.weight = store.getDbl("weight")
+            self.reps = store.getObjArray("reps")
+            self.workout = store.getStr("workout")
+            self.formalName = store.getStr("formalName")
+            self.note = store.getStr("note")
+        }
+
+        func save(_ store: Store) {
+            store.addDate("completed", completed)
+            store.addDbl("weight", weight)
+            store.addObjArray("reps", reps)
+            store.addStr("workout", workout)
+            store.addStr("formalName", formalName)
+            store.addStr("note", note)
+        }
+
     }
 
     var records: [String: [Record]] = [:]   // keyed by exercise name, last record is the most recent
+    
+    init() {
+    }
+
+    required init(from store: Store) {
+        for name in store.getStrArray("names") {
+            self.records[name] = store.getObjArray("\(name)-records")
+        }
+    }
+
+    func save(_ store: Store) {
+        store.addStrArray("names", Array(self.records.keys))
+        for (name, records) in self.records {
+            store.addObjArray("\(name)-records", records)
+        }
+    }
+}
+
+extension ActualRep: Storable {
+    init(from store: Store) {
+        let tname = store.getStr("type")
+        switch tname {
+        case "reps":
+            self = .reps(count: store.getInt("count"), percent: store.getDbl("percent"))
+        case "duration":
+            self = .duration(secs: store.getInt("secs"), percent: store.getDbl("percent"))
+        default:
+            ASSERT(false, "loading ActualRep had unknown type: \(tname)"); abort()
+        }
+    }
+    
+    func save(_ store: Store) {
+        switch self {
+        case .reps(count: let count, percent: let percent):
+            store.addStr("type", "reps")
+            store.addInt("count", count)
+            store.addDbl("percent", percent)
+
+        case .duration(secs: let secs, percent: let percent):
+            store.addStr("type", "duration")
+            store.addInt("secs", secs)
+            store.addDbl("percent", percent)
+        }
+    }
 }

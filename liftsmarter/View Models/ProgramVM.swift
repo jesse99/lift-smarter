@@ -62,6 +62,7 @@ class ProgramVM: ObservableObject {
     }
 
     func willChange() {
+        self.model.dirty = true
         self.objectWillChange.send()
     }
 }

@@ -149,6 +149,7 @@ struct EditExerciseView: View {
             ASSERT(false, "onEdited should have caught this")
         }
 
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 

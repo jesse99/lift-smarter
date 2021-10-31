@@ -20,7 +20,7 @@ enum Schedule {
 }
 
 /// Encapsulates the exercises that the user is expected to peform on a day (or sey of days).
-class Workout {
+class Workout: Storable {
     var name: String
     var enabled: Bool                   // true if the user wants to perform this workout
     var exercises: [Exercise]           // names must be unique
@@ -36,5 +36,81 @@ class Workout {
         self.exercises = exercises.map {$0.clone()}
         self.schedule = schedule
     }
+
+    required init(from store: Store) {
+        self.name = store.getStr("name")
+        self.enabled = store.getBool("enabled")
+        self.exercises = store.getObjArray("exercises")
+        self.schedule = store.getObj("schedule")
+        
+        let names = store.getStrArray("completed-names")
+        for (i, name) in names.enumerated() {
+            self.completed[name] = store.getDate("completed-\(i)")
+        }
+    }
+
+    func save(_ store: Store) {
+        store.addStr("name", name)
+        store.addBool("enabled", enabled)
+        store.addObjArray("exercises", exercises)
+        store.addObj("schedule", schedule)
+        
+        let names = Array(self.completed.keys)
+        store.addStrArray("completed-names", names)
+        for (i, name) in names.enumerated() {
+            store.addDate("completed-\(i)", self.completed[name]!)
+        }
+    }
 }
 
+extension WeekDay: Storable {
+    init(from store: Store) {
+        self = WeekDay(rawValue: store.getInt("day"))!
+    }
+    
+    func save(_ store: Store) {
+        store.addInt("day", self.rawValue)
+    }
+}
+
+extension Schedule: Storable {
+    init(from store: Store) {
+        let tname = store.getStr("type")
+        switch tname {
+        case "anyDay":
+            self = .anyDay
+            
+        case "cyclic":
+            self = .cyclic(store.getInt("count"))
+            
+        case "days":
+            self = .days(store.getObjArray("days"))
+            
+        case "weeks":
+            self = .weeks(store.getIntArray("weeks"), store.getObj("schedule"))
+            
+        default:
+            ASSERT(false, "loading Schedule had unknown type: \(tname)"); abort()
+        }
+    }
+    
+    func save(_ store: Store) {
+        switch self {
+        case .anyDay:
+            store.addStr("type", "anyDay")
+            
+        case .cyclic(let count):
+            store.addStr("type", "cyclic")
+            store.addInt("count", count)
+
+        case .days(let days):
+            store.addStr("type", "days")
+            store.addObjArray("days", days)
+
+        case .weeks(let weeks, let schedule):
+            store.addStr("type", "weeks")
+            store.addIntArray("weeks", weeks)
+            store.addObj("schedule", schedule)
+        }
+    }
+}

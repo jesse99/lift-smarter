@@ -16,6 +16,36 @@ enum Apparatus: Equatable {
     case fixedWeights(name: String?)
 }
 
+extension Apparatus: Storable {
+    init(from store: Store) {
+        let tname = store.getStr("type")
+        switch tname {
+        case "bodyWeight":
+            self = .bodyWeight
+            
+        case "fixedWeights":
+            let name = store.hasKey("name") ? store.getStr("name") : nil
+            self = .fixedWeights(name: name)
+            
+        default:
+            ASSERT(false, "loading apparatus had unknown type: \(tname)"); abort()
+        }
+    }
+    
+    func save(_ store: Store) {
+        switch self {
+        case .bodyWeight:
+            store.addStr("type", "bodyWeight")
+            
+        case .fixedWeights(name: let name):
+            store.addStr("type", "fixedWeights")
+            if let name = name {
+                store.addStr("name", name)
+            }
+        }
+    }
+}
+
 extension Apparatus {
     func caseIndex() -> Int {
         switch self {

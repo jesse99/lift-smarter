@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 10/5/21.
 import Foundation
 
-struct FixedWeights: Equatable, Sequence {
+struct FixedWeights: Equatable, Sequence, Storable {
     init() {
         self.weights = []
     }
@@ -10,6 +10,14 @@ struct FixedWeights: Equatable, Sequence {
         self.weights = weights
     }
     
+    init(from store: Store) {
+        self.weights = store.getDblArray("weights")
+    }
+
+    func save(_ store: Store) {
+        store.addDblArray("weights", weights)
+    }
+
     mutating func add(_ weight: Double) {
         if let index = self.weights.firstIndex(where: {$0 >= weight}) {
             if self.weights[index] != weight {            // ValidateFixedWeightRange allows overlapping ranges so we need to test for dupes
@@ -59,7 +67,7 @@ struct FixedWeights: Equatable, Sequence {
 }
 
 /// List of arbitrary weights, e.g. for dumbbells or a cable machine.
-struct FixedWeightSet: Equatable {
+struct FixedWeightSet: Equatable, Storable {
     var weights: FixedWeights
     var extra: FixedWeights
     var extraAdds: Int          // number of extra weights that can be added to the main weight
@@ -76,6 +84,18 @@ struct FixedWeightSet: Equatable {
         self.extraAdds = extraAdds
     }
     
+    init(from store: Store) {
+        self.weights = store.getObj("weights")
+        self.extra = store.getObj("extra")
+        self.extraAdds = store.getInt("extraAdds")
+    }
+
+    func save(_ store: Store) {
+        store.addObj("weights", weights)
+        store.addObj("extra", extra)
+        store.addInt("extraAdds", extraAdds)
+    }
+
     static func ==(lhs: FixedWeightSet, rhs: FixedWeightSet) -> Bool {
         return lhs.weights == rhs.weights && lhs.extra == rhs.extra && lhs.extraAdds == rhs.extraAdds
     }

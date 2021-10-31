@@ -65,6 +65,7 @@ struct DurationsView: View {
     private func onNext() {
         if instance.finished {
             instance.resetCurrent()
+            app.saveState()
             self.presentation.wrappedValue.dismiss()
         } else {
             self.implicitTimerModal = true

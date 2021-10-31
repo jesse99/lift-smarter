@@ -180,6 +180,7 @@ struct EditFWSView: View {
             self.program.setFWS(self.name, self.fws)
         }
 
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 }

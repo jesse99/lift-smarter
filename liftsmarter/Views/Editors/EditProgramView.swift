@@ -141,6 +141,7 @@ struct EditProgramView: View {
             break
         }
 
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
 }

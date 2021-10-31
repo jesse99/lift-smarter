@@ -9,7 +9,7 @@ let RecentHours = 8.0
 /// 
 /// This is essentially a de-normalized form of the data designed to simplify usage (but slightly
 /// complicate edits).
-class Exercise {
+class Exercise: Storable {
     var name: String            // "Heavy Bench"
     var formalName: String      // "Bench Press"
     var apparatus: Apparatus
@@ -28,55 +28,30 @@ class Exercise {
         self.enabled = true
     }
         
-    func clone() -> Exercise {
-        let copy = Exercise(self.name, self.formalName, self.apparatus, self.info, overridePercent: self.overridePercent)
-        copy.allowRest = self.allowRest
-        copy.enabled = self.enabled
-        return copy
+    required init(from store: Store) {
+        self.name = store.getStr("name")
+        self.formalName = store.getStr("formalName")
+        self.apparatus = store.getObj("apparatus")
+        self.info = store.getObj("info")
+        self.allowRest = store.getBool("allowRest")
+        self.overridePercent = store.getStr("overridePercent")
+        self.enabled = store.getBool("enabled")
     }
-        
-//    func isBodyWeight() -> Bool {
-//        switch self.modality.apparatus {
-//        case .bodyWeight:
-//            return true
-//        default:
-//            return false
-//        }
-//    }
-//
-//    static func ==(lhs: Exercise, rhs: Exercise) -> Bool {  // TODO: names would have to be unique?
-//        return lhs.name == rhs.name
-//    }
 
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(self.id)
-//    }
+    func save(_ store: Store) {
+        store.addStr("name", name)
+        store.addStr("formalName", formalName)
+        store.addObj("apparatus", apparatus)
+        store.addObj("info", info)
+        store.addBool("allowRest", allowRest)
+        store.addStr("overridePercent", overridePercent)
+        store.addBool("enabled", enabled)
+    }
+
+    func clone() -> Exercise {
+        let store = Store()
+        store.addObj("self", self)
+        let result: Exercise = store.getObj("self")
+        return result
+    }
 }
-
-
-//func defaultExpectedSets(_ sets: Sets) -> ExpectedSets {
-//    switch sets {
-//    case .durations(_, _):
-//        return .durations
-//
-//    case .fixedReps(_):
-//        return .fixedReps
-//
-//    case .maxReps(_, _):
-//        return .maxReps(reps: [8, 8, 8])
-//
-//    case .repRanges(warmups: let warmups, worksets: let worksets, backoffs: let backoff):
-//        let r1 = warmups.map({$0.reps.min})
-//        let r2 = worksets.map({$0.reps.min})
-//        let r3 = backoff.map({$0.reps.min})
-//        return .repRanges(warmupsReps: r1, worksetsReps: r2, backoffsReps: r3)
-//
-//    case .repTotal(total: _, rest: _):
-//        return .repTotal(reps: [5, 5, 5])
-//    }
-//}
-//
-//func defaultExpected(_ sets: Sets) -> Expected {
-//    // TODO: if apparatus is a fixed weight set then default weight to the smallest weight?
-//    return Expected(weight: 0.0, sets: defaultExpectedSets(sets))
-//}

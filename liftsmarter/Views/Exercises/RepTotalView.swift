@@ -87,6 +87,7 @@ struct RepTotalView: View {
     
     private func popView() {
         instance.resetCurrent()
+        app.saveState()
         self.presentation.wrappedValue.dismiss()
     }
     
