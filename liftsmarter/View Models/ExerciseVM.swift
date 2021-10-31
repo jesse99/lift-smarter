@@ -310,6 +310,9 @@ extension ExerciseVM {
                         }
                     }
                 }
+                if let biggest = entries.last, desired > biggest {
+                    return entries.count - 1
+                }
             }
             return nil
         }
