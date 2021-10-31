@@ -82,7 +82,7 @@ struct EditFWSView: View {
         .alert(isPresented: $showAlert) {   // and views can only have one alert
             if self.alertAction == .deleteSelected {
                 return Alert(
-                    title: Text("Confirn delete"),
+                    title: Text("Confirm delete"),
                     message: Text(self.selection!.name),
                     primaryButton: .destructive(Text("Delete")) {self.doDelete()},
                     secondaryButton: .default(Text("Cancel")))

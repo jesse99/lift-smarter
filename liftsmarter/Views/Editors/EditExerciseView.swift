@@ -3,6 +3,7 @@ import SwiftUI
 
 struct EditExerciseView: View {
     let instance: InstanceVM
+    @ObservedObject var program: ProgramVM
     @State var name: String
     @State var formalName: String
     @State var weight: String
@@ -18,7 +19,8 @@ struct EditExerciseView: View {
     @State var error = ""
     @Environment(\.presentationMode) var presentation
 
-    init(_ instance: InstanceVM) {
+    init(_ program: ProgramVM, _ instance: InstanceVM) {
+        self.program = program
         self.instance = instance
 
         self._name = State(initialValue: instance.name)
@@ -178,6 +180,6 @@ struct EditExerciseView_Previews: PreviewProvider {
     static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
 
     static var previews: some View {
-        EditExerciseView(instance)
+        EditExerciseView(program, instance)
     }
 }

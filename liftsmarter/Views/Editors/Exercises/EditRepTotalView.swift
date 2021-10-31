@@ -96,7 +96,7 @@ struct EditRepTotalView: View {
 struct EditRepTotalView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
-    static let exercise = model.program.exercises.first(where: {$0.name == "Foam Rolling"})!
+    static let exercise = model.program.exercises.first(where: {$0.name == "Pushup"})!
     static var info = Binding.constant(exercise.info)
 
     static var previews: some View {
