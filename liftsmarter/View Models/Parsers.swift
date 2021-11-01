@@ -178,7 +178,7 @@ func parseRepRanges(_ text: String, label: String, emptyOK: Bool) -> Either<Stri
 // Times = Time+ ('x' Int)?
 // Time = Int ('s' | 'm' | 'h')?    if units are missing seconds are assumed
 // Int = [0-9]+
-func parseTimes(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false) -> Either<String, [Int]> {
+func parseTimes(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bool = false, multipleOK: Bool = true) -> Either<String, [Int]> {
     func parseTime(_ scanner: Scanner) -> Either<String, Int> {
         let time = scanner.scanDouble()
         if time == nil {
@@ -242,6 +242,10 @@ func parseTimes(_ text: String, label: String, zeroOK: Bool = false, emptyOK: Bo
     
     if !scanner.isAtEnd {
         return .left("\(label.capitalized) should be times followed by an optional xN to repeat")
+    }
+    
+    if times.count > 1 && !multipleOK {
+        return .left("\(label.capitalized) should be a single time")
     }
     
     return .right(times)

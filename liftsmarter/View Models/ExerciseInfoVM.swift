@@ -162,16 +162,16 @@ extension ExerciseInfo {
 
         case .repTotal(_):
             switch coalesce(parseInt(table["total"]!, label: "total"),
-                            parseInt(table["rest"]!, label: "rest", zeroOK: true),
+                            parseTimes(table["rest"]!, label: "rest", zeroOK: true, multipleOK: false),
                             parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
             case .right((let t, let r, let e)):
                 let expected = e.reduce(0, {$0 + $1})
                 if expected == t {
-                    let info = RepTotalInfo(total: t, rest: r)
+                    let info = RepTotalInfo(total: t, rest: r.at(0) ?? 0)
                     info.expectedReps = e
                     return .right(.repTotal(info))
                 } else if e.isEmpty {
-                    let info = RepTotalInfo(total: t, rest: r)
+                    let info = RepTotalInfo(total: t, rest: r.at(0) ?? 0)
                     return .right(.repTotal(info))
                 } else {
                     return .left("Expected reps is \(expected) which doesn't match total")

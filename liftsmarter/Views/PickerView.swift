@@ -69,9 +69,11 @@ struct PickerView: View {
                    // VStack(alignment: .leading) {
                     ForEach(self.entries, id: \.id) {entry in
 //                      List(self.entries, id: \.id) {entry in
-                            Text(entry.name).font(.title).foregroundColor(entry.color)
+                            Text(entry.name).font(.headline).foregroundColor(entry.color)
                                 .contentShape(Rectangle())  // so we can click within spacer
                                 .onTapGesture {self.value = entry.name}
+                                .padding(.bottom)
+                            Spacer().frame(height: 2)
                         }
                         .onAppear(perform: {self.scrollIntoView(scrollView)})
                         .onChange(of: self.value, perform: {_ in self.onEdit(scrollView)})

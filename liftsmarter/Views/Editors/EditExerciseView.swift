@@ -22,7 +22,7 @@ struct EditExerciseView: View {
     init(_ program: ProgramVM, _ instance: InstanceVM) {
         self.program = program
         self.instance = instance
-
+        
         self._name = State(initialValue: instance.name)
         self._formalName = State(initialValue: instance.formalName)
         self._weight = State(initialValue: friendlyWeight(instance.exercise.expectedWeight))
@@ -40,7 +40,7 @@ struct EditExerciseView: View {
                 
                 HStack {
                     Text("Formal Name:").font(.headline)
-                    Button(self.formalName, action: {self.formalNameModal = true})
+                    Button(self.getFormalName(), action: {self.formalNameModal = true})
                         .font(.callout)
                         .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name:", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
                     Spacer()
@@ -73,6 +73,11 @@ struct EditExerciseView: View {
                 message: Text(self.helpText),
                 dismissButton: .default(Text("OK")))
         }
+    }
+
+    private func getFormalName() -> String {
+        // If we allow this to be empty then there's no button to click
+        return self.formalName.isEmpty ? "none" : self.formalName
     }
 
     private func onEdited(_ text: String) {
@@ -117,7 +122,7 @@ struct EditExerciseView: View {
             }
         }
 
-        return entries
+        return entries.sorted(by: {$0.0 < $1.0})
     }
 
     func onCancel() {
