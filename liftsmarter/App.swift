@@ -8,6 +8,7 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
     var model: Model
     let program: ProgramVM
     let logs: LogsVM
+    let notifications: Notifications
     @Environment(\.scenePhase) private var phase
     
     init() {
@@ -19,26 +20,35 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
 
         self.program = ProgramVM(model)
         self.logs = LogsVM(model)
-        
+        self.notifications = Notifications()
+
         app = self
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView(program, logs)
-        }
-        .onChange(of: phase) {newPhase in
-            // We do this in case iOS decides to exit our app once it's in the background.
-            // TODO: Potentially this could be the only place where we save but that might be a bit annoying in the sim where we normally just kill the app.
-            if newPhase == .background && self.model.dirty {
-                self.saveState()
-            }
-        }
+        }.onChange(of: phase, perform: self.onPhaseChange(_:))
     }
     
     func saveState() {
         self.model.program.validate()       // TODO: temp
         storeObject(model, to: "model")
+    }
+    
+    private func onPhaseChange(_ newPhase: ScenePhase) {
+        if newPhase == .background {
+            if self.model.dirty {
+                // We do this in case iOS decides to exit our app once it's in the background.
+                // TODO: Potentially this could be the only place where we save but that might be a bit annoying in the sim where we normally just kill the app.
+                self.saveState()
+            }
+            if let secs = TimerView.remaining {
+                self.notifications.add(afterSecs: secs)
+            }
+        } else if newPhase == .active {
+            self.notifications.remove()
+        }
     }
 }
 

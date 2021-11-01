@@ -55,6 +55,7 @@
 		37D53895271CDEBF006B3833 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53894271CDEBF006B3833 /* NoteView.swift */; };
 		37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53896271D21E8006B3833 /* EditNoteView.swift */; };
 		37D53899271E5A57006B3833 /* RepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53898271E5A57006B3833 /* RepTotalView.swift */; };
+		37DBB452272F68D200A29438 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DBB451272F68D200A29438 /* Notifications.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
@@ -134,6 +135,7 @@
 		37D53894271CDEBF006B3833 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		37D53896271D21E8006B3833 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
 		37D53898271E5A57006B3833 /* RepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepTotalView.swift; sourceTree = "<group>"; };
+		37DBB451272F68D200A29438 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 				37ECEA5C26EB0CD700D0AD8E /* Extensions */,
 				37ECEA4726EAD73500D0AD8E /* Model */,
 				37A3C5EE271147F400BFA8CC /* Notes.swift */,
+				37DBB451272F68D200A29438 /* Notifications.swift */,
 				37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */,
 				379BAFB8272E325700642B11 /* Store.swift */,
 				37ECEA6A26ED5AF700D0AD8E /* Views */,
@@ -464,6 +467,7 @@
 				373AB0D3271F486400F9898B /* ExerciseInfo.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,
 				377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */,
+				37DBB452272F68D200A29438 /* Notifications.swift in Sources */,
 				377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */,
 				377791CC26F0367900EC5028 /* InstanceVM.swift in Sources */,
 				37ECEA5E26EB0CEF00D0AD8E /* DateExtension.swift in Sources */,

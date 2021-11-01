@@ -2,9 +2,6 @@
 import AVFoundation // for vibrate
 import SwiftUI
 
-var timerRunning = false        // TODO: SceneDelegate should use these
-var timerSecs: Double = 0.0
-
 struct TimerView: View {
     let title: String
     @State var duration: Int
@@ -16,6 +13,8 @@ struct TimerView: View {
     @State private var resting: Bool = false
     @Environment(\.presentationMode) private var presentationMode
     private let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
+
+    static var remaining: Double? = nil    // nil => not running
 
     var body: some View {
         VStack {
@@ -35,7 +34,7 @@ struct TimerView: View {
     }
     
     func onStopTimer() {
-        timerRunning = false
+        TimerView.remaining = nil
         let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
         center.removeAllDeliveredNotifications()
@@ -73,8 +72,7 @@ struct TimerView: View {
         }
 
         // Timers don't run in the background so we'll use a local notification via sceneDidEnterBackground.
-        timerRunning = true
-        timerSecs = secs
+        TimerView.remaining = secs
         
         let wasWaiting = self.waiting
         self.waiting = secs > 0.0
@@ -98,7 +96,7 @@ struct TimerView_Previews: PreviewProvider {
     }
 }
 
-// TODO: this should go somewhere else
+// TODO: this should go somewhere else, maybe make it a friendly function
 fileprivate func secsToShortDurationName(_ interval: Double) -> String {
     let secs = Int(round(interval))
     let mins = interval/60.0
