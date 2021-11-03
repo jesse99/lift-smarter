@@ -420,6 +420,21 @@ extension ExerciseInfo: Storable {
 }
 
 extension ExerciseInfo {
+    func resetCurrent(_ weight: Double) {
+        switch self {
+        case .durations(let info):
+            info.resetCurrent(weight: weight)
+        case .fixedReps(let info):
+            info.resetCurrent(weight: weight)
+        case .maxReps(let info):
+            info.resetCurrent(weight: weight)
+        case .repRanges(let info):
+            info.resetCurrent(weight: weight)
+        case .repTotal(let info):
+            info.resetCurrent(weight: weight)
+        }
+    }
+
     func caseIndex() -> Int {
         switch self {
         case .durations(_):

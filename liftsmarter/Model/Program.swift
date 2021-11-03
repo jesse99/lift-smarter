@@ -107,19 +107,37 @@ class Program: Storable {
         case .durations(let info):
             ASSERT(info.sets.count > 0, "must have at least one set")
             ASSERT(info.targetSecs.isEmpty || info.targetSecs.count == info.sets.count, "targetSecs must match sets")
-            ASSERT(info.currentSecs.count <= info.sets.count, "currentSecs must match sets")
-            ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            if inProgram {
+                ASSERT(info.currentSecs.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            } else {
+                ASSERT(info.currentSecs.count <= info.sets.count, "currentSecs must match sets")
+                ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            }
             
         case .fixedReps(let info):
             ASSERT(info.sets.count > 0, "must have at least one set")
-            ASSERT(info.currentReps.count <= info.sets.count, "currentReps must match sets")
-            ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            if inProgram {
+                ASSERT(info.currentReps.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            } else {
+                ASSERT(info.currentReps.count <= info.sets.count, "currentReps must match sets")
+                ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            }
 
         case .maxReps(let info):
             ASSERT(info.restSecs.count > 0, "must have at least one set")
             ASSERT(info.expectedReps.isEmpty || info.expectedReps.count == info.restSecs.count, "expectedReps must match sets")
-            ASSERT(info.currentReps.count <= info.restSecs.count, "currentReps must match sets")
-            ASSERT(info.current.setIndex <= info.restSecs.count, "setIndex must match sets")
+            if inProgram {
+                ASSERT(info.currentReps.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            } else {
+                ASSERT(info.currentReps.count <= info.restSecs.count, "currentReps must match sets")
+                ASSERT(info.current.setIndex <= info.restSecs.count, "setIndex must match sets")
+            }
             
         case .repRanges(let info):
             ASSERT(info.sets.first(where: {$0.stage == .workset}) != nil, "must have at least one workset")
@@ -131,12 +149,24 @@ class Program: Storable {
                 }
             }
             
-            ASSERT(info.currentReps.count <= info.sets.count, "currentReps must match sets")
-            ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            if inProgram {
+                ASSERT(info.currentReps.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            } else {
+                ASSERT(info.currentReps.count <= info.sets.count, "currentReps must match sets")
+                ASSERT(info.current.setIndex <= info.sets.count, "setIndex must match sets")
+            }
             
         case .repTotal(let info):
             ASSERT(info.total > 0, "at least one rep is required")
             // Note that expectedReps can be empty and currentReps.count can be smaller or larger than expectedReps
+
+            if inProgram {
+                ASSERT(info.currentReps.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            }
         }
 
         // Most state within a workout exercise should match that of the exercise in the program.

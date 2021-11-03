@@ -49,7 +49,7 @@ struct EditWorkoutView: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.default)
                             .autocapitalization(.words)
-                            .disableAutocorrection(false)
+                            .disableAutocorrection(true)
                             .onChange(of: self.scheduleText, perform: self.onEdited)
                     }
                     if !self.scheduleLabel.isEmpty {

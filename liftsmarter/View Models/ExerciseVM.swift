@@ -182,6 +182,9 @@ extension ExerciseVM {
     
     func setInfo(_ info: ExerciseInfo) { 
         self.program.modify(self.exercise, callback: {$0.info = info})
+        
+        let exercise = self.program.model(exercise).program.exercises.first(where: {$0.name == self.name})!
+        exercise.info.resetCurrent(0.0)    // validate expects program exercies to have default current
     }
     
     func advanceWeight() {
@@ -394,6 +397,7 @@ extension ExerciseVM {
                         .sheet(isPresented: modal) {EditDurationsView(exerciseName, einfo)}
                     Spacer()
                     Menu("Durations") {     // TODO: should this (and apparatus) omit the menu item for the current selection
+                        // TODO: usually these items will be displayed in the reverse order but that is actually context dependent, see https://stackoverflow.com/questions/67124144/is-there-any-option-to-set-order-for-menu-items-in-swiftui
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})

@@ -74,9 +74,19 @@ struct EditRepsSetView: View {
             let worksetSets = rInfo.sets.filter({$0.stage == .workset})
             let backoffSets = rInfo.sets.filter({$0.stage == .backoff})
 
-            let warmupExp = rInfo.expectedReps.filter({$0.stage == .warmup})
-            let worksetExp = rInfo.expectedReps.filter({$0.stage == .workset})
-            let backoffExp = rInfo.expectedReps.filter({$0.stage == .backoff})
+            var warmupExp = rInfo.expectedReps.filter({$0.stage == .warmup})
+            var worksetExp = rInfo.expectedReps.filter({$0.stage == .workset})
+            var backoffExp = rInfo.expectedReps.filter({$0.stage == .backoff})
+            
+            if warmupExp.count != warmupSets.count {
+                warmupExp = warmupSets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value, stage: .warmup)})
+            }
+            if worksetExp.count != worksetSets.count {
+                worksetExp = worksetSets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value, stage: .workset)})
+            }
+            if backoffExp.count != backoffSets.count {
+                backoffExp = backoffSets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value, stage: .backoff)})
+            }
             
             switch self.stage {
             case .warmup:

@@ -38,7 +38,8 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
     private let instance: Exercise
     
     init(_ program: ProgramVM, _ workout: WorkoutVM, _ instance: Exercise) {
-        ASSERT(workout.workout(instance).exercises.contains(where: {$0.name == instance.name}), "exercise is missing from the workout")
+        ASSERT(workout.workout(instance).exercises.first(where: {$0 === instance}) != nil, "exercise must be in the workout")
+        ASSERT(program.model(instance).program.exercises.first(where: {$0 === instance}) == nil, "exercise cannot be in the program")
         self.program = program
         self.workout = workout
         self.exercise = ExerciseVM(program, instance)
@@ -232,18 +233,7 @@ extension InstanceVM {
 
     func resetCurrent() {
         self.willChange()
-        switch self.instance.info {
-        case .durations(let info):
-            info.resetCurrent(weight: info.expectedWeight)  // current applies to an exercise not all of them
-        case .fixedReps(let info):
-            info.resetCurrent(weight: info.expectedWeight)
-        case .maxReps(let info):
-            info.resetCurrent(weight: info.expectedWeight)
-        case .repRanges(let info):
-            info.resetCurrent(weight: info.expectedWeight)
-        case .repTotal(let info):
-            info.resetCurrent(weight: info.expectedWeight)
-        }
+        self.instance.info.resetCurrent(self.exercise.expectedWeight)  // current applies to an exercise not all of them
     }
 
     func appendCurrent(_ reps: Int? = nil, now: Date = Date()) {
@@ -509,22 +499,26 @@ extension InstanceVM {
     
     // For rest between sets.
     func implicitTimer(delta: Int = 0) -> TimerView {
-        let title = self.getSetTimerTitle("Set", delta)
         switch self.instance.info {
         case .durations(let info):
+            let title = self.getSetTimerTitle("Set", delta)
             return TimerView(title: title, duration: info.sets[self.setIndex + delta].secs, secondDuration: self.restDuration())
 
         case .fixedReps(let info):
+            let title = self.getSetTimerTitle("Set", delta)
             return TimerView(title: title, duration: info.sets[self.setIndex + delta].restSecs)
 
         case .maxReps(let info):
+            let title = self.getSetTimerTitle("Set", delta)
             return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
         case .repRanges(let info):
+            let title = self.getSetTimerTitle("", delta)
             let set = info.currentSet(delta)
             return TimerView(title: title, duration: set.restSecs)
 
         case .repTotal(let info):
+            let title = self.getSetTimerTitle("Set", delta)
             return TimerView(title: title, duration: info.rest)
         }
     }
@@ -656,10 +650,30 @@ extension InstanceVM {
     
     private func getSetTimerTitle(_ prefix: String, _ delta: Int = 0) -> String {
         let i = self.setIndex + delta
-        if let numSets = self.exercise.numSets() {
-            return "\(prefix) \(i+1) of \(numSets)"
-        } else {
-            return "\(prefix) \(i+1)"
+        switch self.instance.info {
+        case .repRanges(let info):
+            let numWarmups = info.sets.filter({$0.stage == .warmup}).count
+            let numWorksets = info.sets.filter({$0.stage == .workset}).count
+            let numBackoff = info.sets.filter({$0.stage == .backoff}).count
+
+            switch info.sets[i].stage {
+            case .warmup:
+                return "Warmup \(prefix) \(i+1) of \(numWarmups)"
+            case .workset:
+                if numWarmups == 0 && numBackoff == 0 {
+                    return "\(prefix) \(i+1 - numWarmups) of \(numWorksets)"
+                } else {
+                    return "Work Set \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
+                }
+            case .backoff:
+                return "Bbackoff \(prefix) \(i+1 - numWarmups - numWorksets) of \(numBackoff)"
+            }
+        default:
+            if let numSets = self.exercise.numSets() {
+                return "\(prefix) \(i+1) of \(numSets)"
+            } else {
+                return "\(prefix) \(i+1)"
+            }
         }
     }
 }
