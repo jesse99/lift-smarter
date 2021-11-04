@@ -127,7 +127,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             
         case .fixedWeights(name: let name):
             if let name = name, let fws = self.program.getFixedWeights()[name] {
-                return fws.getClosestAbove(self.expectedWeight)
+                return fws.getAbove(self.expectedWeight)
             }
             return nil
         }

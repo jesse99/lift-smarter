@@ -37,7 +37,6 @@ struct RepRangesView: View {
                             let expected = self.instance.expectedReps()!
                             RepsPickerView(initial: expected, min: 1, dismissed: self.onRepsPressed)
                         }
-                    // TODO: need to optionally advance weight
                         .alert(isPresented: $updateExpectedAlert) { () -> Alert in
                             Alert(title: Text("Do you want to update expected reps?"),
                                 primaryButton:   .default(Text("Yes"), action: self.onUpdateExpected),
@@ -46,8 +45,8 @@ struct RepRangesView: View {
                     Spacer().frame(height: 50)
                         .alert(isPresented: $advanceWeightAlert) { () -> Alert in
                             Alert(title: Text("Do you want to advance the weight?"),
-                                primaryButton: .default(Text("Yes"), action: {self.doAdvanceWeight()}),
-                                secondaryButton: .default(Text("No"), action: {self.popView()})
+                                primaryButton: .default(Text("Yes"), action: self.doAdvanceWeight),
+                                secondaryButton: .default(Text("No"), action: self.popView)
                             )}
 
                     Button("Start Timer", action: onStartTimer)
@@ -89,8 +88,6 @@ struct RepRangesView: View {
             }
         case .finished:
             if self.instance.currentIsUnexpected() {
-                // TODO: If can also advance weight may want to add an extra button to update
-                // both reps and expected weight.
                 self.updateExpectedAlert = true
                 
             } else if self.instance.canAdvanceWeight() {
@@ -114,8 +111,12 @@ struct RepRangesView: View {
     }
     
     private func onUpdateExpected() {
-        self.instance.updateExpected()
-        self.popView()
+        if self.instance.canAdvanceWeight() {
+            self.instance.updateExpected()
+        } else {
+            self.instance.updateExpected()
+            self.popView()
+        }
     }
     
     private func doAdvanceWeight() {

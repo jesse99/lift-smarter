@@ -319,7 +319,10 @@ extension InstanceVM {
             info.total = info.currentReps.reduce(0, {$0 + $1})
         }
 
-        self.program.modify(self.instance, callback: {$0.info = self.instance.info})
+        self.program.modify(self.instance, callback: {$0.info = self.instance.info.clone()})
+        
+        let exercise = self.program.model(instance).program.exercises.first(where: {$0.name == self.name})!
+        exercise.info.resetCurrent(0.0)    // validate expects program exercies to have default current
     }
 }
 
@@ -661,7 +664,7 @@ extension InstanceVM {
                 return "Warmup \(prefix) \(i+1) of \(numWarmups)"
             case .workset:
                 if numWarmups == 0 && numBackoff == 0 {
-                    return "\(prefix) \(i+1 - numWarmups) of \(numWorksets)"
+                    return "Work Set \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
                 } else {
                     return "Work Set \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
                 }

@@ -150,6 +150,7 @@ class Program: Storable {
             }
             
             if inProgram {
+//                info.current.weight = 0.0
                 ASSERT(info.currentReps.count == 0, "current is workout specific")
                 ASSERT(info.current.setIndex == 0, "current is workout specific")
                 ASSERT(info.current.weight == 0.0, "current is workout specific")
