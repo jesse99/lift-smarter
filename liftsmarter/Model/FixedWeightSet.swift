@@ -120,51 +120,45 @@ struct FixedWeightSet: Equatable, Storable {
     
     // Equal or below.
     func getClosestBelow(_ target: Double) -> Double {
-        if let index = self.weights.firstIndex(where: {$0 >= target}) {
-            if self.weights[index] == target {
-                return self.weights[index]
-            } else if index > 0 {
-                return self.weights[index - 1]
+        for candidate in self.weights.reversed() {
+            if candidate <= target {
+                return candidate
             }
         }
-        if let last = self.weights.last, last < target {
-            return last
-        }
+        
         return 0.0
     }
     
     // Equal or above.
     func getClosestAbove(_ target: Double) -> Double? {
-        if let index = self.weights.firstIndex(where: {$0 >= target}) {
-            return self.weights[index]
-        } else {
-            if let last = self.weights.last, last < target {
-                return last
+        for candidate in self.weights {
+            if candidate >= target {
+                return candidate
             }
-            return nil
         }
+        
+        return self.weights.last
     }
     
-    // Next weight below specified weight (weight should be in fws).
-    func getBelow(_ weight: Double) -> Double? {
-        if let index = self.weights.firstIndex(where: {$0 == weight}) {
-            if index > 0 {
-                return self.weights[index - 1]
+    // Next weight below specified weight
+    func getBelow(_ weight: Double) -> Double {
+        for candidate in self.weights.reversed() {
+            if candidate < weight {
+                return candidate
             }
         }
-        return nil
+        
+        return 0.0
     }
 
-    // Next weight above specified weight (weight should be zero or in fws).
+    // Next weight above specified weight
     func getAbove(_ weight: Double) -> Double? {
-        if let index = self.weights.firstIndex(where: {$0 == weight}) {
-            if index + 1 < self.weights.count {
-                return self.weights[index + 1]
+        for candidate in self.weights {
+            if candidate > weight {
+                return candidate
             }
         }
-        if let first = self.weights.first, weight < first {
-            return first
-        }
-        return nil
+        
+        return self.weights.last
     }
 }
