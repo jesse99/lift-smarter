@@ -483,6 +483,46 @@ extension InstanceVM {
 
     }
 
+    func notesLabel() -> String {
+        // This is per the exercise not the instance. That's probably want people want though it does seem slightly confusing.
+        var count = 0
+        if let records = program.model(instance).history.records[self.name] {
+            let weight = self.exercise.expectedWeight
+            var reps: [ActualRep]
+            
+            switch self.exercise.info {
+            case .durations(let info):
+                reps = info.sets.map({.duration(secs: $0.secs, percent: 1.0)})
+            case .fixedReps(let info):
+                reps = info.sets.map({.reps(count: $0.reps.reps, percent: 1.0)})
+            case .maxReps(_):
+                return "Completed=\(records.count)"
+            case .repRanges(let info):
+                reps = info.sets.map({.reps(count: $0.reps.min, percent: $0.percent.value)})
+            case .repTotal(_):
+                return "Completed=\(records.count)"
+            }
+            
+            for record in records.reversed() {
+                if abs(record.weight - weight) < 0.1 && record.reps == reps {
+                    count += 1
+                } else {
+                    break
+                }
+            }
+
+            if self.finished {
+                return "Completed=\(records.count)"
+            } else if count >= 1 {
+                return "Same x\(count+1)  Completed=\(records.count)"   // + 1 because current sets match previous sets
+            } else {
+                return "New  Completed=\(records.count)"
+            }
+        } else {
+            return "New"
+        }
+    }
+    
     func nextLabel() -> String {
         switch self.instance.info {
         case .durations(_):

@@ -53,7 +53,7 @@ struct RepRangesView: View {
                         .font(.system(size: 20.0))
                         .sheet(isPresented: self.$explicitTimerModal) {instance.explicitTimer()}
                     Spacer()
-                    Text(self.getNoteLabel()).font(.callout)   // Same previous x3
+                    Text(instance.notesLabel()).font(.callout)   // Same x3
                 }
             }
 
@@ -148,11 +148,6 @@ struct RepRangesView: View {
         if instance.shouldReset() {
             instance.resetCurrent()
         }
-    }
-
-    private func getNoteLabel() -> String {
-//        return getPreviouslabel(self.display, workout(), instance())
-        return "a note"
     }
 }
 

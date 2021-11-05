@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 9/18/21.
 import Foundation
 
-enum ActualRep {    // note that this represents a single rep
+enum ActualRep: Equatable {    // note that this represents a single rep
     case reps(count: Int, percent: Double)
     case duration(secs: Int, percent: Double)
 }
