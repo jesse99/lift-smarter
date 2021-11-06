@@ -181,7 +181,7 @@ extension ExerciseVM {
     }
     
     func setInfo(_ info: ExerciseInfo) { 
-        self.program.modify(self.exercise, callback: {$0.info = info})
+        self.program.modify(self.exercise, callback: {$0.info = info.clone()})
         
         let exercise = self.program.model(exercise).program.exercises.first(where: {$0.name == self.name})!
         exercise.info.resetCurrent(0.0)    // validate expects program exercies to have default current

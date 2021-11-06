@@ -53,7 +53,7 @@ struct DurationsView: View {
                     .sheet(isPresented: self.$noteModal) {NoteView(self.program, formalName: self.instance.formalName)}
                 Button("Edit", action: onEdit)
                     .font(.callout)
-                    .sheet(isPresented: self.$editModal) {EditExerciseView(self.program, self.instance)}
+                    .sheet(isPresented: self.$editModal, onDismiss: self.onEdited) {EditExerciseView(self.program, self.instance)}
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
@@ -86,6 +86,12 @@ struct DurationsView: View {
     
     private func onEdit() {
         self.editModal = true
+    }
+    
+    private func onEdited() {
+        if self.instance.exercise.info.caseIndex() != 0 {
+            self.presentation.wrappedValue.dismiss()
+        }
     }
 
     private func onStartHistory() {
