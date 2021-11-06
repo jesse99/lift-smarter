@@ -27,7 +27,7 @@ struct LogLine: Identifiable, Storable {
         self.seconds = store.getDbl("seconds")
         self.level = store.getObj("level")
         self.line = store.getStr("line")
-        self.current = store.getBool("current")
+        current = false
         self.id = store.getInt("id")
     }
 
@@ -35,7 +35,6 @@ struct LogLine: Identifiable, Storable {
         store.addDbl("seconds", seconds)
         store.addObj("level", level)
         store.addStr("line", line)
-        store.addBool("current", current)
         store.addInt("id", id)
     }
 }
@@ -50,7 +49,7 @@ class Logs: Storable {
     
     init() {
         self.startTime = Date().timeIntervalSince1970 - 0.00001  // subtract a tiny time so we don't print a -0.0 timestamp
-        logError = {self.log(.Error, $0)}   // TODO: should save logs too (and just the logs)
+        logError = {self.log(.Error, $0)} 
     }
     
     deinit {
@@ -66,6 +65,8 @@ class Logs: Storable {
         self.maxLines = store.getInt("maxLines")
         self.nextID = store.getInt("nextID")
         self.startTime = store.getDbl("startTime")
+
+        logError = {self.log(.Error, $0)}
     }
 
     func save(_ store: Store) {

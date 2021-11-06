@@ -19,6 +19,7 @@ func ASSERT(_ predicate: Bool, _ prefix: String, file: StaticString = #file, lin
     if !predicate {
         let url = URL(fileURLWithPath: file.description)
         logErr("\(prefix) failed at \(url.lastPathComponent):\(line)")
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -31,6 +32,7 @@ func ASSERT_EQ<T>(_ lhs: T, _ rhs: T, _ prefix: String = "", file: StaticString 
         } else {
             logErr("\(lhs) == \(rhs) failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -43,6 +45,7 @@ func ASSERT_NE<T>(_ lhs: T, _ rhs: T, _ prefix: String = "", file: StaticString 
         } else {
             logErr("\(lhs) != \(rhs) failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -55,6 +58,7 @@ func ASSERT_LE<T>(_ lhs: T, _ rhs: T, _ prefix: String = "", file: StaticString 
         } else {
             logErr("\(lhs) <= \(rhs) failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -67,6 +71,7 @@ func ASSERT_GE<T>(_ lhs: T, _ rhs: T, _ prefix: String = "", file: StaticString 
         } else {
             logErr("\(lhs) >= \(rhs) failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -79,6 +84,7 @@ func ASSERT_NIL<T>(_ value: T?, _ prefix: String = "", file: StaticString = #fil
         } else {
             logErr("\(v) == nil failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
@@ -91,6 +97,7 @@ func ASSERT_NOT_NIL<T>(_ value: T?, _ prefix: String = "", file: StaticString = 
         } else {
             logErr("not nil failed at \(url.lastPathComponent):\(line)")
         }
+        app.saveState()
         precondition(false, file: file, line: line)
     }
 }
