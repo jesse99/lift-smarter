@@ -388,6 +388,33 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .orange)
     }
 
+    func testOverdue() throws {
+        let (model, program, workout) = create(["Squat", "Lunge"], .days([.monday, .wednesday]))
+        
+        let work = model.program.workouts.first(where: {$0.name == workout.name})!
+        let exercise = work.exercises[0]
+        work.completed[exercise.name] = date(day: 6)
+
+        // TODO: do this if there are no exercises in the workout completed for the last scheduled day
+        // TODO: should we test with a second workout?
+        // TODO: test the case where the next workout is cardio
+        var (label, color) = program.subLabel(workout, now: date(day: 9))   // thursday
+        XCTAssertEqual(label, "Overdue 1 day")
+        XCTAssertEqual(color, .red)
+
+        (label, color) = program.subLabel(workout, now: date(day: 10))   // friday
+        XCTAssertEqual(label, "Overdue 2 days")
+        XCTAssertEqual(color, .red)
+
+        (label, color) = program.subLabel(workout, now: date(day: 11))   // saturday
+        XCTAssertEqual(label, "Overdue 3 days")
+        XCTAssertEqual(color, .red)
+
+        (label, color) = program.subLabel(workout, now: date(day: 12))   // sunday
+        XCTAssertEqual(label, "tomorrow")
+        XCTAssertEqual(color, .blue)
+    }
+
     private func create(_ names: [String], _ schedule: Schedule = .anyDay, restWeeks: [Int] = []) -> (Model, ProgramVM, WorkoutVM) {
         let sets = [DurationSet(secs: 30), DurationSet(secs: 30)]
         let exercises = names.map({Exercise($0, $0, .bodyWeight, .durations(DurationsInfo(sets: sets)))})
