@@ -69,8 +69,8 @@ class WorkoutLabelTests: XCTestCase {
         let (_, program, workout) = create(["Squat", "Lunge"], .cyclic(3))
         
         var (label, color) = program.subLabel(workout)
-        XCTAssertEqual(label, "never started")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .red)
 
         let instance = workout.instances.first(where: {$0.name == "Squat"})!
         instance.appendCurrent(now: date(minutes: 10))
@@ -94,23 +94,23 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 5))
         XCTAssertEqual(label, "overdue by 1 day")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 6))
         XCTAssertEqual(label, "overdue by 2 days")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
         
         (label, color) = program.subLabel(workout, now: date(month: 12, day: 14))
         XCTAssertEqual(label, "overdue by more than 3 months")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
     }
     
     func testCyclic2() throws {
         let (_, program, workout) = create(["Squat", "Lunge"], .cyclic(2))
         
         var (label, color) = program.subLabel(workout)
-        XCTAssertEqual(label, "never started")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(label, "not scheduled")
+        XCTAssertEqual(color, .red)
 
         let instance = workout.instances.first(where: {$0.name == "Squat"})!
         instance.appendCurrent(now: date(minutes: 10))
@@ -130,11 +130,11 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 4))
         XCTAssertEqual(label, "overdue by 1 day")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 5))
         XCTAssertEqual(label, "overdue by 2 days")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
     }
     
     func testCyclic1() throws {
@@ -158,11 +158,11 @@ class WorkoutLabelTests: XCTestCase {
 
         (label, color) = program.subLabel(workout, now: date(day: 3))
         XCTAssertEqual(label, "overdue by 1 day")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 4))
         XCTAssertEqual(label, "overdue by 2 days")
-        XCTAssertEqual(color, .orange)
+        XCTAssertEqual(color, .red)
     }
     
     func testDays() throws {
@@ -321,31 +321,31 @@ class WorkoutLabelTests: XCTestCase {
         
         var (label, color) = program.subLabel(workout, now: date())
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 2))
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 6))
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 16))  // rest week
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 23))  // both rest and workout week
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(day: 30))
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
 
         (label, color) = program.subLabel(workout, now: date(month: 10, day: 11))
         XCTAssertEqual(label, "not scheduled")
-        XCTAssertEqual(color, .black)
+        XCTAssertEqual(color, .red)
     }
 
     func testRestWithNoWeeks() throws {
@@ -388,31 +388,57 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(color, .orange)
     }
 
-    func testOverdue() throws {
-        let (model, program, workout) = create(["Squat", "Lunge"], .days([.monday, .wednesday]))
-        
-        let work = model.program.workouts.first(where: {$0.name == workout.name})!
-        let exercise = work.exercises[0]
-        work.completed[exercise.name] = date(day: 6)
+    func testOverdueWithRest() throws {
+        let (model, programVM, workoutVM) = create(["Bench", "OHP"], .days([.monday, .thursday]))
 
-        // TODO: do this if there are no exercises in the workout completed for the last scheduled day
-        // TODO: should we test with a second workout?
-        // TODO: test the case where the next workout is cardio
-        var (label, color) = program.subLabel(workout, now: date(day: 9))   // thursday
-        XCTAssertEqual(label, "Overdue 1 day")
+        let workout = model.program.workouts.first(where: {$0.name == workoutVM.name})!
+        let exercise = workout.exercises[0]
+        workout.completed[exercise.name] = date(day: 1)
+
+        var (label, color) = programVM.subLabel(workoutVM, now: date(day: 6))   // monday (next scheduled)
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 7))   // tuesday
+        XCTAssertEqual(label, "overdue by 1 day")
         XCTAssertEqual(color, .red)
 
-        (label, color) = program.subLabel(workout, now: date(day: 10))   // friday
-        XCTAssertEqual(label, "Overdue 2 days")
-        XCTAssertEqual(color, .red)
-
-        (label, color) = program.subLabel(workout, now: date(day: 11))   // saturday
-        XCTAssertEqual(label, "Overdue 3 days")
-        XCTAssertEqual(color, .red)
-
-        (label, color) = program.subLabel(workout, now: date(day: 12))   // sunday
-        XCTAssertEqual(label, "tomorrow")
+        // Exercises that rely on rest weeks should have at least one day of rest between them.
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 8))   // wednesday
+        XCTAssertEqual(label, "tomorrow")       // TODO: " (skipped previous)"?
         XCTAssertEqual(color, .blue)
+
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 9))   // thursday
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+    }
+
+    func testOverdueWithNoRest() throws {
+        let (model, programVM, workoutVM) = create(["Stretch", "Jog"], .days([.monday, .thursday]))
+        for instance in workoutVM.instances {
+            instance.exercise.setAllowRest(false)
+        }
+
+        let workout = model.program.workouts.first(where: {$0.name == workoutVM.name})!
+        let exercise = workout.exercises[0]
+        workout.completed[exercise.name] = date(day: 1)
+
+        var (label, color) = programVM.subLabel(workoutVM, now: date(day: 6))   // monday (next scheduled)
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 7))   // tuesday
+        XCTAssertEqual(label, "overdue by 1 day")
+        XCTAssertEqual(color, .red)
+
+        // Exercises that don't rely on rest weeks can be done back to back.
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 8))   // wednesday
+        XCTAssertEqual(label, "overdue by 2 days")
+        XCTAssertEqual(color, .red)
+
+        (label, color) = programVM.subLabel(workoutVM, now: date(day: 9))   // thursday
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
     }
 
     private func create(_ names: [String], _ schedule: Schedule = .anyDay, restWeeks: [Int] = []) -> (Model, ProgramVM, WorkoutVM) {

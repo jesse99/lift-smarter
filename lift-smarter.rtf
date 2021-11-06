@@ -6,17 +6,9 @@
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs48 \cf2 \'95\'a0Make sure logs are persisted on asserts\
-	- old logs should show up as gray\
-	- should try this out\
-\'95 Should Logs save all the state?\
-\'95 Workout should say \'93Overdue by 1 day\'94 in red:\
-	- only if allowRest and \
-		next workout also has allowRest and is more than one day away\
-	      or next workout is not allowRest and not scheduled for today\
-	- shouldn\'92t we do something kind of similar for non-rest workouts?\
+\f0\fs48 \cf2 \'95 Workout should say \'93Overdue by 1 day\'94 in red:\
 	- edit schedule should have a sub-field for cyclic to allow user to pick next scheduled date\
-		store date - days\
+		store date - days, see newestCompleted\
 		where? probably want to add a real lastCompleted field to Workout\
 		set that as each exercise is completed\
 \'95 Button should read \'93Done\'85\'94 if there are follow on alerts?\

@@ -316,20 +316,17 @@ extension ProgramVM {
             return ("", .black)
                 
         case .notScheduled:
-            return ("not scheduled", .black)
+            return ("not scheduled", .red)
                 
-        case .notStarted:
-            return ("never started", .orange)
-
         case .overdue(let n):
             if n == 1 {
-                return ("overdue by 1 day", .orange)
+                return ("overdue by 1 day", .red)
             } else if n > 60 {
-                return ("overdue by more than \(n/30) months", .orange) // relatively crude estimate is fine here
+                return ("overdue by more than \(n/30) months", .red) // relatively crude estimate is fine here
             } else if n > 30 {
-                return ("overdue by more than 1 month", .orange)
+                return ("overdue by more than 1 month", .red)
             } else {
-                return ("overdue by \(n) days", .orange)
+                return ("overdue by \(n) days", .red)
             }
         }
     }
@@ -342,7 +339,7 @@ extension ProgramVM {
             return .days(extraDays)
         case .days(let n):
             return .days(n + extraDays)
-        case .error, .notScheduled, .notStarted:
+        case .error, .notScheduled:
             return delta
         case .overdue(_):
             ASSERT(false, "week schedule dosn't support cyclic sub-schedule")
@@ -392,12 +389,11 @@ extension ProgramVM {
         return buttons
     }
     
-    enum ScheduleDelta {
+    enum ScheduleDelta: Equatable {
         case anyDay
         case days(Int)
         case error
         case notScheduled
-        case notStarted
         case overdue(Int)
     }
     
@@ -428,19 +424,63 @@ extension ProgramVM {
                 if delta == 1 {
                     return .days(0)
                 } else {
-                    return .notStarted
+                    return .notScheduled
                 }
             }
 
         case .days(let days):
+            // Figure out how many days till the next scheduled workout.
+            var delta:ScheduleDelta
             var daysToScheduled = 8
             for day in days {
                 daysToScheduled = min(self.daysTo(now, day), daysToScheduled)
             }
             switch daysToScheduled {
-            case 8: return .notScheduled
-            default: return .days(daysToScheduled)
+            case 8: delta = .notScheduled
+            default: delta = .days(daysToScheduled)
             }
+
+            // If we missed the last scheduled workout then tell the user that he's overdue
+            // (if possible).
+            var overdueBy: Int? = nil
+            let calendar = Calendar.current
+            if let completed = self.newestCompleted(workout, instances) {
+                // Iterate through each day after the last workout,
+                for delta in 1..<16 {
+                    let day = calendar.date(byAdding: .day, value: delta, to: completed)!
+                    if days.first(where: {
+                        let rawDay = Calendar.current.component(.weekday, from: day) - 1
+                        return $0.rawValue == rawDay
+                    }) != nil {
+                        // if the day is a scheduled workout day then reset to baseline,
+                        overdueBy = 0
+                    } else {
+                        // if we've gone past a scheduled workout day then we're overdue,
+                        if let d = overdueBy {
+                            overdueBy = d + 1
+                        }
+                    }
+                    // if the day is today then we can stop iterating.
+                    if day.daysMatch(now) {
+                        break
+                    }
+                }
+                
+                if let days = overdueBy {
+                    if days == 0 {
+                        return .days(0)
+                    } else {
+                        // If the workout requires rest days and is due tomorrow then give it up as a last cause
+                        // and just say tomorrow.
+                        let allowRest = instances.first(where: {$0.exercise.allowRest}) != nil
+                        if delta != .days(1) || !allowRest {
+                            return .overdue(days)
+                        }
+                    }
+                }
+            }
+            
+            return delta
 
         case .weeks(_, _):
             ASSERT(false, "don't call this with a week schedule")
