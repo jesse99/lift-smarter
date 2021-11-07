@@ -56,11 +56,12 @@
 		37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53896271D21E8006B3833 /* EditNoteView.swift */; };
 		37D53899271E5A57006B3833 /* RepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53898271E5A57006B3833 /* RepTotalView.swift */; };
 		37DBB452272F68D200A29438 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DBB451272F68D200A29438 /* Notifications.swift */; };
+		37E5C8002738491700C60157 /* EditExtrasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E5C7FF2738491700C60157 /* EditExtrasView.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
 		37ECEA2526EAD65300D0AD8E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2426EAD65300D0AD8E /* Preview Assets.xcassets */; };
-		37ECEA2F26EAD65300D0AD8E /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA2E26EAD65300D0AD8E /* ModelTests.swift */; };
+		37ECEA2F26EAD65300D0AD8E /* FixedWeightSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */; };
 		37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4826EAD74A00D0AD8E /* Program.swift */; };
 		37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4A26EAD85B00D0AD8E /* Model.swift */; };
 		37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4C26EAD93900D0AD8E /* Workout.swift */; };
@@ -136,13 +137,14 @@
 		37D53896271D21E8006B3833 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
 		37D53898271E5A57006B3833 /* RepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepTotalView.swift; sourceTree = "<group>"; };
 		37DBB451272F68D200A29438 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		37E5C7FF2738491700C60157 /* EditExtrasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExtrasView.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		37ECEA2126EAD65300D0AD8E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		37ECEA2426EAD65300D0AD8E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		37ECEA2A26EAD65300D0AD8E /* liftsmarterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = liftsmarterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		37ECEA2E26EAD65300D0AD8E /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWeightSetTests.swift; sourceTree = "<group>"; };
 		37ECEA4826EAD74A00D0AD8E /* Program.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		37ECEA4A26EAD85B00D0AD8E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		37ECEA4C26EAD93900D0AD8E /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -195,6 +197,7 @@
 				37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */,
 				37A3C5E9270FDA0000BFA8CC /* EditExerciseView.swift */,
 				3718979C2708D40B00351C5A /* EditExercisesView.swift */,
+				37E5C7FF2738491700C60157 /* EditExtrasView.swift */,
 				37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */,
 				37A3C5F32712504400BFA8CC /* EditFWSsView.swift */,
 				37D53896271D21E8006B3833 /* EditNoteView.swift */,
@@ -267,7 +270,7 @@
 		37ECEA2D26EAD65300D0AD8E /* liftsmarterTests */ = {
 			isa = PBXGroup;
 			children = (
-				37ECEA2E26EAD65300D0AD8E /* ModelTests.swift */,
+				37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */,
 				371897942700EB2000351C5A /* ScheduleTests.swift */,
 				37A3C5E02709120D00BFA8CC /* WorkoutLabelTests.swift */,
 			);
@@ -459,6 +462,7 @@
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
 				37A3C5E5270D62D500BFA8CC /* FixedWeightSet.swift in Sources */,
+				37E5C8002738491700C60157 /* EditExtrasView.swift in Sources */,
 				377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */,
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
 				3742BFC5272A3F67006D43E0 /* EditRepRangesView.swift in Sources */,
@@ -510,7 +514,7 @@
 			files = (
 				371897952700EB2000351C5A /* ScheduleTests.swift in Sources */,
 				37A3C5E12709120D00BFA8CC /* WorkoutLabelTests.swift in Sources */,
-				37ECEA2F26EAD65300D0AD8E /* ModelTests.swift in Sources */,
+				37ECEA2F26EAD65300D0AD8E /* FixedWeightSetTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

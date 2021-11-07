@@ -1,6 +1,14 @@
 //  Created by Jesse Vorisek on 10/5/21.
 import Foundation
 
+let epsilonWeight = 0.001   // a weight smaller than any real weight
+
+struct ActualWeights {
+    let total: Double       // often sum of weights below but will also include stuff like barbell weight if that's being used
+    let weights: [Double]   // for fixed weight sets this will have one entry, for plates it'll be something like [45. 25]
+    let extra: [Double]     // often empty, otherwise something like [2.5, 1.25]
+}
+
 struct FixedWeights: Equatable, Sequence, Storable {
     init() {
         self.weights = []
@@ -69,7 +77,7 @@ struct FixedWeights: Equatable, Sequence, Storable {
 /// List of arbitrary weights, e.g. for dumbbells or a cable machine.
 struct FixedWeightSet: Equatable, Storable {
     var weights: FixedWeights
-    var extra: FixedWeights
+    var extra: FixedWeights     // TODO: should we support multiples of the same extra weight? maybe by allowing duplicate weights in the list? people could just explicity add the duplicate (eg add a 5.0 extra for two 2.5 extras)
     var extraAdds: Int          // number of extra weights that can be added to the main weight
 
     init() {
@@ -118,6 +126,20 @@ struct FixedWeightSet: Equatable, Storable {
         return self.weights.map({$0})
     }
     
+    // TODO:
+    // for getClosestAbove
+    //    find the last weight <= target               don't think this quite works with large extra weights
+    //    if equal then return it
+    //    if can add extra and get >=target then use that (skip any that wind up larger than next weight)
+    //    use the next weight
+    //
+    // build up a list of weight combos
+    // include a list of extras
+    // return the closest with the smallest number of extras
+    //
+    // could keep a cache (valid of FixedWeight edit counts and extraAdds matches cached)
+    // cache would be ActualWeights sorted by total and them extra.count
+    
     // Equal or below.
     func getClosestBelow(_ target: Double) -> Double {
         for candidate in self.weights.reversed() {
@@ -142,23 +164,11 @@ struct FixedWeightSet: Equatable, Storable {
     
     // Next weight below specified weight
     func getBelow(_ weight: Double) -> Double {
-        for candidate in self.weights.reversed() {
-            if candidate < weight {
-                return candidate
-            }
-        }
-        
-        return 0.0
+        return self.getClosestBelow(weight - epsilonWeight)
     }
 
     // Next weight above specified weight
     func getAbove(_ weight: Double) -> Double? {
-        for candidate in self.weights {
-            if candidate > weight {
-                return candidate
-            }
-        }
-        
-        return self.weights.last
+        return self.getClosestAbove(weight + epsilonWeight)
     }
 }

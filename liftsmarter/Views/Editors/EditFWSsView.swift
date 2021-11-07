@@ -12,6 +12,7 @@ struct EditFWSsView: View {
     @State var selection: ListEntry? = nil
     @State var addingSheet: Bool = false
     @State var editingSheet: Bool = false
+    @State var editingExtraSheet: Bool = false
     @State var confirmAlert: Bool = false
     @State var alertMesg: String = ""
     @State var error = ""
@@ -52,6 +53,9 @@ struct EditFWSsView: View {
             }
             .sheet(isPresented: self.$editingSheet) {
                 EditFWSView(self.program, self.selection!.name)
+            }
+            .sheet(isPresented: self.$editingExtraSheet) {
+                EditExtrasView(self.program, self.selection!.name)
             }
             Text(self.error).foregroundColor(.red).font(.callout)
 
@@ -94,6 +98,7 @@ struct EditFWSsView: View {
         }
         buttons.append(.destructive(Text("Delete"), action: self.onDelete))
         buttons.append(.default(Text("Edit"), action: self.onEdit))
+        buttons.append(.default(Text("Edit Extras"), action: self.onEditExtra))
         buttons.append(.cancel(Text("Cancel"), action: {}))
 
         return buttons
@@ -151,6 +156,10 @@ struct EditFWSsView: View {
 
     private func onEdit() {
         self.editingSheet = true
+    }
+
+    private func onEditExtra() {
+        self.editingExtraSheet = true
     }
 
     private func onValidName(_ name: String) -> String {

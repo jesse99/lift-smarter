@@ -6,6 +6,7 @@ struct AddFixedWeightsView: View {
     let program: ProgramVM
     let name: String
     let fws: Binding<FixedWeightSet>
+    let extra: Bool
     @State var first = ""
     @State var max = ""
     @State var step = ""
@@ -14,10 +15,11 @@ struct AddFixedWeightsView: View {
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
     
-    init(_ program: ProgramVM, _ name: String, _ fws: Binding<FixedWeightSet>) {
+    init(_ program: ProgramVM, _ name: String, _ fws: Binding<FixedWeightSet>, extra: Bool) {
         self.program = program
         self.name = name
         self.fws = fws
+        self.extra = extra
     }
 
     var body: some View {
@@ -74,14 +76,26 @@ struct AddFixedWeightsView: View {
 
     func onOK() {
         if let f = Double(self.first) { // this should always work
-            if let s = Double(self.step), let m = Double(self.max) {
-                var weight = f
-                while weight <= m {
-                    self.fws.wrappedValue.weights.add(weight)
-                    weight += s
+            if extra {
+                if let s = Double(self.step), let m = Double(self.max) {
+                    var weight = f
+                    while weight <= m {
+                        self.fws.wrappedValue.extra.add(weight)
+                        weight += s
+                    }
+                } else {
+                    self.fws.wrappedValue.extra.add(f)
                 }
             } else {
-                self.fws.wrappedValue.weights.add(f)
+                if let s = Double(self.step), let m = Double(self.max) {
+                    var weight = f
+                    while weight <= m {
+                        self.fws.wrappedValue.weights.add(weight)
+                        weight += s
+                    }
+                } else {
+                    self.fws.wrappedValue.weights.add(f)
+                }
             }
         }
         self.presentation.wrappedValue.dismiss()
@@ -94,6 +108,7 @@ struct AddFixedWeightsView_Previews: PreviewProvider {
     static var fws = Binding.constant(program.getFWS("Dumbbells")!)
 
     static var previews: some View {
-        AddFixedWeightsView(program, "Dumbbells", fws)
+        AddFixedWeightsView(program, "Dumbbells", fws, extra: false
+        )
     }
 }

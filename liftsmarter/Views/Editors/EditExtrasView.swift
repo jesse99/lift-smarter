@@ -1,37 +1,19 @@
-//  Created by Jesse Vorisek on 10/9/21.
+//  Created by Jesse Vorisek on 11/7/21.
 import SwiftUI
 
-var listEntryID: Int = 0
-
-struct ListEntry: Identifiable {
-    let name: String
-    let color: Color
-    let id: Int     // can't use this as an index because ids should change when entries change
-    let index: Int
-
-    init(_ name: String, _ color: Color, _ index: Int) {
-        self.name = name
-        self.color = color
-        self.id = listEntryID
-        self.index = index
-        
-        listEntryID += 1
-    }
-}
-
-/// Used to edit a single FixedWeightSet.
-struct EditFWSView: View {
+/// Used to edit the extra weights in a FixedWeightSet.
+struct EditExtrasView: View {
     enum ActiveAlert {case deleteSelected, deleteAll}
 
     let program: ProgramVM
     let originalName: String
-    @State var name: String
+    @State var extraAdds: String
     @State var fws: FixedWeightSet
     @State var showEditActions = false
     @State var showAdd = false
     @State var showEdit = false
     @State var showAlert = false
-    @State var alertAction: EditFWSView.ActiveAlert = .deleteSelected
+    @State var alertAction: EditExtrasView.ActiveAlert = .deleteSelected
     @State var selection: ListEntry? = nil
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
@@ -39,15 +21,17 @@ struct EditFWSView: View {
     init(_ program: ProgramVM, _ name: String) {
         self.program = program
         self.originalName = name
-        self._fws = State(initialValue: program.getFWS(name) ?? FixedWeightSet([]))
-        self._name = State(initialValue: name)
+        
+        let fws = program.getFWS(name) ?? FixedWeightSet([])
+        self._fws = State(initialValue: fws)
+        self._extraAdds = State(initialValue: fws.extraAdds.description)
     }
     
     var body: some View {
         VStack() {
-            Text("Fixed Weights").font(.largeTitle)
+            Text("Extra Fixed Weights").font(.largeTitle)
 
-            wordsField("Name", self.$name, self.onEditedName)
+            intField("Max to use", self.$extraAdds, self.onEditedExtraAdds)
             Divider().background(Color.black)
 
             List(self.getEntries()) {entry in
@@ -60,7 +44,7 @@ struct EditFWSView: View {
                         self.showEditActions = true
                     }
             }
-            .sheet(isPresented: self.$showEdit) {EditTextView(title: "\(self.name) Weight", content: friendlyWeight(self.fws.weights[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
+            .sheet(isPresented: self.$showEdit) {EditTextView(title: "Weight", content: friendlyWeight(self.fws.extra[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
 
@@ -71,7 +55,7 @@ struct EditFWSView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: false)}
+                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: true)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -88,14 +72,14 @@ struct EditFWSView: View {
             } else {
                 return Alert(
                     title: Text("Confirm delete all"),
-                    message: Text("\(self.fws.weights.count) weights"),
+                    message: Text("\(self.fws.extra.count) weights"),
                     primaryButton: .destructive(Text("Delete")) {self.doDeleteAll()},
                     secondaryButton: .default(Text("Cancel")))
             }}
     }
 
     private func getEntries() -> [ListEntry] {
-        return self.fws.weights.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
+        return self.fws.extra.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
     }
     
     private func editButtons() -> [ActionSheet.Button] {
@@ -109,22 +93,22 @@ struct EditFWSView: View {
         return buttons
     }
     
-    private func onEditedName(_ text: String) {
+    private func onEditedExtraAdds(_ text: String) {
         self.error = ""
 
-        if text != self.originalName {
-            if self.program.getFWS(text) != nil {
-                self.error = "Name already exists"
-            }
+        if let count = Int(self.extraAdds) {
+            self.fws.extraAdds = count
+        } else {
+            self.error = "Max to use should be a number"
         }
     }
     
     func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
-        let originalWeight = self.fws.weights[self.selection!.index]
+        let originalWeight = self.fws.extra[self.selection!.index]
         if abs(newWeight - originalWeight) > 0.01 {
-            self.fws.weights.remove(at: self.selection!.index)
-            self.fws.weights.add(newWeight)
+            self.fws.extra.remove(at: self.selection!.index)
+            self.fws.extra.add(newWeight)
         }
     }
 
@@ -142,7 +126,7 @@ struct EditFWSView: View {
     }
 
     func doDelete() {
-        self.fws.weights.remove(at: self.selection!.index)
+        self.fws.extra.remove(at: self.selection!.index)
     }
     
     func doDeleteAll() {
@@ -172,11 +156,8 @@ struct EditFWSView: View {
     }
 
     func onOK() {
-        if self.name != self.originalName {
-            self.program.delFWS(self.originalName)
-            self.program.setFWS(self.name, self.fws)
-        } else if self.fws != program.getFWS(self.name) {
-            self.program.setFWS(self.name, self.fws)
+        if self.fws != program.getFWS(self.originalName) {
+            self.program.setFWS(self.originalName, self.fws)
         }
 
         app.saveState()
@@ -184,11 +165,11 @@ struct EditFWSView: View {
     }
 }
 
-struct EditFWSView_Previews: PreviewProvider {
+struct EditExtrasView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
 
     static var previews: some View {
-        EditFWSView(program, "Dumbbells")
+        EditExtrasView(program, "Dumbbells")
     }
 }
