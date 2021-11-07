@@ -403,16 +403,9 @@ extension ProgramVM {
             return .anyDay
                 
         case .cyclic(let delta):
-            let calendar = Calendar.current
             if let dueDate = workout.nextCyclic() {
                 if now.compare(dueDate) != .orderedDescending {
-                    for n in 0..<30 {
-                        let candidate = calendar.date(byAdding: .day, value: -n, to: dueDate)!
-                        if candidate.daysMatch(now) {
-                            return .days(n)
-                        }
-                    }
-                    return .days(Int(dueDate.daysSinceDate(now)))
+                    return .days(daysBetween(from: now, to: dueDate))
                 } else {
                     let n = daysBetween(from: dueDate, to: now)
                     return .overdue(n)
