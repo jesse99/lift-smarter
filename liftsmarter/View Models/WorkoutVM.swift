@@ -28,7 +28,14 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         get {return self.workout.exercises.map({InstanceVM(self.program, self, $0)})}
     }
     
-    // TODO: do we need this?
+    var schedule: Schedule {
+        get {return self.workout.schedule}
+    }
+    
+    func nextCyclic() -> Date? {
+        return self.workout.nextCyclic
+    }
+
     func lastCompleted(_ instance: InstanceVM) -> Date? {
         return self.workout.completed[instance.name]
     }
@@ -62,6 +69,16 @@ extension WorkoutVM {
     func setSchedule(_ schedule: Schedule) {
         self.willChange()
         self.workout.schedule = schedule
+    }
+
+    func setNextCyclic(_ date: Date) {
+        switch self.workout.schedule {
+        case .cyclic(_):
+            self.willChange()
+            self.workout.nextCyclic = date
+        default:
+            ASSERT(false, "expected cyclic")
+        }
     }
 
     func move(_ instance: InstanceVM, by: Int) {
@@ -305,26 +322,82 @@ extension WorkoutVM {
 
 // Editing
 extension WorkoutVM {
-    func render() -> (Schedule, String, String, Schedule?, String, String) {
+    func render() -> (schedule: Schedule, text: String, label: String, subSchedule: Schedule?, subText: String, subLabel: String, nextCyclic: Date?) {
         switch self.workout.schedule {
         case .anyDay:
-            return (self.workout.schedule, "", "", nil, "", "")
+            return (schedule: self.workout.schedule,
+                    text: "",
+                    label: "",
+                    subSchedule: nil,
+                    subText: "",
+                    subLabel: "",
+                    nextCyclic: nil)
+            
         case .cyclic(let n):
-            return (self.workout.schedule, n.description, "days", nil, "", "")
+            var next = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+            if let date = self.workout.nextCyclic {
+                next = date
+            }
+            return (schedule: self.workout.schedule,
+                    text: n.description,
+                    label: "days",
+                    subSchedule: nil,
+                    subText: "",
+                    subLabel: "",
+                    nextCyclic: next)
+            
         case .days(let days):
-            return (self.workout.schedule, self.renderWeekDays(days), "", nil, "", "")
+            return (schedule: self.workout.schedule,
+                    text: self.renderWeekDays(days),
+                    label: "",
+                    subSchedule: nil,
+                    subText: "",
+                    subLabel: "",
+                    nextCyclic: nil)
+            
         case .weeks(let weeks, let subSchedule):
             let w = weeks.map({$0.description})
             switch subSchedule {
             case .anyDay:
-                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, "", "")
+                return (schedule: self.workout.schedule,
+                        text: w.joined(separator: " "),
+                        label: "",
+                        subSchedule: subSchedule,
+                        subText: "",
+                        subLabel: "",
+                        nextCyclic: nil)
+                
             case .cyclic(let n):
-                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, n.description, "days")
+                var next = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+                if let date = self.workout.nextCyclic {
+                    next = date
+                }
+                return (schedule: self.workout.schedule,
+                        text: w.joined(separator: " "),
+                        label: "",
+                        subSchedule: subSchedule,
+                        subText: n.description,
+                        subLabel: "days",
+                        nextCyclic: next)
+                
             case .days(let days):
-                return (self.workout.schedule, w.joined(separator: " "), "", subSchedule, self.renderWeekDays(days), "")
+                return (schedule: self.workout.schedule,
+                        text: w.joined(separator: " "),
+                        label: "",
+                        subSchedule: subSchedule,
+                        subText: self.renderWeekDays(days),
+                        subLabel: "",
+                        nextCyclic: nil)
+                
             case .weeks(_, let subSchedule):
                 ASSERT(false, "sub-schedule can't be weeks")
-                return (self.workout.schedule, "", "", subSchedule, "", "")
+                return (schedule: self.workout.schedule,
+                        text: "",
+                        label: "",
+                        subSchedule,
+                        subText: "",
+                        subLabel: "",
+                        nextCyclic: nil)
             }
         }
     }

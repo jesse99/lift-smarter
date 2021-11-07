@@ -404,17 +404,15 @@ extension ProgramVM {
                 
         case .cyclic(let delta):
             let calendar = Calendar.current
-            if let completed = self.newestCompleted(workout, instances) {
-                let dueDate = calendar.date(byAdding: .day, value: delta, to: completed)!
+            if let dueDate = workout.nextCyclic() {
                 if now.compare(dueDate) != .orderedDescending {
-                    for n in 0..<delta {
+                    for n in 0..<30 {
                         let candidate = calendar.date(byAdding: .day, value: -n, to: dueDate)!
                         if candidate.daysMatch(now) {
                             return .days(n)
                         }
                     }
-                    ASSERT(false, "should never happen")
-                    return .error
+                    return .days(Int(dueDate.daysSinceDate(now)))
                 } else {
                     let n = daysBetween(from: dueDate, to: now)
                     return .overdue(n)

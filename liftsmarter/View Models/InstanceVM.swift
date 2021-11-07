@@ -298,6 +298,15 @@ extension InstanceVM {
             
             let workout = workout.workout(self.instance)
             workout.completed[self.name] = now
+
+            switch self.workout.schedule {
+            case .cyclic(let n):
+                let calendar = Calendar.current
+                let date = calendar.date(byAdding: .day, value: n, to: now)!
+                self.workout.setNextCyclic(date)
+            default:
+                break
+            }
         }
     }
     

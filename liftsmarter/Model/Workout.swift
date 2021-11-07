@@ -25,6 +25,7 @@ class Workout: Storable {
     var enabled: Bool                   // true if the user wants to perform this workout
     var exercises: [Exercise]           // names must be unique
     var schedule: Schedule
+    var nextCyclic: Date? = nil         // used if schedule is cyclic
     var completed: [String: Date] = [:] // exercise.name => date last completed
 
     init(_ name: String, _ exercises: [Exercise], schedule: Schedule) {
@@ -47,6 +48,12 @@ class Workout: Storable {
         for (i, name) in names.enumerated() {
             self.completed[name] = store.getDate("completed-\(i)")
         }
+        
+        if store.hasKey("nextCyclic") {
+            self.nextCyclic = store.getDate("nextCyclic")
+        } else {
+            self.nextCyclic = nil
+        }
     }
 
     func save(_ store: Store) {
@@ -59,6 +66,10 @@ class Workout: Storable {
         store.addStrArray("completed-names", names)
         for (i, name) in names.enumerated() {
             store.addDate("completed-\(i)", self.completed[name]!)
+        }
+        
+        if let d = self.nextCyclic {
+            store.addDate("nextCyclic", d)
         }
     }
 }

@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct EditWorkoutView: View {
-    let workout: WorkoutVM
+    @ObservedObject var workout: WorkoutVM
     @State var name: String
     @State var oldExercises: [InstanceVM]
     @State var selection: InstanceVM? = nil
@@ -20,19 +20,30 @@ struct EditWorkoutView: View {
     @State var subScheduleText: String
     @State var subScheduleLabel: String
 
+    @State var nextCyclic: Date
+    @State var hasDatePicker: Bool
+
     init(_ workout: WorkoutVM) {
         self.workout = workout
         self._name = State(initialValue: workout.name)
         self._oldExercises = State(initialValue: workout.instances)
 
         let tuple = workout.render()
-        self._schedule = State(initialValue: tuple.0)
-        self._scheduleText = State(initialValue: tuple.1)
-        self._scheduleLabel = State(initialValue: tuple.2)
+        self._schedule = State(initialValue: tuple.schedule)
+        self._scheduleText = State(initialValue: tuple.text)
+        self._scheduleLabel = State(initialValue: tuple.label)
 
-        self._subSchedule = State(initialValue: tuple.3)
-        self._subScheduleText = State(initialValue: tuple.4)
-        self._subScheduleLabel = State(initialValue: tuple.5)
+        self._subSchedule = State(initialValue: tuple.subSchedule)
+        self._subScheduleText = State(initialValue: tuple.subText)
+        self._subScheduleLabel = State(initialValue: tuple.subLabel)
+
+        if let date = tuple.nextCyclic {
+            self._nextCyclic = State(initialValue: date)
+            self._hasDatePicker = State(initialValue: true)
+        } else {
+            self._nextCyclic = State(initialValue: Date.distantFuture)
+            self._hasDatePicker = State(initialValue: false)
+        }
     }
     
     var body: some View {
@@ -71,6 +82,14 @@ struct EditWorkoutView: View {
                         if !self.subScheduleLabel.isEmpty {
                             Text(self.subScheduleLabel).font(.headline)
                         }
+                    }.padding(.leading).padding(.trailing)
+                }
+                
+                if self.hasDatePicker {
+                    // Not scheduled will be mapped to yesterday (makes the picker a lot nicer to use).
+                    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+                    DatePicker(selection: $nextCyclic, in: yesterday..., displayedComponents: .date) {
+                        Text("Next on").font(.headline)
                     }.padding(.leading).padding(.trailing)
                 }
 
@@ -130,6 +149,12 @@ struct EditWorkoutView: View {
         switch self.workout.parse(self.name, self.schedule, self.scheduleText, self.subSchedule, self.subScheduleText) {
         case .right(let schedule):
             self.workout.setSchedule(schedule)
+            
+            if self.hasDatePicker {
+                if self.nextCyclic != self.workout.nextCyclic() {
+                    self.workout.setNextCyclic(self.nextCyclic)
+                }
+            }
         case .left(_):
             ASSERT(false, "validate should have prevented this from executing")
         }
