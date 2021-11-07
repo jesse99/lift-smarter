@@ -536,13 +536,21 @@ extension InstanceVM {
         switch self.instance.info {
         case .durations(_):
             if self.finished {
-                return "Done"
+                if self.currentIsUnexpected() || self.canAdvanceWeight() {
+                    return "Done…"
+                } else {
+                    return "Done"
+                }
             } else {
                 return "Start"
             }
         default:
             if self.finished {
-                return "Done"
+                if self.currentIsUnexpected() || self.canAdvanceWeight() {
+                    return "Done…"
+                } else {
+                    return "Done"
+                }
             } else {
                 return "Next"
             }
