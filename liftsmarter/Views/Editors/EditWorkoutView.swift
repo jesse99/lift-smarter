@@ -54,7 +54,7 @@ struct EditWorkoutView: View {
                 wordsField("Name", self.$name, self.onEdited)
 
                 HStack {
-                    self.workout.scheduleButton(self.$schedule, self.$scheduleText, self.$scheduleLabel, self.$subSchedule, self.$subScheduleText, self.$subScheduleLabel)
+                    self.workout.scheduleButton(self.$schedule, self.$scheduleText, self.$scheduleLabel, self.$subSchedule, self.$subScheduleText, self.$subScheduleLabel, self.$nextCyclic, self.$hasDatePicker)
                     if self.workout.hasScheduleText(self.schedule) {
                         TextField("", text: self.$scheduleText)
                             .textFieldStyle(RoundedBorderTextFieldStyle())

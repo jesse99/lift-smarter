@@ -185,7 +185,7 @@ extension WorkoutVM {
     }
 
     func scheduleButton(_ schedule: Binding<Schedule>, _ text: Binding<String>, _ label: Binding<String>,
-                        _ subSchedule: Binding<Schedule?>, _ subText: Binding<String>, _ subLabel: Binding<String>) -> AnyView {
+                        _ subSchedule: Binding<Schedule?>, _ subText: Binding<String>, _ subLabel: Binding<String>, _ nextCyclic: Binding<Date>, _ hasDatePicker: Binding<Bool>) -> AnyView {
         var menuText = ""
         switch schedule.wrappedValue {
         case .anyDay: menuText = "Any Day"
@@ -203,6 +203,9 @@ extension WorkoutVM {
                 subSchedule.wrappedValue = nil
                 subText.wrappedValue = ""
                 subLabel.wrappedValue = ""
+                
+                nextCyclic.wrappedValue = Date.distantFuture
+                hasDatePicker.wrappedValue = false
             })
             Button("Every N Days", action: {
                 schedule.wrappedValue = .cyclic(2)
@@ -212,6 +215,10 @@ extension WorkoutVM {
                 subSchedule.wrappedValue = nil
                 subText.wrappedValue = ""
                 subLabel.wrappedValue = ""
+                
+                let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+                nextCyclic.wrappedValue = self.workout.nextCyclic ?? yesterday
+                hasDatePicker.wrappedValue = true
             })
             Button("Week Days", action: {
                 schedule.wrappedValue = .days([.monday, .wednesday, .friday])
@@ -221,6 +228,9 @@ extension WorkoutVM {
                 subSchedule.wrappedValue = nil
                 subText.wrappedValue = ""
                 subLabel.wrappedValue = ""
+                
+                nextCyclic.wrappedValue = Date.distantFuture
+                hasDatePicker.wrappedValue = false
             })
             Button("Weeks", action: {
                 subSchedule.wrappedValue = .days([.monday, .wednesday, .friday])
@@ -230,7 +240,9 @@ extension WorkoutVM {
                 schedule.wrappedValue = .weeks([1, 3], subSchedule.wrappedValue!)
                 text.wrappedValue = "1 3"
                 label.wrappedValue = ""
-                
+                                
+                nextCyclic.wrappedValue = Date.distantFuture
+                hasDatePicker.wrappedValue = false
             })
             Button("Cancel", action: {})
         }.font(.callout)
