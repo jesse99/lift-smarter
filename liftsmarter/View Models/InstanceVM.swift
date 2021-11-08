@@ -458,38 +458,50 @@ extension InstanceVM {
 
         let closest = exercise.getClosestBelow(weight*percent)
         if case .right(let weight) = closest {
-            let suffix = percent.value >= 0.01 && weight >= 0.1 ? " @ " + friendlyUnitsWeight(weight) : ""
+            let suffix = percent.value >= 0.01 && weight.total >= 0.1 ? " @ " + friendlyUnitsWeight(weight.total) : ""
             text += suffix
         }
 
         return text
     }
 
-    // TODO: this would be stuff like plates
     func subSubTitle() -> String {
+        var weight = 0.0
+        var percent = WeightPercent(1.0)
         switch self.instance.info {
-        case .durations(_):
-//        switch exercise.getClosest(self.display, exercise.expected.weight) {
-//        case .right(let weight):
-//            return weight >= 0.1 ? friendlyUnitsWeight(weight) : ""
-//        case .left(let err):
-//            return err
-//        }
-            return ""       // TODO: implement this
+        case .durations(let info):
+            weight = info.expectedWeight
 
-        case .fixedReps(_):
-            return ""
+        case .fixedReps(let info):
+            weight = info.expectedWeight
 
-        case .maxReps(_):
-            return ""
+        case .maxReps(let info):
+            if info.current.setIndex < info.expectedReps.count {
+                weight = info.expectedWeight
+            } else if info.currentReps.count != info.restSecs.count {
+                weight = info.expectedWeight
+            }
 
-        case .repRanges(_):
-            return ""       // note that this one, at least, will depend upon setIndex
-
-        case .repTotal(_):
-            return ""
+        case .repRanges(let info):
+            if info.current.setIndex < info.sets.count {
+                let set = info.currentSet()
+                weight = info.expectedWeight
+                percent = set.percent
+            }
+            
+        case .repTotal(let info):
+            weight = info.expectedWeight
         }
 
+        let closest = exercise.getClosestBelow(weight*percent)
+        if case .right(let weight) = closest {
+            if weight.weights.count > 1 || weight.extra.count > 0 {
+                var parts = weight.weights.map({friendlyWeight($0)})
+                parts.append(contentsOf: weight.extra.map({friendlyWeight($0) + " extra"}))
+                return parts.joined(separator: " + ")
+            }
+        }
+        return ""
     }
 
     func notesLabel() -> String {

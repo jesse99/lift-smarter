@@ -22,7 +22,7 @@ struct EditExtrasView: View {
         self.program = program
         self.originalName = name
         
-        let fws = program.getFWS(name) ?? FixedWeightSet([])
+        let fws = program.getFWS(name)?.clone() ?? FixedWeightSet([])
         self._fws = State(initialValue: fws)
         self._extraAdds = State(initialValue: fws.extraAdds.description)
     }

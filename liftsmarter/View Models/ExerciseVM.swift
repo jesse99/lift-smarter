@@ -43,7 +43,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.apparatus}
     }
 
-    func getClosestBelow(_ target: Double) -> Either<String, Double> {
+    func getClosestBelow(_ target: Double) -> Either<String, ActualWeights> {
         switch self.exercise.apparatus {
         case .fixedWeights(name: let name):
             if let name = name {
@@ -57,7 +57,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
                 return .left("No fixed weights activated")
             }
         default:
-            return .right(target)
+            return .right(ActualWeights(total: target, weights: [target], extra: []))
         }
     }
 
@@ -126,8 +126,8 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             return nil
             
         case .fixedWeights(name: let name):
-            if let name = name, let fws = self.program.getFixedWeights()[name] {
-                return fws.getAbove(self.expectedWeight)
+            if let name = name, let fws = self.program.getFixedWeights()[name], let weight = fws.getAbove(self.expectedWeight) {
+                return weight.total
             }
             return nil
         }
@@ -286,18 +286,18 @@ extension ExerciseVM {
             if let desired = Double(text) {
                 let actual = fws.getClosestBelow(desired)    // for worksets we use closest below
                 return fws.getAll().map({
-                    if abs($0 - actual) < 0.01 {
-                        if abs(desired - actual) > badWeight {
-                            return (friendlyWeight($0), .red)
+                    if abs($0.total - actual.total) < 0.01 {
+                        if abs(desired - actual.total) > badWeight {
+                            return (friendlyWeight($0.total), .red)
                         } else {
-                            return (friendlyWeight($0), .blue)
+                            return (friendlyWeight($0.total), .blue)
                         }
                     } else {
-                        return (friendlyWeight($0), .black)
+                        return (friendlyWeight($0.total), .black)
                     }
                 })
             } else {
-                return fws.getAll().map({return (friendlyWeight($0), .black)})
+                return fws.getAll().map({return (friendlyWeight($0.total), .black)})
             }
         }
         
@@ -307,13 +307,13 @@ extension ExerciseVM {
                 let entries = fws.getAll()
                 for i in 0..<entries.count {
                     let candidate = entries[i]
-                    if abs(candidate - actual) < 0.01 {
-                        if abs(desired - actual) < badWeight {
+                    if abs(candidate.total - actual.total) < 0.01 {
+                        if abs(desired - actual.total) < badWeight {
                             return i
                         }
                     }
                 }
-                if let biggest = entries.last, desired > biggest {
+                if let biggest = entries.last?.total, desired > biggest {
                     return entries.count - 1
                 }
             }
@@ -323,7 +323,7 @@ extension ExerciseVM {
         func buttonColor(_ fws: FixedWeightSet) -> Color {
             if let weight = Double(text.wrappedValue) {
                 let actual = fws.getClosestBelow(weight)
-                if weight > 0.0 && abs(actual - weight) > badWeight {
+                if weight > 0.0 && abs(actual.total - weight) > badWeight {
                     return .red
                 } else {
                     return .black

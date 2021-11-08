@@ -30,18 +30,25 @@ struct FixedWeights: Equatable, Sequence, Storable {
         if let index = self.weights.firstIndex(where: {$0 >= weight}) {
             if self.weights[index] != weight {            // ValidateFixedWeightRange allows overlapping ranges so we need to test for dupes
                 self.weights.insert(weight, at: index)
+                self.edited += 1
             }
         } else {
             self.weights.append(weight)
+            self.edited += 1
         }
     }
     
     mutating func remove(at: Int) {
         self.weights.remove(at: at)
+        self.edited += 1
     }
     
     var count: Int {
         get {return self.weights.count}
+    }
+    
+    var editedCount: Int {
+        get {return self.edited}
     }
     
     // Weights are guaranteed to be sorted.
@@ -67,15 +74,22 @@ struct FixedWeights: Equatable, Sequence, Storable {
         return self.weights.makeIterator()
     }
 
+    func subsets(sizeLE: Int, allowEmpty: Bool) -> [[Double]] {
+        var result: [[Double]] = []
+        self.weights.subsets(sizeLE: sizeLE, allowEmpty: allowEmpty, {result.append($0)})
+        return result
+    }
+
     static func ==(lhs: FixedWeights, rhs: FixedWeights) -> Bool {
         return lhs.weights == rhs.weights
     }
     
     private var weights: [Double]
+    private var edited = 0
 }
 
 /// List of arbitrary weights, e.g. for dumbbells or a cable machine.
-struct FixedWeightSet: Equatable, Storable {
+class FixedWeightSet: Equatable, Storable {
     var weights: FixedWeights
     var extra: FixedWeights     // TODO: should we support multiples of the same extra weight? maybe by allowing duplicate weights in the list? people could just explicity add the duplicate (eg add a 5.0 extra for two 2.5 extras)
     var extraAdds: Int          // number of extra weights that can be added to the main weight
@@ -92,7 +106,7 @@ struct FixedWeightSet: Equatable, Storable {
         self.extraAdds = extraAdds
     }
     
-    init(from store: Store) {
+    required init(from store: Store) {
         self.weights = store.getObj("weights")
         self.extra = store.getObj("extra")
         self.extraAdds = store.getInt("extraAdds")
@@ -104,15 +118,22 @@ struct FixedWeightSet: Equatable, Storable {
         store.addInt("extraAdds", extraAdds)
     }
 
+    func clone() -> FixedWeightSet {
+        let store = Store()
+        store.addObj("self", self)
+        let result: FixedWeightSet = store.getObj("self")
+        return result
+    }
+
     static func ==(lhs: FixedWeightSet, rhs: FixedWeightSet) -> Bool {
         return lhs.weights == rhs.weights && lhs.extra == rhs.extra && lhs.extraAdds == rhs.extraAdds
     }
     
-    func getClosest(_ target: Double) -> Double {
+    func getClosest(_ target: Double) -> ActualWeights {
         let below = self.getClosestBelow(target)
         let above = self.getClosestAbove(target)
         if above != nil {
-            if abs(below - target) <= abs(above! - target) {
+            if abs(below.total - target) <= abs(above!.total - target) {
                 return below
             } else {
                 return above!
@@ -122,53 +143,78 @@ struct FixedWeightSet: Equatable, Storable {
         }
     }
     
-    func getAll() -> [Double] {
-        return self.weights.map({$0})
+    func getAll() -> [ActualWeights] {
+        if self.cachedWeights != self.weights.editedCount || self.cachedExtra != self.extra.editedCount || self.cachedCount != self.extraAdds {
+            self.cache = []
+            
+            let subsets = self.extra.subsets(sizeLE: self.extraAdds, allowEmpty: true)
+            for weight in self.weights {
+                for subset in subsets {
+                    let total = weight + subset.reduce(0.0, {$0 + $1})
+                    if let index = cache.firstIndex(where: {abs($0.total - total) < epsilonWeight}) {
+                        if cache[index].extra.count > subset.count {
+                            // We've found a simpler configuration for this weight.
+                            cache.remove(at: index)
+                            cache.insert(ActualWeights(total: total, weights: [weight], extra: subset.sorted(by: {$0 > $1})), at: index)
+                        }
+                    } else {
+                        // We've found a brand new weight.
+                        cache.append(ActualWeights(total: total, weights: [weight], extra: subset.sorted(by: {$0 > $1})))
+                    }
+                }
+            }
+            
+            // Cache is sorted from smallest to largest but the extra field is largest to smallest (looks nicer when displaying it to the user).
+            self.cache.sort(by: {$0.total < $1.total})
+
+            self.cachedWeights = self.weights.editedCount
+            self.cachedExtra = self.extra.editedCount
+            self.cachedCount = self.extraAdds
+        }
+        
+        return self.cache
     }
     
-    // TODO:
-    // for getClosestAbove
-    //    find the last weight <= target               don't think this quite works with large extra weights
-    //    if equal then return it
-    //    if can add extra and get >=target then use that (skip any that wind up larger than next weight)
-    //    use the next weight
-    //
-    // build up a list of weight combos
-    // include a list of extras
-    // return the closest with the smallest number of extras
-    //
-    // could keep a cache (valid of FixedWeight edit counts and extraAdds matches cached)
-    // cache would be ActualWeights sorted by total and them extra.count
-    
     // Equal or below.
-    func getClosestBelow(_ target: Double) -> Double {
-        for candidate in self.weights.reversed() {
-            if candidate <= target {
+    func getClosestBelow(_ target: Double) -> ActualWeights {
+        let all = self.getAll()
+        for candidate in all.reversed() {
+            if candidate.total <= target {
                 return candidate
             }
         }
         
-        return 0.0
+        return ActualWeights(total: 0.0, weights: [0.0], extra: [])
     }
     
     // Equal or above.
-    func getClosestAbove(_ target: Double) -> Double? {
-        for candidate in self.weights {
-            if candidate >= target {
+    func getClosestAbove(_ target: Double) -> ActualWeights? {
+        let all = self.getAll()
+        for candidate in all {
+            if candidate.total >= target {
                 return candidate
             }
         }
         
-        return self.weights.last
+        if let last = all.last {
+            return last
+        } else {
+            return nil
+        }
     }
     
     // Next weight below specified weight
-    func getBelow(_ weight: Double) -> Double {
+    func getBelow(_ weight: Double) -> ActualWeights {
         return self.getClosestBelow(weight - epsilonWeight)
     }
 
     // Next weight above specified weight
-    func getAbove(_ weight: Double) -> Double? {
+    func getAbove(_ weight: Double) -> ActualWeights? {
         return self.getClosestAbove(weight + epsilonWeight)
     }
+    
+    private var cachedWeights = -1
+    private var cachedExtra = -1
+    private var cachedCount = -1
+    private var cache: [ActualWeights] = []
 }

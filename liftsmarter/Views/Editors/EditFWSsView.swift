@@ -18,14 +18,15 @@ struct EditFWSsView: View {
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
-    // TODO:
-    // use an originalFWSs field
-    // cancel should use the originalFWSs
-    // might want to get a getFWSEntries method to program vm
     init(_ program: ProgramVM, _ apparatus: Binding<Apparatus>) {
         self.program = program
         self.apparatus = apparatus
-        self.originalWeights = program.getFixedWeights()
+        
+        var weights: [String: FixedWeightSet] = [:]
+        for (name, fws) in program.getFixedWeights() {
+            weights[name] = fws.clone()
+        }
+        self.originalWeights = weights
 
         if case .fixedWeights(let name) = apparatus.wrappedValue {
             self.originalName = name

@@ -16,6 +16,36 @@ extension Array {
         
         return result
     }
+    
+    func subsets(sizeLE: Int, allowEmpty: Bool, _ callback: ([Element]) -> Void) {
+        func bitsSet(_ n: Int) -> Int { // TODO: there are more efficient algorithms for this
+            var count = 0
+            var num = n
+            while num > 0 {
+                count = count + (num & 1)
+                num = num >> 1
+            }
+            return count
+        }
+        
+        var result: [Element] = []
+        let count = 1 << self.count
+        for mask in 0..<count {
+            let size = bitsSet(mask)
+            if (size == 0 && allowEmpty) || (size > 0 && size <= sizeLE) {
+                result.removeAll()
+
+                for i in 0..<self.count {
+                    let bit = 1 << i
+                    if (mask & bit) != 0 {
+                        result.append(self[i]);
+                    }
+                }
+
+                callback(result)
+            }
+        }
+    }
 }
 
 func zip3<A, B, C>(_ a1: Array<A>, _ a2: Array<B>, _ a3: Array<C>) -> Array<(A, B, C)> {

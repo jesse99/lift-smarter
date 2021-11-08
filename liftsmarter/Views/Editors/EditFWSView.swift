@@ -39,7 +39,7 @@ struct EditFWSView: View {
     init(_ program: ProgramVM, _ name: String) {
         self.program = program
         self.originalName = name
-        self._fws = State(initialValue: program.getFWS(name) ?? FixedWeightSet([]))
+        self._fws = State(initialValue: program.getFWS(name)?.clone() ?? FixedWeightSet([]))
         self._name = State(initialValue: name)
     }
     

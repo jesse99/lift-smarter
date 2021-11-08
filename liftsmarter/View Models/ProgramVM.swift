@@ -205,7 +205,7 @@ extension ProgramVM {
         if self.model.fixedWeights[name] == nil {
             self.model.fixedWeights[name] = FixedWeightSet([])
         }
-        var fws = self.model.fixedWeights[name]!
+        let fws = self.model.fixedWeights[name]!
         
         var weight = first
         while weight <= last {
