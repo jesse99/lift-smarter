@@ -31,8 +31,6 @@ class Program: Storable {
         self.weeksStart = weeksStart
 //        self.notes = []
 //        self.addNote("Created")
-        
-        self.validate()
     }
     
     required init(from store: Store) {
@@ -41,9 +39,7 @@ class Program: Storable {
         self.exercises = store.getObjArray("exercises")
         self.restWeeks = store.getIntArray("restWeeks")
         self.weeksStart = store.getDate("weeksStart")
-        self.exerciseClipboard = store.getObjArray("exerciseClipboard")
-        
-        self.validate()
+        self.exerciseClipboard = store.getObjArray("exerciseClipboard")        
     }
 
     func save(_ store: Store) {

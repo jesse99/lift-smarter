@@ -21,7 +21,8 @@ class Model: Storable {
         self.program = program
         self.history = History()
         self.logs = Logs()
-    }    
+        self.validate()
+    }
 
     required init(from store: Store) {
         self.program = store.getObj("program")
@@ -39,6 +40,7 @@ class Model: Storable {
         }
 
         self.logs = store.getObj("logs")
+        self.validate()
     }
 
     func save(_ store: Store) {
@@ -60,5 +62,16 @@ class Model: Storable {
 
         store.addObj("logs", logs)
         dirty = false
+    }
+    
+    func validate() {
+        self.program.validate()
+
+        var instances = Set<ObjectIdentifier>()
+        for (_, fws) in self.fixedWeights {
+            let id = ObjectIdentifier(fws)
+            ASSERT(!instances.contains(id), "fws's must be unique")
+            instances.update(with: id)
+        }
     }
 }

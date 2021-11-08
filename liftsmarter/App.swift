@@ -32,7 +32,7 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
     }
     
     func saveState() {
-        self.model.program.validate()       // TODO: temp
+        self.model.validate()       // TODO: temp
         storeObject(model, to: "model")
     }
     

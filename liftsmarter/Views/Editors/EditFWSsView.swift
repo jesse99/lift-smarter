@@ -98,6 +98,7 @@ struct EditFWSsView: View {
             buttons.append(.default(Text("Activate"), action: self.onActivate))
         }
         buttons.append(.destructive(Text("Delete"), action: self.onDelete))
+        buttons.append(.default(Text("Duplicate"), action: self.onDuplicate))
         buttons.append(.default(Text("Edit"), action: self.onEdit))
         buttons.append(.default(Text("Edit Extras"), action: self.onEditExtra))
         buttons.append(.cancel(Text("Cancel"), action: {}))
@@ -148,6 +149,20 @@ struct EditFWSsView: View {
             self.alertMesg = "\(name) is used by \(uses[0]) and \(uses[1])"
         } else if uses.count > 2 {
             self.alertMesg = "\(name) is used by \(uses[0]), \(uses[1]), ..."
+        }
+    }
+    
+    private func onDuplicate() {
+        let name = self.selection!.name
+        if let fws = self.program.getFixedWeights()[name] {
+            var newName = name
+            for i in 2... {
+                newName = name + " \(i)"
+                if self.program.getFWS(newName) == nil {
+                    break
+                }
+            }
+            self.program.setFWS(newName, fws.clone())
         }
     }
 

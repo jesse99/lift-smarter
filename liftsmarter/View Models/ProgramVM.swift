@@ -12,7 +12,7 @@ class ProgramVM: ObservableObject {
     }
     
     func validate() {
-        self.model.program.validate()
+        self.model.validate()
     }
 
     var name: String {
