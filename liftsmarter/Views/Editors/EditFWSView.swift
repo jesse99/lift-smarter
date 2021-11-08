@@ -72,7 +72,7 @@ struct EditFWSView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, self.$edited, extra: false)}
+                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: false, onEdit: self.onAddedWeight)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -120,7 +120,7 @@ struct EditFWSView: View {
         }
     }
     
-    func onEditedWeight(_ text: String) {
+    private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
         let originalWeight = self.fws.weights[self.selection!.index]
         if abs(newWeight - originalWeight) > epsilonWeight {
@@ -131,7 +131,7 @@ struct EditFWSView: View {
     }
 
     // This is used by EditTextView, not this view.
-    func onValidWeight(_ text: String) -> String {
+    private func onValidWeight(_ text: String) -> String {
         if let newWeight = Double(text) {
             if newWeight < 0.0 {
                 return "Weight cannot be negative (found \(text))"
@@ -143,37 +143,41 @@ struct EditFWSView: View {
         }
     }
 
-    func doDelete() {
+    private func onAddedWeight() {
+        self.edited += 1
+    }
+
+    private func doDelete() {
         self.fws.weights.remove(at: self.selection!.index)
     }
     
-    func doDeleteAll() {
+    private func doDeleteAll() {
         self.fws = FixedWeightSet([])
     }
     
-    func onDelete() {
+    private func onDelete() {
         self.showAlert = true
         self.alertAction = .deleteSelected
     }
     
-    func onDeleteAll() {
+    private func onDeleteAll() {
         self.showAlert = true
         self.alertAction = .deleteAll
     }
     
-    func onEdit() {
+    private func onEdit() {
         self.showEdit = true
     }
 
-    func onAdd() {
+    private func onAdd() {
         self.showAdd = true
     }
 
-    func onCancel() {
+    private func onCancel() {
         self.presentation.wrappedValue.dismiss()
     }
 
-    func onOK() {
+    private func onOK() {
         if self.name != self.originalName {
             self.program.delFWS(self.originalName)
             self.program.setFWS(self.name, self.fws)

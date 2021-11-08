@@ -56,10 +56,11 @@ struct EditExtrasView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, self.$edited, extra: true)}
+                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: true, onEdit: self.onAddedWeight)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
+            .onAppear(perform: self.onValidate)
         }
         .actionSheet(isPresented: $showEditActions) {
             ActionSheet(title: Text(self.selection!.name), buttons: editButtons())}
@@ -95,16 +96,23 @@ struct EditExtrasView: View {
     }
     
     private func onEditedExtraAdds(_ text: String) {
-        self.error = ""
-
+        self.onValidate()
+    }
+    
+    private func onValidate() {
         if let count = Int(self.extraAdds) {
-            self.fws.extraAdds = count
+            if count <= self.fws.extra.count {
+                self.fws.extraAdds = count
+                self.error = ""
+            } else {
+                self.error = "Max to use can't be larger than the number of weights"
+            }
         } else {
             self.error = "Max to use should be a number"
         }
     }
     
-    func onEditedWeight(_ text: String) {
+    private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
         let originalWeight = self.fws.extra[self.selection!.index]
         if abs(newWeight - originalWeight) > 0.01 {
@@ -115,7 +123,7 @@ struct EditExtrasView: View {
     }
 
     // This is used by EditTextView, not this view.
-    func onValidWeight(_ text: String) -> String {
+    private func onValidWeight(_ text: String) -> String {
         if let newWeight = Double(text) {
             if newWeight < 0.0 {
                 return "Weight cannot be negative (found \(text))"
@@ -126,38 +134,45 @@ struct EditExtrasView: View {
             return "Expected a floating point number for weight (found '\(text)')"
         }
     }
+    
+    private func onAddedWeight() {
+        self.edited += 1
+        self.onValidate()
+    }
 
-    func doDelete() {
+    private func doDelete() {
         self.fws.extra.remove(at: self.selection!.index)
+        self.onValidate()
     }
     
-    func doDeleteAll() {
+    private func doDeleteAll() {
         self.fws = FixedWeightSet([])
+        self.onValidate()
     }
     
-    func onDelete() {
+    private func onDelete() {
         self.showAlert = true
         self.alertAction = .deleteSelected
     }
     
-    func onDeleteAll() {
+    private func onDeleteAll() {
         self.showAlert = true
         self.alertAction = .deleteAll
     }
     
-    func onEdit() {
+    private func onEdit() {
         self.showEdit = true
     }
 
-    func onAdd() {
+    private func onAdd() {
         self.showAdd = true
     }
 
-    func onCancel() {
+    private func onCancel() {
         self.presentation.wrappedValue.dismiss()
     }
 
-    func onOK() {
+    private func onOK() {
         if self.fws != program.getFWS(self.originalName) {
             self.program.setFWS(self.originalName, self.fws)
         }
