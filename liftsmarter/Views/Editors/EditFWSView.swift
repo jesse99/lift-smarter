@@ -33,6 +33,7 @@ struct EditFWSView: View {
     @State var showAlert = false
     @State var alertAction: EditFWSView.ActiveAlert = .deleteSelected
     @State var selection: ListEntry? = nil
+    @State var edited = 0   // hack because FixedWeightSet is a class now so @State doesn't work with it
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
@@ -62,7 +63,7 @@ struct EditFWSView: View {
             }
             .sheet(isPresented: self.$showEdit) {EditTextView(title: "\(self.name) Weight", content: friendlyWeight(self.fws.weights[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
             Spacer()
-            Text(self.error).foregroundColor(.red).font(.callout)
+            Text(self.error).foregroundColor(.red).font(.callout).id(self.edited)
 
             Divider()
             HStack {
@@ -71,7 +72,7 @@ struct EditFWSView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: false)}
+                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, self.$edited, extra: false)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -122,9 +123,10 @@ struct EditFWSView: View {
     func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
         let originalWeight = self.fws.weights[self.selection!.index]
-        if abs(newWeight - originalWeight) > 0.01 {
+        if abs(newWeight - originalWeight) > epsilonWeight {
             self.fws.weights.remove(at: self.selection!.index)
             self.fws.weights.add(newWeight)
+            self.edited += 1
         }
     }
 

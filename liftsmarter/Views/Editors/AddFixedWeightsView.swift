@@ -6,6 +6,7 @@ struct AddFixedWeightsView: View {
     let program: ProgramVM
     let name: String
     let fws: Binding<FixedWeightSet>
+    let edited: Binding<Int>
     let extra: Bool
     @State var first = ""
     @State var max = ""
@@ -15,10 +16,11 @@ struct AddFixedWeightsView: View {
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
     
-    init(_ program: ProgramVM, _ name: String, _ fws: Binding<FixedWeightSet>, extra: Bool) {
+    init(_ program: ProgramVM, _ name: String, _ fws: Binding<FixedWeightSet>, _ edited: Binding<Int>, extra: Bool) {
         self.program = program
         self.name = name
         self.fws = fws
+        self.edited = edited
         self.extra = extra
     }
 
@@ -97,6 +99,7 @@ struct AddFixedWeightsView: View {
                     self.fws.wrappedValue.weights.add(f)
                 }
             }
+            self.edited.wrappedValue += 1
         }
         self.presentation.wrappedValue.dismiss()
     }
@@ -106,9 +109,10 @@ struct AddFixedWeightsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(model)
     static var fws = Binding.constant(program.getFWS("Dumbbells")!)
+    static var edited = Binding.constant(1)
 
     static var previews: some View {
-        AddFixedWeightsView(program, "Dumbbells", fws, extra: false
+        AddFixedWeightsView(program, "Dumbbells", fws, edited, extra: false
         )
     }
 }
