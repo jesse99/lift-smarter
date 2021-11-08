@@ -115,7 +115,7 @@ struct EditExtrasView: View {
     private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
         let originalWeight = self.fws.extra[self.selection!.index]
-        if abs(newWeight - originalWeight) > 0.01 {
+        if differentWeight(newWeight, originalWeight) {
             self.fws.extra.remove(at: self.selection!.index)
             self.fws.extra.add(newWeight)
             self.edited += 1

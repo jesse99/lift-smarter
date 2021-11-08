@@ -458,7 +458,7 @@ extension InstanceVM {
 
         let closest = exercise.getClosestBelow(weight*percent)
         if case .right(let weight) = closest {
-            let suffix = percent.value >= 0.01 && weight.total >= 0.1 ? " @ " + friendlyUnitsWeight(weight.total) : ""
+            let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
             text += suffix
         }
 
@@ -525,7 +525,7 @@ extension InstanceVM {
             }
             
             for record in records.reversed() {
-                if abs(record.weight - weight) < 0.1 && record.reps == reps {
+                if sameWeight(record.weight, weight) && record.reps == reps {
                     count += 1
                 } else {
                     break

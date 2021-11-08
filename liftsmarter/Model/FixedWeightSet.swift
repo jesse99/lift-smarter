@@ -3,6 +3,14 @@ import Foundation
 
 let epsilonWeight = 0.001   // a weight smaller than any real weight
 
+func sameWeight(_ lhs: Double, _ rhs: Double) -> Bool {
+    return abs(lhs - rhs) < epsilonWeight
+}
+
+func differentWeight(_ lhs: Double, _ rhs: Double) -> Bool {
+    return abs(lhs - rhs) > epsilonWeight
+}
+
 struct ActualWeights {
     let total: Double       // often sum of weights below but will also include stuff like barbell weight if that's being used
     let weights: [Double]   // for fixed weight sets this will have one entry, for plates it'll be something like [45. 25]
@@ -151,7 +159,7 @@ class FixedWeightSet: Equatable, Storable {
             for weight in self.weights {
                 for subset in subsets {
                     let total = weight + subset.reduce(0.0, {$0 + $1})
-                    if let index = cache.firstIndex(where: {abs($0.total - total) < epsilonWeight}) {
+                    if let index = cache.firstIndex(where: {sameWeight($0.total, total)}) {
                         if cache[index].extra.count > subset.count {
                             // We've found a simpler configuration for this weight.
                             cache.remove(at: index)

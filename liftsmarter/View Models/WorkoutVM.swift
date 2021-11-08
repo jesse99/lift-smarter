@@ -602,7 +602,7 @@ func dedupe(_ sets: [String]) -> [String] {
 // TODO: move this into Weights.swift?
 func weightSuffix(_ percent: WeightPercent, _ maxWeight: Double) -> String {
     let weight = maxWeight * percent
-    return percent.value >= 0.01 && weight >= 0.1 ? " @ " + friendlyUnitsWeight(weight) : ""
+    return percent.value >= 0.01 && weight > epsilonWeight ? " @ " + friendlyUnitsWeight(weight) : ""
 }
 
 func friendlyFloat(_ str: String) -> String {

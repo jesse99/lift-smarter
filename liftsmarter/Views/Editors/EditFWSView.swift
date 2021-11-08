@@ -123,7 +123,7 @@ struct EditFWSView: View {
     private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
         let originalWeight = self.fws.weights[self.selection!.index]
-        if abs(newWeight - originalWeight) > epsilonWeight {
+        if differentWeight(newWeight, originalWeight) {
             self.fws.weights.remove(at: self.selection!.index)
             self.fws.weights.add(newWeight)
             self.edited += 1

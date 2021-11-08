@@ -97,7 +97,7 @@ final class DurationsInfo: Equatable, Storable {
     }
 
     static func == (lhs: DurationsInfo, rhs: DurationsInfo) -> Bool {
-        return lhs.sets == rhs.sets && lhs.targetSecs == rhs.targetSecs && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01
+        return lhs.sets == rhs.sets && lhs.targetSecs == rhs.targetSecs && sameWeight(lhs.expectedWeight, rhs.expectedWeight)
     }
 }
 
@@ -146,7 +146,7 @@ final class FixedRepsInfo: Equatable, Storable {
     }
 
     static func == (lhs: FixedRepsInfo, rhs: FixedRepsInfo) -> Bool {
-        return lhs.sets == rhs.sets && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01
+        return lhs.sets == rhs.sets && sameWeight(lhs.expectedWeight, rhs.expectedWeight)
     }
 }
 
@@ -209,7 +209,7 @@ final class MaxRepsInfo: Equatable, Storable {
     }
 
     static func == (lhs: MaxRepsInfo, rhs: MaxRepsInfo) -> Bool {
-        return lhs.restSecs == rhs.restSecs && lhs.targetReps == rhs.targetReps && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01
+        return lhs.restSecs == rhs.restSecs && lhs.targetReps == rhs.targetReps && sameWeight(lhs.expectedWeight, rhs.expectedWeight)
     }
 }
 
@@ -292,7 +292,7 @@ final class RepRangesInfo: Equatable, Storable {
     }
 
     static func == (lhs: RepRangesInfo, rhs: RepRangesInfo) -> Bool {
-        return lhs.sets == rhs.sets && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01 && lhs.expectedReps == rhs.expectedReps
+        return lhs.sets == rhs.sets && sameWeight(lhs.expectedWeight, rhs.expectedWeight) && lhs.expectedReps == rhs.expectedReps
     }
 }
 
@@ -349,7 +349,7 @@ final class RepTotalInfo: Equatable, Storable {
     }
 
     static func == (lhs: RepTotalInfo, rhs: RepTotalInfo) -> Bool {
-        return lhs.total == rhs.total && lhs.rest == rhs.rest && abs(lhs.expectedWeight - rhs.expectedWeight) < 0.01 && lhs.expectedReps == rhs.expectedReps
+        return lhs.total == rhs.total && lhs.rest == rhs.rest && sameWeight(lhs.expectedWeight, rhs.expectedWeight) && lhs.expectedReps == rhs.expectedReps
     }
 }
 

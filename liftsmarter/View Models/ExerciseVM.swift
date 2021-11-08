@@ -286,7 +286,7 @@ extension ExerciseVM {
             if let desired = Double(text) {
                 let actual = fws.getClosestBelow(desired)    // for worksets we use closest below
                 return fws.getAll().map({
-                    if abs($0.total - actual.total) < 0.01 {
+                    if sameWeight($0.total, actual.total) {
                         if abs(desired - actual.total) > badWeight {
                             return (friendlyWeight($0.total), .red)
                         } else {
@@ -307,7 +307,7 @@ extension ExerciseVM {
                 let entries = fws.getAll()
                 for i in 0..<entries.count {
                     let candidate = entries[i]
-                    if abs(candidate.total - actual.total) < 0.01 {
+                    if sameWeight(candidate.total, actual.total) {
                         if abs(desired - actual.total) < badWeight {
                             return i
                         }
