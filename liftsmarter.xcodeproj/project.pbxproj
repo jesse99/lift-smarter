@@ -57,6 +57,7 @@
 		37D53899271E5A57006B3833 /* RepTotalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53898271E5A57006B3833 /* RepTotalView.swift */; };
 		37DBB452272F68D200A29438 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37DBB451272F68D200A29438 /* Notifications.swift */; };
 		37E5C8002738491700C60157 /* EditExtrasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E5C7FF2738491700C60157 /* EditExtrasView.swift */; };
+		37E5C802273A0B1000C60157 /* Plates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E5C801273A0B1000C60157 /* Plates.swift */; };
 		37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1D26EAD65200D0AD8E /* App.swift */; };
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
@@ -75,6 +76,7 @@
 		37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6626ED4A0F00D0AD8E /* Logs.swift */; };
 		37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */; };
 		37ECEA6C26ED5B1F00D0AD8E /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6B26ED5B1F00D0AD8E /* LogView.swift */; };
+		37FC754C273A546F00874917 /* PlatesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754B273A546F00874917 /* PlatesTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +140,7 @@
 		37D53898271E5A57006B3833 /* RepTotalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepTotalView.swift; sourceTree = "<group>"; };
 		37DBB451272F68D200A29438 /* Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		37E5C7FF2738491700C60157 /* EditExtrasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExtrasView.swift; sourceTree = "<group>"; };
+		37E5C801273A0B1000C60157 /* Plates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plates.swift; sourceTree = "<group>"; };
 		37ECEA1A26EAD65200D0AD8E /* liftsmarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = liftsmarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		37ECEA1D26EAD65200D0AD8E /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		37ECEA1F26EAD65200D0AD8E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -158,6 +161,7 @@
 		37ECEA6626ED4A0F00D0AD8E /* Logs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logs.swift; sourceTree = "<group>"; };
 		37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsVM.swift; sourceTree = "<group>"; };
 		37ECEA6B26ED5B1F00D0AD8E /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		37FC754B273A546F00874917 /* PlatesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatesTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +275,7 @@
 			isa = PBXGroup;
 			children = (
 				37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */,
+				37FC754B273A546F00874917 /* PlatesTest.swift */,
 				371897942700EB2000351C5A /* ScheduleTests.swift */,
 				37A3C5E02709120D00BFA8CC /* WorkoutLabelTests.swift */,
 			);
@@ -288,6 +293,7 @@
 				37ECEA6626ED4A0F00D0AD8E /* Logs.swift */,
 				37ECEA6426ED2FE700D0AD8E /* Mocks.swift */,
 				37ECEA4A26EAD85B00D0AD8E /* Model.swift */,
+				37E5C801273A0B1000C60157 /* Plates.swift */,
 				37ECEA4826EAD74A00D0AD8E /* Program.swift */,
 				37ECEA5626EB0BAE00D0AD8E /* Sets.swift */,
 				37ECEA4C26EAD93900D0AD8E /* Workout.swift */,
@@ -458,6 +464,7 @@
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
 				3742BFC12726210D006D43E0 /* EditMaxRepsView.swift in Sources */,
 				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
+				37E5C802273A0B1000C60157 /* Plates.swift in Sources */,
 				3742BFC7272A40B2006D43E0 /* EditRepsSetView.swift in Sources */,
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
@@ -512,6 +519,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37FC754C273A546F00874917 /* PlatesTest.swift in Sources */,
 				371897952700EB2000351C5A /* ScheduleTests.swift in Sources */,
 				37A3C5E12709120D00BFA8CC /* WorkoutLabelTests.swift in Sources */,
 				37ECEA2F26EAD65300D0AD8E /* FixedWeightSetTests.swift in Sources */,

@@ -11,9 +11,15 @@ enum Apparatus: Equatable {
     /// kettlebell, chains, milk jug, or whatever (this comes from Expected).
     case bodyWeight
 
+    /// Barbell, leg press, etc.
+    case dualPlates(barWeight: Double, _ plates: Plates)
+
     /// This is used for dumbbels, kettlebells, cable machines, etc. Name references a FixedWeights object.
     /// If name is nil then the user hasn't activated a FixedWeight set yet.
     case fixedWeights(name: String?)
+
+    /// T-bar row, landmine, etc.
+    case singlePlates(_ plates: Plates)
 }
 
 extension Apparatus: Storable {
@@ -23,9 +29,15 @@ extension Apparatus: Storable {
         case "bodyWeight":
             self = .bodyWeight
             
+        case "dualPlates":
+            self = .dualPlates(barWeight: store.getDbl("barWeight"), store.getObj("plates"))
+            
         case "fixedWeights":
             let name = store.hasKey("name") ? store.getStr("name") : nil
             self = .fixedWeights(name: name)
+            
+        case "singlePlates":
+            self = .singlePlates(store.getObj("plates"))
             
         default:
             ASSERT(false, "loading apparatus had unknown type: \(tname)"); abort()
@@ -36,12 +48,21 @@ extension Apparatus: Storable {
         switch self {
         case .bodyWeight:
             store.addStr("type", "bodyWeight")
-            
+
+        case .dualPlates(barWeight: let bar, let plates):
+            store.addStr("type", "dualPlates")
+            store.addDbl("barWeight", bar)
+            store.addObj("plates", plates)
+
         case .fixedWeights(name: let name):
             store.addStr("type", "fixedWeights")
             if let name = name {
                 store.addStr("name", name)
             }
+
+        case .singlePlates(let plates):
+            store.addStr("type", "singlePlates")
+            store.addObj("plates", plates)
         }
     }
 }
@@ -53,6 +74,10 @@ extension Apparatus {
             return 0
         case .fixedWeights(name: _):
             return 1
+        case .dualPlates(barWeight: _, _):
+            return 2
+        case .singlePlates(_):
+            return 3
         }
     }
 }

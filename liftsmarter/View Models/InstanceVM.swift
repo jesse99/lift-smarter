@@ -456,16 +456,40 @@ extension InstanceVM {
             }
         }
 
-        let closest = exercise.getClosestBelow(weight*percent)
-        if case .right(let weight) = closest {
-            let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
-            text += suffix
+        if weight > 0.0 {
+            let closest = exercise.getClosestBelow(weight*percent)
+            if case .right(let weight) = closest {
+                let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
+                text += suffix
+            }
         }
 
         return text
     }
 
     func subSubTitle() -> String {
+        func combine(_ parts: [String]) -> [String] {
+            var result: [String] = []
+            
+            var i = 0
+            var count = 1
+            while i < parts.count {
+                if i + 1 < parts.count && parts[i] == parts[i + 1] {
+                    count += 1
+                } else {
+                    if count > 1 {
+                        result.append("\(parts[i])x\(count)")
+                    } else {
+                        result.append(parts[i])
+                    }
+                    count = 1
+                }
+                i += 1
+            }
+            
+            return result
+        }
+        
         var weight = 0.0
         var percent = WeightPercent(1.0)
         switch self.instance.info {
@@ -493,12 +517,17 @@ extension InstanceVM {
             weight = info.expectedWeight
         }
 
-        let closest = exercise.getClosestBelow(weight*percent)
-        if case .right(let weight) = closest {
-            if weight.weights.count > 1 || weight.extra.count > 0 {
-                var parts = weight.weights.map({friendlyWeight($0)})
-                parts.append(contentsOf: weight.extra.map({friendlyWeight($0) + " extra"}))
-                return parts.joined(separator: " + ")
+        if weight > 0.0 {
+            let closest = exercise.getClosestBelow(weight*percent)
+            if case .right(let weight) = closest {
+                let parts: [String] = weight.weights.map({
+                    if $0.label.isEmpty {
+                        return friendlyWeight($0.weight)
+                    } else {
+                        return friendlyWeight($0.weight) + " " + $0.label
+                    }
+                })
+                return combine(parts).joined(separator: " + ")
             }
         }
         return ""

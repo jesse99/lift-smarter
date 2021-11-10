@@ -11,10 +11,14 @@ func differentWeight(_ lhs: Double, _ rhs: Double) -> Bool {
     return abs(lhs - rhs) > epsilonWeight
 }
 
+struct ActualWeight {
+    let weight: Double   // 45 for a plate, 35 for a dumbbell, 2.5 for a magnet, 1.2.5 for an extra weight
+    let label: String    // "", "bumper", or "magnet" for a plate and "" or "extra" for a fixed weight (extra because it could be a cable machine)
+}
+
 struct ActualWeights {
-    let total: Double       // often sum of weights below but will also include stuff like barbell weight if that's being used
-    let weights: [Double]   // for fixed weight sets this will have one entry, for plates it'll be something like [45. 25]
-    let extra: [Double]     // often empty, otherwise something like [2.5, 1.25]
+    let total: Double            // often sum of weights below but will also include stuff like barbell weight if that's being used
+    let weights: [ActualWeight]
 }
 
 struct FixedWeights: Equatable, Sequence, Storable {
@@ -160,14 +164,19 @@ class FixedWeightSet: Equatable, Storable {
                 for subset in subsets {
                     let total = weight + subset.reduce(0.0, {$0 + $1})
                     if let index = cache.firstIndex(where: {sameWeight($0.total, total)}) {
-                        if cache[index].extra.count > subset.count {
+                        if cache[index].weights.count > subset.count + 1 {
                             // We've found a simpler configuration for this weight.
                             cache.remove(at: index)
-                            cache.insert(ActualWeights(total: total, weights: [weight], extra: subset.sorted(by: {$0 > $1})), at: index)
+                            
+                            let fixed = [ActualWeight(weight: weight, label: "")]
+                            let extra = subset.sorted(by: {$0 > $1}).map({ActualWeight(weight: $0, label: "extra")})
+                            cache.insert(ActualWeights(total: total, weights: fixed + extra), at: index)
                         }
                     } else {
                         // We've found a brand new weight.
-                        cache.append(ActualWeights(total: total, weights: [weight], extra: subset.sorted(by: {$0 > $1})))
+                        let fixed = [ActualWeight(weight: weight, label: "")]
+                        let extra = subset.sorted(by: {$0 > $1}).map({ActualWeight(weight: $0, label: "extra")})
+                        cache.append(ActualWeights(total: total, weights: fixed + extra))
                     }
                 }
             }
@@ -192,7 +201,7 @@ class FixedWeightSet: Equatable, Storable {
             }
         }
         
-        return ActualWeights(total: 0.0, weights: [0.0], extra: [])
+        return ActualWeights(total: 0.0, weights: [ActualWeight(weight: 0.0, label: "")])
     }
     
     // Equal or above.

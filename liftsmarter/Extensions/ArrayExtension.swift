@@ -16,7 +16,16 @@ extension Array {
         
         return result
     }
-    
+        
+    func isSorted(_ legit: (Element, Element) -> Bool) -> Bool {
+        for i in 0..<self.count - 1 {
+            if !legit(self[i], self[i + 1]) {
+                return false
+            }
+        }
+        return true
+    }
+
     func subsets(sizeLE: Int, allowEmpty: Bool, _ callback: ([Element]) -> Void) {
         func bitsSet(_ n: Int) -> Int { // TODO: there are more efficient algorithms for this
             var count = 0

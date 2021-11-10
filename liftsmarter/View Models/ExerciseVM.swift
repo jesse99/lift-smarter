@@ -45,6 +45,9 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
 
     func getClosestBelow(_ target: Double) -> Either<String, ActualWeights> {
         switch self.exercise.apparatus {
+        case .dualPlates(barWeight: let bar, let plates):
+            let actuals = plates.getClosestBelow(target - bar, dual: true)
+            return .right(ActualWeights(total: actuals.total + bar, weights: actuals.weights))
         case .fixedWeights(name: let name):
             if let name = name {
                 let model = self.program.model(self.exercise)
@@ -56,8 +59,10 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             } else {
                 return .left("No fixed weights activated")
             }
+        case .singlePlates(let plates):
+            return .right(plates.getClosestBelow(target, dual: false))
         default:
-            return .right(ActualWeights(total: target, weights: [target], extra: []))
+            return .right(ActualWeights(total: target, weights: [ActualWeight(weight: target, label: "")]))
         }
     }
 
@@ -125,11 +130,21 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         case .bodyWeight:
             return nil
             
+        case .dualPlates(barWeight: let bar, let plates):
+            if let weight = plates.getAbove(self.expectedWeight - bar, dual: true) {
+                return weight.total + bar
+            }
+            return nil
+
         case .fixedWeights(name: let name):
             if let name = name, let fws = self.program.getFixedWeights()[name], let weight = fws.getAbove(self.expectedWeight) {
                 return weight.total
             }
             return nil
+            
+        case .singlePlates(let plates):
+            let weight = plates.getAbove(self.expectedWeight, dual: false)
+            return weight?.total
         }
     }
 
@@ -301,6 +316,26 @@ extension ExerciseVM {
             }
         }
         
+        func populate(_ bar: Double, _ text: String, _ plates: Plates, dual: Bool) -> [(String, Color)] {
+            if var desired = Double(text) {
+                desired -= bar
+                let actual = plates.getClosestBelow(desired, dual: dual)    // for worksets we use closest below
+                return plates.getAll(dual: dual).map({
+                    if sameWeight($0.total, actual.total) {
+                        if abs(desired - actual.total) > badWeight {
+                            return (friendlyWeight($0.total + bar), .red)
+                        } else {
+                            return (friendlyWeight($0.total + bar), .blue)
+                        }
+                    } else {
+                        return (friendlyWeight($0.total + bar), .black)
+                    }
+                })
+            } else {
+                return plates.getAll(dual: dual).map({return (friendlyWeight($0.total + bar), .black)})
+            }
+        }
+        
         func select(_ text: String, _ fws: FixedWeightSet) -> Int? {
             if let desired = Double(text) {
                 let actual = fws.getClosestBelow(desired)
@@ -320,9 +355,43 @@ extension ExerciseVM {
             return nil
         }
         
+        func select(_ bar: Double, _ text: String, _ plates: Plates, dual: Bool) -> Int? {
+            if var desired = Double(text) {
+                desired -= bar
+                let actual = plates.getClosestBelow(desired, dual: dual)
+                let entries = plates.getAll(dual: dual)
+                for i in 0..<entries.count {
+                    let candidate = entries[i]
+                    if sameWeight(candidate.total, actual.total) {
+                        if abs(desired - actual.total) < badWeight {
+                            return i
+                        }
+                    }
+                }
+                if let biggest = entries.last?.total, desired > biggest {
+                    return entries.count - 1
+                }
+            }
+            return nil
+        }
+        
         func buttonColor(_ fws: FixedWeightSet) -> Color {
             if let weight = Double(text.wrappedValue) {
                 let actual = fws.getClosestBelow(weight)
+                if weight > 0.0 && abs(actual.total - weight) > badWeight {
+                    return .red
+                } else {
+                    return .black
+                }
+            } else {
+                return .red
+            }
+        }
+        
+        func buttonColor(_ bar: Double, _ plates: Plates, dual: Bool) -> Color {
+            if var weight = Double(text.wrappedValue) {
+                weight -= bar
+                let actual = plates.getClosestBelow(weight, dual: dual)
                 if weight > 0.0 && abs(actual.total - weight) > badWeight {
                     return .red
                 } else {
@@ -356,7 +425,22 @@ extension ExerciseVM {
         switch self.exercise.apparatus {
         case .bodyWeight:
             return weightField()
-            
+
+        case .dualPlates(barWeight: let bar, let plates):
+            return AnyView(
+                HStack {
+                    Text("Weight:").font(.headline)
+                    Button(text.wrappedValue, action: {modal.wrappedValue = true})
+                        .font(.body)
+                        .foregroundColor(buttonColor(bar, plates, dual: true))
+                        .sheet(isPresented: modal) {
+                            PickerView(title: "Weight", prompt: "Value:", initial: text.wrappedValue, populate: {populate(bar, $0, plates, dual: true)}, confirm: confirm, selected: {text in select(bar, text, plates, dual: true)}, type: .decimalPad)
+                        }
+                    Spacer()
+                    Button("?", action: onHelp).font(.callout).padding(.trailing)
+                }.padding(.leading)
+            )
+
         case .fixedWeights(let theName):
             if let name = theName, let fws = self.program.getFWS(name) {
                 return AnyView(
@@ -375,6 +459,21 @@ extension ExerciseVM {
             } else {
                 return weightField()
             }
+
+        case .singlePlates(let plates):
+            return AnyView(
+                HStack {
+                    Text("Weight:").font(.headline)
+                    Button(text.wrappedValue, action: {modal.wrappedValue = true})
+                        .font(.body)
+                        .foregroundColor(buttonColor(0.0, plates, dual: false))
+                        .sheet(isPresented: modal) {
+                            PickerView(title: "Weight", prompt: "Value:", initial: text.wrappedValue, populate: {populate(0.0, $0, plates, dual: false)}, confirm: confirm, selected: {text in select(0.0, text, plates, dual: false)}, type: .decimalPad)
+                        }
+                    Spacer()
+                    Button("?", action: onHelp).font(.callout).padding(.trailing)
+                }.padding(.leading)
+            )
         }
     }
 
@@ -502,6 +601,13 @@ extension ExerciseVM {
             }
         }
         
+        let plates = Plates([
+            Plate(weight: 45, count: 4, type: .standard),
+            Plate(weight: 35, count: 4, type: .standard),
+            Plate(weight: 25, count: 4, type: .standard),
+            Plate(weight: 10, count: 4, type: .standard),
+            Plate(weight: 5, count: 4, type: .standard)
+        ])
         switch apparatus.wrappedValue {
         case .bodyWeight:
             return AnyView(
@@ -512,12 +618,34 @@ extension ExerciseVM {
                 
                     Menu("Body Weight") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Single Plates", action: {change(.singlePlates(plates))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()
                     
                     Button("?", action: {onHelp("Includes an optional arbitrary weight.")}).font(.callout)
+                }.padding()
+            )
+
+        case .dualPlates(barWeight: _, _):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout).disabled(true)
+                    Spacer()
+                
+                    Menu("Dual Plates") {
+                        Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    
+                    Button("?", action: {onHelp("Barbells, leg press, etc.")}).font(.callout)
                 }.padding()
             )
 
@@ -531,12 +659,34 @@ extension ExerciseVM {
                 
                     Menu("Fixed Weights") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Single Plates", action: {change(.singlePlates(plates))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()
                     
                     Button("?", action: {onHelp("Dumbbells, kettlebells, cable machines, etc.")}).font(.callout)
+                }.padding()
+            )
+
+        case .singlePlates(_):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout).disabled(true)
+                    Spacer()
+                
+                    Menu("Single Plates") {
+                        Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    
+                    Button("?", action: {onHelp("T-Bar rows, landmines, etc.")}).font(.callout)
                 }.padding()
             )
         }

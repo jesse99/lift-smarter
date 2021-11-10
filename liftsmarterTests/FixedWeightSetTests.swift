@@ -38,39 +38,39 @@ class FixedWeightSetTests: XCTestCase {
         
         let actuals = fws.getAll()
         let weights = actuals.map({$0.total})
-        let counts = actuals.map({$0.extra.count})
+        let counts = actuals.map({$0.weights.count})
         
         XCTAssertEqual(weights[0], 10.0)
-        XCTAssertEqual(counts[0], 0)
+        XCTAssertEqual(counts[0], 1)
 
         XCTAssertEqual(weights[1], 12.0)    // 1 extra
         XCTAssertEqual(weights[2], 13.0)
         XCTAssertEqual(weights[3], 14.0)
         XCTAssertEqual(weights[4], 15.0)
-        XCTAssertEqual(counts[1], 1)
-        XCTAssertEqual(counts[2], 1)
-        XCTAssertEqual(counts[3], 1)
-        XCTAssertEqual(counts[4], 1)
+        XCTAssertEqual(counts[1], 2)
+        XCTAssertEqual(counts[2], 2)
+        XCTAssertEqual(counts[3], 2)
+        XCTAssertEqual(counts[4], 2)
 
         XCTAssertEqual(weights[5], 16.0)    // 2 extra
         XCTAssertEqual(weights[6], 17.0)
         XCTAssertEqual(weights[7], 18.0)
         XCTAssertEqual(weights[8], 19.0)
-        XCTAssertEqual(counts[5], 2)
-        XCTAssertEqual(counts[6], 2)
-        XCTAssertEqual(counts[7], 2)
-        XCTAssertEqual(counts[8], 2)
+        XCTAssertEqual(counts[5], 3)
+        XCTAssertEqual(counts[6], 3)
+        XCTAssertEqual(counts[7], 3)
+        XCTAssertEqual(counts[8], 3)
 
         XCTAssertEqual(weights[9], 20.0)
-        XCTAssertEqual(counts[9], 0)
+        XCTAssertEqual(counts[9], 1)
 
         XCTAssertEqual(weights[10], 21.0)    // 3 extra
         XCTAssertEqual(weights[11], 22.0)
         // ...
         XCTAssertEqual(weights.last, 32.0)
-        XCTAssertEqual(counts[10], 3)
-        XCTAssertEqual(counts[11], 1)
-        XCTAssertEqual(counts.last, 3)
+        XCTAssertEqual(counts[10], 4)
+        XCTAssertEqual(counts[11], 2)
+        XCTAssertEqual(counts.last, 4)
     }
 
     func testBasics() throws {
