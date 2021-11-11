@@ -38,12 +38,13 @@ class PlatesTests: XCTestCase {
         let actuals = plates.getAll(dual: true)
         let weights = actuals.map({$0.total})
 
-        XCTAssertEqual(weights[0], 10.0)
-        XCTAssertEqual(weights[1], 12.5)
-        XCTAssertEqual(weights[2], 15.0)
-        XCTAssertEqual(weights[3], 20.0)
-        XCTAssertEqual(weights[4], 22.5)
-        XCTAssertEqual(weights[5], 25.0)
+        XCTAssertEqual(weights[0], 0.0)
+        XCTAssertEqual(weights[1], 10.0)
+        XCTAssertEqual(weights[2], 12.5)
+        XCTAssertEqual(weights[3], 15.0)
+        XCTAssertEqual(weights[4], 20.0)
+        XCTAssertEqual(weights[5], 22.5)
+        XCTAssertEqual(weights[6], 25.0)
         XCTAssertEqual(weights.last!, 2.0*(45 + 45 + 35 + 35 + 25 + 25 + 10 + 10 + 5 + 5 + 1.25 + 1.25))
     }
     

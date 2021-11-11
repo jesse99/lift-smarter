@@ -519,7 +519,7 @@ extension InstanceVM {
 
         if weight > 0.0 {
             let closest = exercise.getClosestBelow(weight*percent)
-            if case .right(let weight) = closest {
+            if case .right(let weight) = closest, (weight.weights.first?.weight ?? 0.0) > 0.0 {
                 let parts: [String] = weight.weights.map({
                     if $0.label.isEmpty {
                         return friendlyWeight($0.weight)

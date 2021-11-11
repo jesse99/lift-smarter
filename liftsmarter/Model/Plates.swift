@@ -107,9 +107,14 @@ class Plates: Equatable, Storable {
                     temp.append(contentsOf: Array(repeating: candidate, count: candidate.count))
                 }
             }
-            
-            let scaling = dual ? 2.0 : 1.0
+
             var cache: [ActualWeights] = []
+            if dual {
+                // Just the bar.
+                cache.append(ActualWeights(total: 0.0, weights: [ActualWeight(weight: 0.0, label: "")]))
+            }
+
+            let scaling = dual ? 2.0 : 1.0
             temp.subsets(sizeLE: temp.count, allowEmpty: false, {subset in
                 if subset.contains(where: {$0.type == .standard || $0.type == .bumper}) {
                     let total = scaling * subset.reduce(0.0, {$0 + $1.weight})
