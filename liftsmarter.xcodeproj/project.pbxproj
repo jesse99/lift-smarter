@@ -79,6 +79,7 @@
 		37FC754C273A546F00874917 /* PlatesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754B273A546F00874917 /* PlatesTest.swift */; };
 		37FC754E273CBA5700874917 /* EditPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754D273CBA5700874917 /* EditPlateView.swift */; };
 		37FC7550273CBF0C00874917 /* EditPlatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754F273CBF0C00874917 /* EditPlatesView.swift */; };
+		37FC7552273E204700874917 /* RecentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC7551273E204700874917 /* RecentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +167,7 @@
 		37FC754B273A546F00874917 /* PlatesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatesTest.swift; sourceTree = "<group>"; };
 		37FC754D273CBA5700874917 /* EditPlateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlateView.swift; sourceTree = "<group>"; };
 		37FC754F273CBF0C00874917 /* EditPlatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlatesView.swift; sourceTree = "<group>"; };
+		37FC7551273E204700874917 /* RecentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -347,6 +349,7 @@
 				37D53894271CDEBF006B3833 /* NoteView.swift */,
 				37A3C5EC2711469800BFA8CC /* PickerView.swift */,
 				377791B726ED98AA00EC5028 /* ProgramView.swift */,
+				37FC7551273E204700874917 /* RecentView.swift */,
 				373AB0D0271F2AE700F9898B /* RepsPickerView.swift */,
 				37A6DC8826F1956800AC85DE /* TimerView.swift */,
 				377791BE26EE9AE700EC5028 /* WorkoutView.swift */,
@@ -457,6 +460,7 @@
 				3718978F26F81B1A00351C5A /* EditWorkoutView.swift in Sources */,
 				37A3C5F22712115000BFA8CC /* Components.swift in Sources */,
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
+				37FC7552273E204700874917 /* RecentView.swift in Sources */,
 				379BAFB9272E325700642B11 /* Store.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,
 				3742BFC3272654F0006D43E0 /* RepRangesView.swift in Sources */,

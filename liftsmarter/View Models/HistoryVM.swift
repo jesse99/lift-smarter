@@ -71,7 +71,7 @@ extension HistoryVM {
         var reps: [String] = []
         var percents: [Double] = []
         
-        for rep in record.reps {
+        for rep in record.sets {
             switch rep {
             case .duration(secs: let duration, percent: let percent):
                 reps.append("\(duration)s")

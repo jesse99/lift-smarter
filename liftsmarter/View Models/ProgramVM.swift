@@ -389,6 +389,38 @@ extension ProgramVM {
         return buttons
     }
     
+    func recentlyCompleted(_ exerciseName: String) -> [ListEntry] {
+        func setToStr(_ set: ActualSet) -> String {
+            switch set {
+            case .reps(count: let count, percent: _):
+                return count.description
+            case .duration(secs: let secs, percent: _):
+                return friendlySecs(secs)
+            }
+        }
+        
+        if let records = self.model.history.records[exerciseName] {
+            let n = records.count > 10 ? records.count - 10 : 0
+            return records.reversed().dropFirst(n).mapi({
+                let sets = dedupe($1.sets.map(setToStr))
+                var prefix = sets.joined(separator: ", ")
+                if $1.weight > 0.0 {
+                    prefix += " @ " + friendlyUnitsWeight($1.weight)
+                }
+
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MMM d"
+                let middle = " on " + formatter.string(from: $1.completed)
+                
+                let suffix = $1.note.isEmpty ? "" : " \($1.note)"
+
+                return ListEntry(prefix + middle + suffix, .black, $0)
+            })
+        } else {
+            return []
+        }
+    }
+
     enum ScheduleDelta: Equatable {
         case anyDay
         case days(Int)

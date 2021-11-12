@@ -9,6 +9,7 @@ struct FixedRepsView: View {
     @State var noteModal = false
     @State var implicitTimerModal = false
     @State var explicitTimerModal = false
+    @State var recentModal = false
     @Environment(\.presentationMode) var presentation
 
     init(_ program: ProgramVM, _ instance: InstanceVM) {
@@ -37,7 +38,9 @@ struct FixedRepsView: View {
                         .font(.system(size: 20.0))
                         .sheet(isPresented: self.$explicitTimerModal) {instance.explicitTimer()}
                     Spacer()
-                    Text(instance.notesLabel()).font(.callout)   // Same x3
+                    Button(instance.notesLabel(), action: {self.recentModal = true})
+                        .font(.callout)
+                        .sheet(isPresented: self.$recentModal) {RecentView(self.program, self.instance.name)}
                 }
             }
 

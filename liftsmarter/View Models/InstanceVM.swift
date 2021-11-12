@@ -538,23 +538,23 @@ extension InstanceVM {
         var count = 0
         if let records = program.model(instance).history.records[self.name] {
             let weight = self.exercise.expectedWeight
-            var reps: [ActualRep]
+            var sets: [ActualSet]
             
             switch self.exercise.info {
             case .durations(let info):
-                reps = info.sets.map({.duration(secs: $0.secs, percent: 1.0)})
+                sets = info.sets.map({.duration(secs: $0.secs, percent: 1.0)})
             case .fixedReps(let info):
-                reps = info.sets.map({.reps(count: $0.reps.reps, percent: 1.0)})
+                sets = info.sets.map({.reps(count: $0.reps.reps, percent: 1.0)})
             case .maxReps(_):
                 return "Completed=\(records.count)"
             case .repRanges(let info):
-                reps = info.sets.map({.reps(count: $0.reps.min, percent: $0.percent.value)})
+                sets = info.sets.map({.reps(count: $0.reps.min, percent: $0.percent.value)})
             case .repTotal(_):
                 return "Completed=\(records.count)"
             }
             
             for record in records.reversed() {
-                if sameWeight(record.weight, weight) && record.reps == reps {
+                if sameWeight(record.weight, weight) && record.sets == sets {
                     count += 1
                 } else {
                     break

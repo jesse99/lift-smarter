@@ -652,3 +652,21 @@ func friendlyUnitsWeight(_ weight: Double, plural: Bool = true) -> String {
         return friendlyWeight(weight) + " lb"
     }
 }
+
+func friendlySecs(_ interval: Int) -> String {
+    let secs = interval
+    let mins = Double(interval)/60.0
+    let hours = Double(interval)/3600.0
+    let days = round(hours/24.0)
+    
+    if secs < 120 {
+        return "\(secs)s"
+    } else if mins < 60.0 {
+        return String(format: "%0.1fm", arguments: [mins])
+    } else if hours < 24.0 {
+        return String(format: "%0.1fh", arguments: [hours])
+    } else {
+        return String(format: "%0.1fd", arguments: [days])
+    }
+}
+

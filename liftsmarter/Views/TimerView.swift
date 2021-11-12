@@ -96,7 +96,6 @@ struct TimerView_Previews: PreviewProvider {
     }
 }
 
-// TODO: this should go somewhere else, maybe make it a friendly function
 fileprivate func secsToShortDurationName(_ interval: Double) -> String {
     let secs = Int(round(interval))
     let mins = interval/60.0

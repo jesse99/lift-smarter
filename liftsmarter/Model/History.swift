@@ -1,7 +1,7 @@
 //  Created by Jesse Vorisek on 9/18/21.
 import Foundation
 
-enum ActualRep: Equatable {    // note that this represents a single rep
+enum ActualSet: Equatable {    // note that this represents a single set
     case reps(count: Int, percent: Double)
     case duration(secs: Int, percent: Double)
 }
@@ -11,7 +11,7 @@ class History: Storable {
     class Record: Storable {
         var completed: Date     // date exercise was finished
         var weight: Double      // may be 0.0, this is from current.weight
-        var reps: [ActualRep]
+        var sets: [ActualSet]
         var workout: String     // not used atm, but may be used later to show users more detailed views
         var formalName: String  // not used atm, but may be used later to show users more detailed views
         var note: String = ""   // optional arbitrary text set by user
@@ -24,30 +24,30 @@ class History: Storable {
             case .durations(let info):
                 self.completed = info.current.startDate    // using startDate instead of Date() makes testing a bit easier...
                 self.weight = info.current.weight
-                self.reps = info.currentSecs.map({.duration(secs: $0, percent: 1.0)})
+                self.sets = info.currentSecs.map({.duration(secs: $0, percent: 1.0)})
             case .fixedReps(let info):
                 self.completed = info.current.startDate
                 self.weight = info.current.weight
-                self.reps = info.currentReps.map({.reps(count: $0, percent: 1.0)})
+                self.sets = info.currentReps.map({.reps(count: $0, percent: 1.0)})
             case .maxReps(let info):
                 self.completed = info.current.startDate
                 self.weight = info.current.weight
-                self.reps = info.currentReps.map({.reps(count: $0, percent: 1.0)})
+                self.sets = info.currentReps.map({.reps(count: $0, percent: 1.0)})
             case .repRanges(let info):
                 self.completed = info.current.startDate
                 self.weight = info.current.weight
-                self.reps = info.currentReps.map({.reps(count: $0.reps, percent: $0.percent)})
+                self.sets = info.currentReps.map({.reps(count: $0.reps, percent: $0.percent)})
             case .repTotal(let info):
                 self.completed = info.current.startDate
                 self.weight = info.current.weight
-                self.reps = info.currentReps.map({.reps(count: $0, percent: 1.0)})
+                self.sets = info.currentReps.map({.reps(count: $0, percent: 1.0)})
             }
         }
 
         required init(from store: Store) {
             self.completed = store.getDate("completed")
             self.weight = store.getDbl("weight")
-            self.reps = store.getObjArray("reps")
+            self.sets = store.getObjArray("reps")
             self.workout = store.getStr("workout")
             self.formalName = store.getStr("formalName")
             self.note = store.getStr("note")
@@ -56,7 +56,7 @@ class History: Storable {
         func save(_ store: Store) {
             store.addDate("completed", completed)
             store.addDbl("weight", weight)
-            store.addObjArray("reps", reps)
+            store.addObjArray("reps", sets)
             store.addStr("workout", workout)
             store.addStr("formalName", formalName)
             store.addStr("note", note)
@@ -83,7 +83,7 @@ class History: Storable {
     }
 }
 
-extension ActualRep: Storable {
+extension ActualSet: Storable {
     init(from store: Store) {
         let tname = store.getStr("type")
         switch tname {
