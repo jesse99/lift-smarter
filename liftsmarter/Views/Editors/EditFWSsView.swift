@@ -75,7 +75,7 @@ struct EditFWSsView: View {
         }
         .actionSheet(isPresented: $showEditActions) {
             ActionSheet(title: Text(self.selection!.name), buttons: editButtons())}
-        .alert(isPresented: $confirmAlert) {   // and views can only have one alert
+        .alert(isPresented: $confirmAlert) {  
             return Alert(
                 title: Text("Confirm delete"),
                 message: Text(self.alertMesg),

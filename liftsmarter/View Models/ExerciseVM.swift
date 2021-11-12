@@ -601,12 +601,19 @@ extension ExerciseVM {
             }
         }
         
-        let plates = Plates([
+        let plates2 = Plates([
             Plate(weight: 45, count: 4, type: .standard),
             Plate(weight: 35, count: 4, type: .standard),
             Plate(weight: 25, count: 4, type: .standard),
             Plate(weight: 10, count: 4, type: .standard),
             Plate(weight: 5, count: 4, type: .standard)
+        ])
+        let plates1 = Plates([
+            Plate(weight: 45, count: 2, type: .standard),   // don't need to use as many plates here and Plates.getAll is kinda slow with single plates
+            Plate(weight: 35, count: 2, type: .standard),
+            Plate(weight: 25, count: 2, type: .standard),
+            Plate(weight: 10, count: 2, type: .standard),
+            Plate(weight: 5, count: 2, type: .standard)
         ])
         switch apparatus.wrappedValue {
         case .bodyWeight:
@@ -618,9 +625,9 @@ extension ExerciseVM {
                 
                     Menu("Body Weight") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Single Plates", action: {change(.singlePlates(plates1))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()
@@ -633,14 +640,15 @@ extension ExerciseVM {
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
-                        .font(.callout).disabled(true)
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditPlatesView(apparatus)}
                     Spacer()
                 
                     Menu("Dual Plates") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Single Plates", action: {change(.singlePlates(plates1))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()
@@ -659,9 +667,9 @@ extension ExerciseVM {
                 
                     Menu("Fixed Weights") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Single Plates", action: {change(.singlePlates(plates1))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()
@@ -674,14 +682,15 @@ extension ExerciseVM {
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
-                        .font(.callout).disabled(true)
+                        .font(.callout)
+                        .sheet(isPresented: modal) {EditPlatesView(apparatus)}
                     Spacer()
                 
                     Menu("Single Plates") {
                         Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates))})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
                         Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates))})
+                        Button("Single Plates", action: {change(.singlePlates(plates1))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading)
                     Spacer()

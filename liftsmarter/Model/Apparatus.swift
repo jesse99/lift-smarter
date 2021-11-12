@@ -80,4 +80,17 @@ extension Apparatus {
             return 3
         }
     }
+
+    func clone() -> Apparatus {
+        switch self {
+        case .bodyWeight:
+            return self
+        case .fixedWeights(name: _):
+            return self
+        case .dualPlates(barWeight: let bar, let plates):
+            return .dualPlates(barWeight: bar, plates.clone())
+        case .singlePlates(let plates):
+            return .singlePlates(plates.clone())
+        }
+    }
 }

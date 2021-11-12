@@ -28,7 +28,7 @@ struct EditExerciseView: View {
         self._weight = State(initialValue: friendlyWeight(instance.exercise.expectedWeight))
         self._allowRest = State(initialValue: instance.exercise.allowRest)
         self._info = State(initialValue: instance.exercise.info)
-        self._apparatus = State(initialValue: instance.exercise.apparatus)
+        self._apparatus = State(initialValue: instance.exercise.apparatus.clone())
     }
 
     var body: some View {

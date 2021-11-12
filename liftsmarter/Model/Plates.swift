@@ -53,6 +53,29 @@ class Plates: Equatable, Storable {
         return lhs.plates == rhs.plates
     }
     
+    var count: Int {
+        get {return self.plates.count}
+    }
+    
+    subscript(index: Int) -> Plate {
+        get {
+            return self.plates[index]
+        }
+    }
+    
+    func delete(at: Int) {
+        self.plates.remove(at: at)
+        self.cache1 = []
+        self.cache2 = []
+    }
+
+    func add(_ plate: Plate) {
+        self.plates.append(plate)
+        self.plates.sort(by: {$0.weight > $1.weight})
+        self.cache1 = []
+        self.cache2 = []
+    }
+
     func getClosest(_ target: Double, dual: Bool) -> ActualWeights {
         let below = self.getClosestBelow(target, dual: dual)
         let above = self.getClosestAbove(target, dual: dual)

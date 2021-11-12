@@ -43,7 +43,7 @@ struct EditRepTotalView: View {
             }
             .padding()
         }
-        .alert(isPresented: $showHelp) {   // and views can only have one alert
+        .alert(isPresented: $showHelp) {  
             return Alert(
                 title: Text("Help"),
                 message: Text(self.helpText),

@@ -44,7 +44,7 @@ struct AddFixedWeightsView: View {
             }
             .padding()
         }
-        .alert(isPresented: $showHelp) {   // and views can only have one alert
+        .alert(isPresented: $showHelp) { 
             return Alert(
                 title: Text("Help"),
                 message: Text(self.helpText),
@@ -72,11 +72,11 @@ struct AddFixedWeightsView: View {
         self.showHelp = true
     }
 
-    func onCancel() {
+    private func onCancel() {
         self.presentation.wrappedValue.dismiss()
     }
 
-    func onOK() {
+    private func onOK() {
         if let f = Double(self.first) { // this should always work
             if extra {
                 if let s = Double(self.step), let m = Double(self.max) {
