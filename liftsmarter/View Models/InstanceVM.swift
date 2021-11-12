@@ -545,12 +545,13 @@ extension InstanceVM {
                 sets = info.sets.map({.duration(secs: $0.secs, percent: 1.0)})
             case .fixedReps(let info):
                 sets = info.sets.map({.reps(count: $0.reps.reps, percent: 1.0)})
-            case .maxReps(_):
-                return "Completed=\(records.count)"
+            case .maxReps(let info):
+                sets = info.expectedReps.map({.reps(count: $0, percent: 1.0)})
             case .repRanges(let info):
-                sets = info.sets.map({.reps(count: $0.reps.min, percent: $0.percent.value)})
-            case .repTotal(_):
-                return "Completed=\(records.count)"
+                let worksets = info.expectedReps.filter({$0.stage == .workset})
+                sets = worksets.map({.reps(count: $0.reps, percent: $0.percent)})
+            case .repTotal(let info):
+                sets = info.expectedReps.map({.reps(count: $0, percent: 1.0)})
             }
             
             for record in records.reversed() {
