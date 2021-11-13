@@ -14,13 +14,6 @@ class LogsVM: ObservableObject {
     }
 }
 
-// Misc Logic
-extension LogsVM {
-    func log(_ level: LogLevel, _ message: String) {
-        self.model.logs.log(level, message)
-    }
-}
-
 // UI
 extension LogsVM {
     func tabImage() -> String {

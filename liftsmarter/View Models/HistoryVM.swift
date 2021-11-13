@@ -11,10 +11,6 @@ class HistoryVM: ObservableObject {
 
 // Misc Logic
 extension HistoryVM {
-    func log(_ level: LogLevel, _ message: String) {
-        self.model.logs.log(level, message)
-    }
-
     @discardableResult func append(_ workout: WorkoutVM, _ exercise: InstanceVM, _ startDate: Date) -> History.Record {
         self.objectWillChange.send()
         workout.willChange()

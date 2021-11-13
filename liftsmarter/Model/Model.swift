@@ -10,11 +10,12 @@ class Model: Storable {
     // shared objects with classes. So that's what we do with the caveat that when we mutate objects embedded
     // within arrays we need to explicitly call objectWillChange.send to inform views that the state changed
     // (this is the "nested ObservableObject" problem).
-    var program: Program
+    var program: Program                        // this is the active program (and is a reference to an object in programs)
     var fixedWeights: [String: FixedWeightSet] = [:]
     var history: History
-    var userNotes: [String: String] = [:]    // this overrides defaultNotes
+    var userNotes: [String: String] = [:]       // this overrides defaultNotes
     var logs: Logs
+    var programs: [Program] = []                // saved programs (sorted by name)
     var dirty = false
 
     init(_ program: Program) {
@@ -25,7 +26,17 @@ class Model: Storable {
     }
 
     required init(from store: Store) {
-        self.program = store.getObj("program")
+        if store.hasKey("active-program") {
+            // We load all the programs into memory because they don't take much memory and so that we can validate them
+            // as the code is updated (if we persisted them into separate stores it could be a really long time before
+            // they were validated).
+            self.programs = store.getObjArray("programs")
+            let active = store.getStr("active-program")
+            self.program = self.programs.first(where: {$0.name == active})!
+        } else {
+            self.program = store.getObj("program")
+            self.programs = [self.program]
+        }
 
         var names = store.getStrArray("fixedWeights-names")
         for (i, name) in names.enumerated() {
@@ -44,7 +55,8 @@ class Model: Storable {
     }
 
     func save(_ store: Store) {
-        store.addObj("program", program)
+        store.addObjArray("programs", programs)
+        store.addStr("active-program", program.name)
 
         var names = Array(self.fixedWeights.keys)
         store.addStrArray("fixedWeights-names", names)
@@ -65,7 +77,10 @@ class Model: Storable {
     }
     
     func validate() {
-        self.program.validate()
+        ASSERT(self.programs.contains(where: {self.program === $0}), "program should reference a program in programs")
+        for program in self.programs {
+            program.validate()
+        }
 
         var instances = Set<ObjectIdentifier>()
         for (_, fws) in self.fixedWeights {

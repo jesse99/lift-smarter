@@ -215,11 +215,6 @@ extension ProgramVM {
         
         self.model.fixedWeights[name] = fws
     }
-    
-    func log(_ level: LogLevel, _ message: String) {
-        let vm = LogsVM(model)
-        vm.log(level, message)
-    }
 }
 
 struct Confirmation: Identifiable {

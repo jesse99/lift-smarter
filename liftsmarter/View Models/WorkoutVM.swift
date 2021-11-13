@@ -137,10 +137,6 @@ extension WorkoutVM {
             return false
         }
     }
-
-    func log(_ level: LogLevel, _ message: String) {
-        self.program.log(level, message)
-    }
 }
 
 // UI

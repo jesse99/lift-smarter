@@ -17,11 +17,20 @@ struct ContentView: View {
                 .font(.title)
                 .tabItem {
                     VStack {
-                        Image(systemName: "figure.walk")
+                        Image(systemName: "figure.walk")    // these are from SF Symbols.app
                         Text("Workouts")
                     }
                 }
                 .tag(0)
+            ProgramsView()
+                .font(.title)
+                .tabItem {
+                    VStack {
+                        Image(systemName: "menucard")
+                        Text("Programs")
+                    }
+                }
+                .tag(1)
             LogView(self.logs)
                 .font(.title)
                 .tabItem {
@@ -32,7 +41,7 @@ struct ContentView: View {
                         Text("Logs")
                     }
                 }
-                .tag(1)
+                .tag(2)
             Text("Settings")
                 .font(.title)
                 .tabItem {
@@ -41,7 +50,7 @@ struct ContentView: View {
                         Text("Settings")
                     }
                 }
-                .tag(2)
+                .tag(3)
         }
     }
 }
