@@ -15,9 +15,9 @@ class Notifications {   // note that it's awkward to fold this into App because 
                 self.enabled = true
             } else {
                 if let err = error {
-                    logErr("background notifications were not authorized: \(err)")
+                    log(.Error, "background notifications were not authorized: \(err)")
                 } else {
-                    logErr("background notifications were not authorized")    // TODO: use logInfo
+                    log(.Info, "background notifications were not authorized")
                 }
             }
         }
@@ -41,7 +41,7 @@ class Notifications {   // note that it's awkward to fold this into App because 
             let notifications = UNUserNotificationCenter.current()
             notifications.add(request) {error in
                 if let err = error {
-                    logErr("failed to schedule notification: \(err)")
+                    log(.Error, "failed to schedule notification: \(err)")
                 }
             }
         }

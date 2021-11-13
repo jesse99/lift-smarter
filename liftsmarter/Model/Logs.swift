@@ -8,6 +8,24 @@ enum LogLevel: Int {
     case Debug
 }
 
+typealias LogFunc = (LogLevel, String) -> Void
+
+var logToLog: LogFunc? = nil
+var initedLogs = false
+var queuedLogs: [(LogLevel, String)] = []
+
+func log(_ level: LogLevel, _ mesg: String) {
+    if let log = logToLog {
+        log(level, mesg)
+    } else if initedLogs {
+        // We're logging after Logs has been torn down which is quite annoying. Not much we can do other than print.
+        print("\(level.toStr()) \(mesg)")
+    } else {
+        // We're logging before Logs has been instantiated.
+        queuedLogs.append((level, mesg))
+    }
+}
+
 struct LogLine: Identifiable, Storable {
     let seconds: TimeInterval   // since program started
     let level: LogLevel
@@ -49,15 +67,9 @@ class Logs: Storable {
     
     init() {
         self.startTime = Date().timeIntervalSince1970 - 0.00001  // subtract a tiny time so we don't print a -0.0 timestamp
-        logError = {self.log(.Error, $0)} 
+        self.setupLog()
     }
     
-    deinit {
-#if !targetEnvironment(simulator)
-        logError = nil
-#endif
-    }
-
     required init(from store: Store) {
         self.lines = store.getObjArray("lines")
         self.numErrors = store.getInt("numErrors")
@@ -65,8 +77,11 @@ class Logs: Storable {
         self.maxLines = store.getInt("maxLines")
         self.nextID = store.getInt("nextID")
         self.startTime = store.getDbl("startTime")
+        self.setupLog()
+    }
 
-        logError = {self.log(.Error, $0)}
+    deinit {
+        logToLog = nil
     }
 
     func save(_ store: Store) {
@@ -104,9 +119,18 @@ class Logs: Storable {
 
 #if targetEnvironment(simulator)
         let timestamp = entry.timeStr()
-        let prefix = entry.levelStr()
+        let prefix = entry.level.toStr()
         print("\(timestamp) \(prefix) \(message)")
 #endif
+    }
+    
+    private func setupLog() {
+        logToLog = self.log
+        initedLogs = true
+        for (level, mesg) in queuedLogs {
+            self.log(level, mesg)
+        }
+        queuedLogs = []
     }
 }
 
@@ -128,9 +152,11 @@ extension LogLine {
             return String(format: "%.1f", elapsed)
         }
     }
+}
 
-    func levelStr() -> String {
-        switch self.level {
+extension LogLevel {
+    func toStr() -> String {
+        switch self {
         case .Error:
             return "ERR "
         case .Warning:

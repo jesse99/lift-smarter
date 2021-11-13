@@ -2,7 +2,7 @@
 import SwiftUI
 
 /// Recently completed workouts for an exercise.
-struct RecentView: View {
+struct RecentView: View {       // TODO: should turn this into a HistoryView (no limit and editing at least the latest)
     let program: ProgramVM
     let exerciseName: String
     @Environment(\.presentationMode) private var presentation

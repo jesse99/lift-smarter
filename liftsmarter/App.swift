@@ -61,10 +61,10 @@ fileprivate func loadStore(from fileName: String) -> Store? {
             do {
                 return try decoder.decode(Store.self, from: data)
             } catch {
-                logErr("Failed to decode '\(fileName)': \(error.localizedDescription)")
+                log(.Error, "Failed to decode '\(fileName)': \(error.localizedDescription)")
             }
         } else {
-            logErr("Failed to get data for '\(fileName)'")
+            log(.Error, "Failed to get data for '\(fileName)'")
         }
     }
     return nil
@@ -72,7 +72,7 @@ fileprivate func loadStore(from fileName: String) -> Store? {
 
 fileprivate func loadEncoded(from fileName: String) -> AnyObject? {
     guard let url = fileNameToURL(fileName) else {
-        logErr("Failed to get URL for '\(fileName)'")
+        log(.Error, "Failed to get URL for '\(fileName)'")
         return nil
     }
 
@@ -81,7 +81,7 @@ fileprivate func loadEncoded(from fileName: String) -> AnyObject? {
             return try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as AnyObject
         }
     } catch {
-        logErr("Failed to encode '\(fileName)': \(error.localizedDescription)")
+        log(.Error, "Failed to encode '\(fileName)': \(error.localizedDescription)")
     }
     return nil
 }
@@ -96,13 +96,13 @@ fileprivate func storeObject(_ object: Storable, to fileName: String) {
         let data = try encoder.encode(store)
         saveEncoded(data as AnyObject, to: fileName)
     } catch {
-        logErr("Failed to store '\(fileName)': \(error.localizedDescription)")
+        log(.Error, "Failed to store '\(fileName)': \(error.localizedDescription)")
     }
 }
 
 fileprivate func saveEncoded(_ object: AnyObject, to fileName: String) {
     guard let url = fileNameToURL(fileName) else {
-        logErr("Failed to get URL for '\(fileName)'")
+        log(.Error, "Failed to get URL for '\(fileName)'")
         return
     }
 
@@ -110,13 +110,13 @@ fileprivate func saveEncoded(_ object: AnyObject, to fileName: String) {
         let data = try NSKeyedArchiver.archivedData(withRootObject: object, requiringSecureCoding: true)
         try data.write(to: url)
     } catch {
-        logErr("Failed to archive '\(fileName)': \(error.localizedDescription)")
+        log(.Error, "Failed to archive '\(fileName)': \(error.localizedDescription)")
     }
 }
 
 fileprivate func fileNameToURL(_ fname: String) -> URL? {
     guard let dirURL = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first else {
-        logErr("Failed to get URL for '\(fname)'")
+        log(.Error, "Failed to get URL for '\(fname)'")
         return nil
     }
 
