@@ -66,6 +66,7 @@ struct EditProgramView: View {
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout)
 
+            // TODO: add a wizard button here?
             Divider()
             HStack {
                 Button("Cancel", action: self.onCancel).font(.callout)

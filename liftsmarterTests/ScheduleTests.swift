@@ -22,7 +22,7 @@ class ScheduleTests: XCTestCase {
         let exercises: [Exercise] = []
         let program = Program("Home", workouts, exercises, weeksStart: Date())
         self.model = Model(program)
-        self.vm = ProgramVM(self.model)
+        self.vm = ProgramVM(ModelVM(self.model), self.model)
 
         program.weeksStart = self.date(minutes: 0)
     }

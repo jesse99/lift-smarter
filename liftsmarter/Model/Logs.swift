@@ -81,7 +81,9 @@ class Logs: Storable {
     }
 
     deinit {
+#if !targetEnvironment(simulator)       // unit tests are concurrent which causes problems here
         logToLog = nil
+#endif
     }
 
     func save(_ store: Store) {

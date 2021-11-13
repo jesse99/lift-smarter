@@ -450,7 +450,7 @@ class WorkoutLabelTests: XCTestCase {
         program.restWeeks = restWeeks
 
         let model = Model(program)
-        let vm = ProgramVM(model)
+        let vm = ProgramVM(ModelVM(model), model)
         
         return (model, vm, WorkoutVM(vm, workout))
     }
