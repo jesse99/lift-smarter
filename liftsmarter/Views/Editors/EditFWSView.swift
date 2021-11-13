@@ -19,6 +19,22 @@ struct ListEntry: Identifiable {
     }
 }
 
+struct PairedEntry: Identifiable {
+    let lhs: String
+    let rhs: String
+    let id: Int  // can't use this as an index because ids should change when entries change
+    let index: Int
+
+    init(_ lhs: String, _ rhs: String, _ index: Int) {
+        self.lhs = lhs
+        self.rhs = rhs
+        self.id = listEntryID
+        self.index = index
+        
+        listEntryID += 1
+    }
+}
+
 /// Used to edit a single FixedWeightSet.
 struct EditFWSView: View {
     enum ActiveAlert {case deleteSelected, deleteAll}

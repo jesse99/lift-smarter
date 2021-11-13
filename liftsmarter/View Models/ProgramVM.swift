@@ -389,7 +389,7 @@ extension ProgramVM {
         return buttons
     }
     
-    func recentlyCompleted(_ exerciseName: String) -> [ListEntry] {
+    func recentlyCompleted(_ exerciseName: String) -> [PairedEntry] {
         func setToStr(_ set: ActualSet) -> String {
             switch set {
             case .reps(count: let count, percent: _):
@@ -399,22 +399,24 @@ extension ProgramVM {
             }
         }
         
+        let limit = 12
         if let records = self.model.history.records[exerciseName] {
-            let n = records.count > 10 ? records.count - 10 : 0
+            let n = records.count > limit ? records.count - limit : 0
             return records.reversed().dropFirst(n).mapi({
                 let sets = dedupe($1.sets.map(setToStr))
-                var prefix = sets.joined(separator: ", ")
+                var lhs = sets.joined(separator: ", ")
                 if $1.weight > 0.0 {
-                    prefix += " @ " + friendlyUnitsWeight($1.weight)
+                    lhs += " @ " + friendlyUnitsWeight($1.weight)
                 }
 
                 let formatter = DateFormatter()
                 formatter.dateFormat = "MMM d"
-                let middle = " on " + formatter.string(from: $1.completed)
+                let rhs = formatter.string(from: $1.completed)
                 
-                let suffix = $1.note.isEmpty ? "" : " \($1.note)"
+                // TODO: maybe add a new line for these? possibly in italic?
+//                let suffix = $1.note.isEmpty ? "" : " \($1.note)"
 
-                return ListEntry(prefix + middle + suffix, .black, $0)
+                return PairedEntry(lhs, rhs, $0)
             })
         } else {
             return []

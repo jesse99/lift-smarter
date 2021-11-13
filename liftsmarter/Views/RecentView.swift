@@ -17,7 +17,11 @@ struct RecentView: View {
             Text("Recently Completed").font(.largeTitle) 
 
             List(self.program.recentlyCompleted(self.exerciseName)) {entry in
-                Text(entry.name).font(.subheadline)
+                HStack {
+                    Text(entry.lhs).font(.subheadline)
+                    Spacer()
+                    Text(entry.rhs).font(.subheadline)
+                }
             }
 
             Divider()
