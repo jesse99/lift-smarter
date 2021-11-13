@@ -18,7 +18,7 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
             self.model = mockModel()             // TODO: do something else here
         }
 
-        self.program = ProgramVM(model)
+        self.program = ProgramVM(ModelVM(model), model)
         self.logs = LogsVM(model)
         self.notifications = Notifications()
 
@@ -27,7 +27,7 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
 
     var body: some Scene {
         WindowGroup {
-            ContentView(program, logs)
+            ContentView(program.parent, program, logs)
         }.onChange(of: phase, perform: self.onPhaseChange(_:))
     }
     

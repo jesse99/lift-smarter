@@ -74,7 +74,7 @@ struct EditFWSsView: View {
             .padding()
         }
         .actionSheet(isPresented: $showEditActions) {
-            ActionSheet(title: Text(self.selection!.name), buttons: editButtons())}
+            ActionSheet(title: Text(self.selection!.name), buttons: self.editButtons())}
         .alert(isPresented: $confirmAlert) {  
             return Alert(
                 title: Text("Confirm delete"),
@@ -107,19 +107,11 @@ struct EditFWSsView: View {
     }
 
     private func onActivate() {
-        print("activating with \(self.selection!.name)")
         self.fwsName = self.selection!.name
     }
 
     private func onDeactivate() {
         self.fwsName = nil
-    }
-
-    private func doDelete() {
-        self.program.delFWS(self.selection!.name)    
-        if self.fwsName == self.selection!.name {
-            self.fwsName = nil
-        }
     }
 
     private func onDelete() {
@@ -152,6 +144,13 @@ struct EditFWSsView: View {
         }
     }
     
+    private func doDelete() {
+        self.program.delFWS(self.selection!.name)    
+        if self.fwsName == self.selection!.name {
+            self.fwsName = nil
+        }
+    }
+
     private func onDuplicate() {
         let name = self.selection!.name
         if let fws = self.program.getFixedWeights()[name] {
@@ -207,7 +206,7 @@ struct EditFWSsView: View {
 
 struct EditFWSsView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let workout = model.program.workouts[0]
     static let exercise = model.program.exercises.first(where: {$0.name == "Triceps Press"})!
     static var apparatus = Binding.constant(exercise.apparatus)

@@ -52,6 +52,7 @@
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
 		37D00973273F6A7600E8966E /* ProgramsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00972273F6A7600E8966E /* ProgramsView.swift */; };
+		37D00975273F6B9800E8966E /* ModelVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00974273F6B9800E8966E /* ModelVM.swift */; };
 		37D53893271CBE6C006B3833 /* ExerciseInfoVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */; };
 		37D53895271CDEBF006B3833 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53894271CDEBF006B3833 /* NoteView.swift */; };
 		37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53896271D21E8006B3833 /* EditNoteView.swift */; };
@@ -139,6 +140,7 @@
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
 		37D00972273F6A7600E8966E /* ProgramsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramsView.swift; sourceTree = "<group>"; };
+		37D00974273F6B9800E8966E /* ModelVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelVM.swift; sourceTree = "<group>"; };
 		37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfoVM.swift; sourceTree = "<group>"; };
 		37D53894271CDEBF006B3833 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		37D53896271D21E8006B3833 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 				3718978826F69F8F00351C5A /* HistoryVM.swift */,
 				377791CB26F0367900EC5028 /* InstanceVM.swift */,
 				37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */,
+				37D00974273F6B9800E8966E /* ModelVM.swift */,
 				371897982702C63F00351C5A /* Parsers.swift */,
 				3718978C26F6BFA500351C5A /* ProgramVM.swift */,
 				377791CD26F0383300EC5028 /* WorkoutVM.swift */,
@@ -492,6 +495,7 @@
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,
 				377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */,
 				37DBB452272F68D200A29438 /* Notifications.swift in Sources */,
+				37D00975273F6B9800E8966E /* ModelVM.swift in Sources */,
 				37FC754E273CBA5700874917 /* EditPlateView.swift in Sources */,
 				377791C826EEF06600EC5028 /* ArrayExtension.swift in Sources */,
 				377791CC26F0367900EC5028 /* InstanceVM.swift in Sources */,

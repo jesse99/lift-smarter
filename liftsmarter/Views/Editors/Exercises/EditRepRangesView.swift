@@ -82,7 +82,7 @@ struct EditRepRangesView: View {
 
 struct EditRepRangesView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let exercise = model.program.exercises.first(where: {$0.name == "Split Squat"})!
     static var info = Binding.constant(exercise.info)
 

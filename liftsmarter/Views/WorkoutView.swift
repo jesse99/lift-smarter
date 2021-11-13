@@ -52,7 +52,7 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
 
 struct WorkoutView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let vm = WorkoutVM(program, model.program.workouts[0])
 
     static var previews: some View {

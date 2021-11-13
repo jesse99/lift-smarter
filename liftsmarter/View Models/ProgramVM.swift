@@ -5,9 +5,11 @@ import SwiftUI
 // Model views act as an intermdiary between views and the model. Views cannot directly access
 // mutable model classes although they are allowed to access model enums and structs,
 class ProgramVM: ObservableObject {
+    let parent: ModelVM
     private let model: Model
 
-    init(_ model: Model) {
+    init(_ parent: ModelVM, _ model: Model) {
+        self.parent = parent
         self.model = model
     }
     
@@ -25,7 +27,7 @@ class ProgramVM: ObservableObject {
     
     var exercises: [ExerciseVM] {
         get {
-            let program = ProgramVM(self.model)
+            let program = ProgramVM(self.parent, self.model)
             return self.model.program.exercises.map({ExerciseVM(program, $0)})
         }
     }
@@ -40,7 +42,7 @@ class ProgramVM: ObservableObject {
     
     var instanceClipboard: [ExerciseVM] {
         get {
-            let program = ProgramVM(self.model)
+            let program = ProgramVM(self.parent, self.model)
             return self.model.program.exerciseClipboard.map({ExerciseVM(program, $0)})
         }
     }
@@ -62,6 +64,7 @@ class ProgramVM: ObservableObject {
     }
 
     func willChange() {
+        self.parent.willChange()
         self.model.dirty = true
         self.objectWillChange.send()
     }
@@ -72,6 +75,7 @@ extension ProgramVM {
     func setName(_ name: String) {
         self.willChange()
         self.model.program.name = name
+        self.model.programs.sort(by: {$0.name < $1.name})
     }
     
     func setExercises(_ exercises: [ExerciseVM]) {
@@ -638,6 +642,11 @@ extension ProgramVM {
         
         if name.isBlankOrEmpty() {
             errors.append("Name cannot be empty.")
+        }
+        if name != self.model.program.name {
+            if self.model.programs.contains(where: {$0.name == name}) {
+                errors.append("Program names must be unique.")
+            }
         }
         
         let week = Int(currentWeek)

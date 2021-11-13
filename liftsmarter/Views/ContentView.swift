@@ -3,10 +3,12 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selection = 0
+    @ObservedObject var model: ModelVM
     @ObservedObject var program: ProgramVM
     @ObservedObject var logs: LogsVM
     
-    init(_ program: ProgramVM, _ logs: LogsVM) {
+    init(_ model: ModelVM, _ program: ProgramVM, _ logs: LogsVM) {
+        self.model = model
         self.program = program
         self.logs = logs
     }
@@ -22,7 +24,7 @@ struct ContentView: View {
                     }
                 }
                 .tag(0)
-            ProgramsView()
+            ProgramsView(self.model)
                 .font(.title)
                 .tabItem {
                     VStack {
@@ -57,10 +59,10 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let logs = LogsVM(model)
     
     static var previews: some View {
-        ContentView(program, logs)
+        ContentView(program.parent, program, logs)
     }
 }

@@ -36,7 +36,7 @@ struct RecentView: View {       // TODO: should turn this into a HistoryView (no
 
 struct RecentView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
 
     static var previews: some View {
         RecentView(program, "Curls")

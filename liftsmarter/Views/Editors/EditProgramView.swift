@@ -148,7 +148,7 @@ struct EditProgramView: View {
 
 struct EditProgramView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
 
     static var previews: some View {
         EditProgramView(program)

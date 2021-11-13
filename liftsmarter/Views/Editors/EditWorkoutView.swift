@@ -175,7 +175,7 @@ struct EditWorkoutView: View {
 
 struct EditWorkoutView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let workout = model.program.workouts[0]
 
     static var previews: some View {

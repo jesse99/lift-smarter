@@ -107,7 +107,7 @@ struct AddFixedWeightsView: View {
 
 struct AddFixedWeightsView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static var fws = Binding.constant(program.getFWS("Dumbbells")!)
 
     static var previews: some View {

@@ -139,7 +139,7 @@ struct RepTotalView: View {
 
 struct RepTotalView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let workout = WorkoutVM(program, model.program.workouts[3])
     static let instance = workout.instances.first(where: {$0.name == "Pushup"})!
 

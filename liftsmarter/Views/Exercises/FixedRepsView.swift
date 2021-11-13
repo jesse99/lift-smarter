@@ -116,7 +116,7 @@ struct FixedRepsView: View {
 
 struct FixedRepsView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static let workout = WorkoutVM(program, model.program.workouts[1])
     static let instance = workout.instances.first(where: {$0.name == "Foam Rolling"})!
 

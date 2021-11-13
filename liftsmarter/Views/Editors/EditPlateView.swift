@@ -91,7 +91,7 @@ struct EditPlateView: View {
 
 struct EditPlateView_Previews: PreviewProvider {
     static let model = mockModel()
-    static let program = ProgramVM(model)
+    static let program = ProgramVM(ModelVM(model), model)
     static var plate = Plate(weight: 56.0, count: 4, type: .standard)
 
     static var previews: some View {

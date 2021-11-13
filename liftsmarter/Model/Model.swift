@@ -15,11 +15,12 @@ class Model: Storable {
     var history: History
     var userNotes: [String: String] = [:]       // this overrides defaultNotes
     var logs: Logs
-    var programs: [Program] = []                // saved programs (sorted by name)
+    var programs: [Program]                     // saved programs (sorted by name)
     var dirty = false
 
     init(_ program: Program) {
         self.program = program
+        self.programs = [program]
         self.history = History()
         self.logs = Logs()
         self.validate()
@@ -81,6 +82,7 @@ class Model: Storable {
         for program in self.programs {
             program.validate()
         }
+        ASSERT(self.programs.isSorted({$0.name < $1.name}), "programs should be sorted (and unique)")
 
         var instances = Set<ObjectIdentifier>()
         for (_, fws) in self.fixedWeights {
