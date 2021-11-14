@@ -34,7 +34,7 @@ struct RepTotalView: View {
                     Button(instance.nextLabel(), action: onNext)
                         .font(.system(size: 40.0))
                         .sheet(isPresented: $updateRepsModal) {
-                            let expected = self.instance.expectedReps()!
+                            let expected = self.instance.expectedReps()
                             RepsPickerView(initial: expected, min: 1, dismissed: self.onRepsPressed)
                         }
                         .alert(isPresented: $updateExpectedAlert) { () -> Alert in

@@ -81,7 +81,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         get {return self.exercise.info}
     }
 
-    func numSets() -> Int? {
+    func numSets() -> Int {
         switch self.exercise.info {
         case .durations(let info):
             return info.sets.count
@@ -96,29 +96,29 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             return 0
         case .repRanges(let info):
             return info.sets.count
-        case .repTotal(_):
-            return nil
+        case .repTotal:
+            return 0
         }
     }
 
     // Usually the expectedReps method in InstanceVM is used instead.
-    func expectedReps(setIndex: Int) -> Int? {
+    func expectedReps(setIndex: Int) -> Int {
         switch self.exercise.info {
         case .fixedReps(let info):
-            return info.sets.at(setIndex)?.reps.reps ?? 1
+            return info.sets.at(setIndex)?.reps.reps ?? info.sets.last?.reps.reps ?? 1
         case .maxReps(let info):
-            return info.expectedReps.at(setIndex) ?? 1
+            return info.expectedReps.at(setIndex) ?? info.expectedReps.last ?? 1
         case .percentage(let info):
             if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
-                return base.expectedReps(setIndex: setIndex) ?? 0
+                return base.expectedReps(setIndex: setIndex)
             }
             return 0
         case .repRanges(let info):
-            return info.expectedReps.at(setIndex)?.reps ?? info.sets[setIndex].reps.min
+            return info.expectedReps.at(setIndex)?.reps ?? info.sets.at(setIndex)?.reps.min ?? 1
         case .repTotal(let info):
-            return info.expectedReps.at(setIndex) ?? 1
+            return info.expectedReps.at(setIndex) ?? info.expectedReps.last ?? 1
         case .durations:
-            return nil
+            return 0
         }
     }
         
@@ -245,7 +245,7 @@ extension ExerciseVM {
                 info.expectedWeight = weight
             case .maxReps(let info):
                 info.expectedWeight = weight
-            case .percentage(_):
+            case .percentage:
                 ASSERT(false, "no advancing for percentage")
             case .repRanges(let info):
                 info.expectedWeight = weight
@@ -265,7 +265,7 @@ extension ExerciseVM {
                 info.expectedWeight = weight
             case .maxReps(let info):
                 info.expectedWeight = weight
-            case .percentage(_):
+            case .percentage:
                 ASSERT(false, "no setting weight for percentage")
             case .repRanges(let info):
                 info.expectedWeight = weight
@@ -525,7 +525,7 @@ extension ExerciseVM {
         }
         
         switch einfo.wrappedValue {
-        case .durations(_):
+        case .durations:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -547,7 +547,7 @@ extension ExerciseVM {
                 }.padding()
             )
             
-        case .fixedReps(_):
+        case .fixedReps:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -568,7 +568,7 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .maxReps(_):
+        case .maxReps:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -589,7 +589,7 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .percentage(_):
+        case .percentage:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -610,7 +610,7 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .repRanges(_):
+        case .repRanges:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -631,7 +631,7 @@ extension ExerciseVM {
                 }.padding()
             )
             
-        case .repTotal(_):
+        case .repTotal:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -720,7 +720,7 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .fixedWeights(_):
+        case .fixedWeights:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
@@ -741,7 +741,7 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .singlePlates(_):
+        case .singlePlates:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})

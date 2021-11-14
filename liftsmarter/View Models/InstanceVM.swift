@@ -102,7 +102,8 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
     }
 
     func shouldReset() -> Bool {
-        if let numSets = self.exercise.numSets() {
+        let numSets = self.exercise.numSets()
+        if numSets > 0 {
             // 1) If it's been a long time since the user began the exercise then start over.
             // 2) If setIndex has become whacked as a result of user edits then start over.
             return Date().hoursSinceDate(self.startDate) > RecentHours || self.setIndex > numSets
@@ -153,21 +154,17 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
             }
         }
 
-        if let numSets = self.exercise.numSets() {
-            if self.setIndex == 0 {
-                return .notStarted
-            } else if self.setIndex < numSets {
-                return .started
-            } else {
-                return .finished
-            }
-        } else {
-            ASSERT(false, "shouldn't have landed here")
+        let numSets = self.exercise.numSets()
+        if self.setIndex == 0 {
             return .notStarted
+        } else if self.setIndex < numSets {
+            return .started
+        } else {
+            return .finished
         }
     }
     
-    func expectedReps() -> Int? {
+    func expectedReps() -> Int {
         return self.exercise.expectedReps(setIndex: self.setIndex)
     }
         
@@ -273,7 +270,7 @@ extension InstanceVM {
             }
 
             ASSERT(reps == nil, "reps is for repRanges and repTotal")
-            let reps = self.exercise.expectedReps(setIndex: info.current.setIndex) ?? 1
+            let reps = self.exercise.expectedReps(setIndex: info.current.setIndex)
             info.current.setIndex += 1
             info.currentReps.append(reps)
             finished = info.current.setIndex == self.exercise.numSets()
@@ -396,7 +393,7 @@ extension InstanceVM {
             break
         }
         
-        let numSets = self.exercise.numSets()!
+        let numSets = self.exercise.numSets()
         switch self.progress() {
         case .notStarted, .started:
             return "Set \(self.setIndex + 1) of \(numSets)"
@@ -452,15 +449,13 @@ extension InstanceVM {
 
         case .percentage(let info):
             weight = self.exercise.expectedWeight
-            if let numSets = self.exercise.numSets() {
-                if info.current.setIndex < numSets {
-                    if let reps = self.exercise.expectedReps(setIndex: info.current.setIndex) {
-                        if reps == 1 {
-                            text = "1 rep"
-                        } else {
-                            text = "\(reps) reps"
-                        }
-                    }
+            let numSets = self.exercise.numSets()
+            if info.current.setIndex < numSets {
+                let reps = self.exercise.expectedReps(setIndex: info.current.setIndex)
+                if reps == 1 {
+                    text = "1 rep"
+                } else {
+                    text = "\(reps) reps"
                 }
             }
 
@@ -588,8 +583,8 @@ extension InstanceVM {
             case .maxReps(let info):
                 sets = info.expectedReps.map({.reps(count: $0, percent: 1.0)})
             case .percentage(let info):
-                let numSets = self.exercise.numSets() ?? 0
-                sets = (0..<numSets).map({.reps(count: self.exercise.expectedReps(setIndex: $0) ?? 1, percent: info.percent)})
+                let numSets = self.exercise.numSets()
+                sets = (0..<numSets).map({.reps(count: self.exercise.expectedReps(setIndex: $0), percent: info.percent)})
             case .repRanges(let info):
                 let worksets = info.expectedReps.filter({$0.stage == .workset})
                 sets = worksets.map({.reps(count: $0.reps, percent: $0.percent)})
@@ -782,8 +777,8 @@ extension InstanceVM {
             trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
 
         case .percentage:
-            let numSets = self.exercise.numSets() ?? 0
-            let reps = (0..<numSets).map({self.exercise.expectedReps(setIndex: $0) ?? 1})
+            let numSets = self.exercise.numSets()
+            let reps = (0..<numSets).map({self.exercise.expectedReps(setIndex: $0)})
             setStrs = reps.map({getRepLabel($0)})
             trailer = weightSuffix(WeightPercent(1.0), self.exercise.expectedWeight)
             limit = 6
@@ -830,7 +825,8 @@ extension InstanceVM {
                 return "Bbackoff \(prefix) \(i+1 - numWarmups - numWorksets) of \(numBackoff)"
             }
         default:
-            if let numSets = self.exercise.numSets() {
+            let numSets = self.exercise.numSets()
+            if numSets > 0 {
                 return "\(prefix) \(i+1) of \(numSets)"
             } else {
                 return "\(prefix) \(i+1)"
