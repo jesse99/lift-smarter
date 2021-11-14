@@ -47,9 +47,6 @@ struct FixedRepsView: View {
             Divider()
             HStack {
                 Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.instance.started)
-                Button("History", action: onStartHistory)
-                    .font(.callout)
-//                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
                 Spacer()
                 Button("Note", action: onStartNote)
                     .font(.callout)
@@ -77,11 +74,11 @@ struct FixedRepsView: View {
         }
     }
     
-    func onNextCompleted() {
+    private func onNextCompleted() {
         instance.appendCurrent()
     }
     
-    func onReset() {
+    private func onReset() {
         self.instance.resetCurrent()
     }
     
@@ -99,10 +96,6 @@ struct FixedRepsView: View {
         }
     }
 
-    private func onStartHistory() {
-//        self.historyModal = true
-    }
-    
     private func onStartNote() {
         self.noteModal = true
     }

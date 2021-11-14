@@ -57,9 +57,6 @@ struct MaxRepsView: View {
             Divider()
             HStack {
                 Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.instance.started)
-                Button("History", action: onStartHistory)
-                    .font(.callout)
-//                    .sheet(isPresented: self.$historyModal) {HistoryView(self.display, self.workoutIndex, self.exerciseID)}
                 Spacer()
                 Button("Note", action: onStartNote)
                     .font(.callout)
@@ -122,10 +119,6 @@ struct MaxRepsView: View {
         }
     }
 
-    private func onStartHistory() {
-//        self.historyModal = true
-    }
-    
     private func onStartNote() {
         self.noteModal = true
     }

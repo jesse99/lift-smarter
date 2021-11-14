@@ -127,7 +127,7 @@ func mockProgram() -> Program {
     // Lower
     // progression: https://old.reddit.com/r/bodyweightfitness/wiki/exercises/squat
     func splitSquats() -> Exercise {
-        let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.0), restSecs: 90, stage: .warmup)
+        let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.7), restSecs: 90, stage: .warmup)
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60, stage: .workset)
         let info = RepRangesInfo(sets: [warmup] + [work, work, work])
         info.expectedWeight = 16.4
