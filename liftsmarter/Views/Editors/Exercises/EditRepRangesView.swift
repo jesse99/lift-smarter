@@ -31,7 +31,7 @@ struct EditRepRangesView: View {
                 }.padding(.leading)
                 Divider()
                 HStack {
-                    Button("Work Sets", action: {self.worksetModal = true}).font(.callout)
+                    Button("Worksets", action: {self.worksetModal = true}).font(.callout)
                     Spacer()
                     Button("?", action: {
                         self.helpText = "Sets to be done with 100% or so of the weight."

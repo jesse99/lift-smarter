@@ -691,7 +691,7 @@ let defaultNotes: [String: String] = [
             "As the bar approaches your knees drive forward with your hips.",
             "Never bend arms: all the lifting should be done with legs and back.",
             "Don't shrug or lean back too far at the top.",
-            "Can help to switch to a mixed grip for the last warmup and work sets.",
+            "Can help to switch to a mixed grip for the last warmup and worksets.",
             "Can build grip strength by holding the last rep in place."],
         links: ["Stronglifts": "http://stronglifts.com/deadlift/", "Thrall Video": "https://www.youtube.com/watch?v=Y1IGeJEXpF4", "Tips": "https://www.t-nation.com/training/5-tips-to-dominate-the-deadlift", "Grip": "https://stronglifts.com/deadlift/grip/"]),
     
