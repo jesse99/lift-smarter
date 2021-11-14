@@ -357,12 +357,14 @@ extension InstanceVM {
             }
             
         case .percentage(let info):
-            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+            if let base = self.program.instances.first(where: {$0.name == info.baseName}) {
                 switch base.exercise.info {
                 case .durations:
                     return "'\(info.baseName)' cannot be a durations exercise"
                 case .percentage:
                     return "'\(info.baseName)' cannot be a percentage exercise"
+                case .repTotal:
+                    return "'\(info.baseName)' cannot be a rep total exercise"
                 default:
                     if setIndex < self.exercise.numSets() {
                         return base.title(setIndex)
@@ -645,7 +647,7 @@ extension InstanceVM {
             }
         }
     }
-    
+
     // For rest between sets.
     func implicitTimer(delta: Int = 0) -> TimerView {
         switch self.instance.info {
@@ -662,7 +664,7 @@ extension InstanceVM {
             return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
         case .percentage(let info):
-            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+            if let base = self.program.instances.first(where: {$0.name == info.baseName}) {
                 if case .repRanges = base.exercise.info {
                     let title = base.getSetTimerTitle("", index: self.setIndex, delta: delta)
                     return TimerView(title: title, duration: info.rest)
@@ -759,7 +761,7 @@ extension InstanceVM {
     func workoutLabel() -> ([String], String, Int) {
         switch self.instance.info {
         case .percentage(let info):
-            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+            if let base = self.program.instances.first(where: {$0.name == info.baseName}) {
                 return base.workoutLabel(percent: info.percent, useMax: false)
             }
         default:

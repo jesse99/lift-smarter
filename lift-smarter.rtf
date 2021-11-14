@@ -1,37 +1,12 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2580
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 AndaleMono;\f1\fswiss\fcharset0 Helvetica;\f2\fswiss\fcharset0 Helvetica-Bold;
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fnil\fcharset0 AndaleMono;
 \f3\fswiss\fcharset0 Helvetica-Oblique;}
-{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green116\blue0;\red14\green14\blue255;
-\red170\green13\blue145;\red15\green104\blue160;\red92\green38\blue153;\red28\green0\blue207;\red46\green13\blue110;
-\red2\green2\blue2;}
-{\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;\csgenericrgb\c0\c45600\c0;\csgenericrgb\c5500\c5500\c100000;
-\csgenericrgb\c66500\c5200\c56900;\csgenericrgb\c5882\c40784\c62745;\csgenericrgb\c35900\c14900\c60100;\csgenericrgb\c11000\c0\c81000;\csgenericrgb\c18100\c5200\c43100;
-\csgenericrgb\c784\c784\c784;}
+{\colortbl;\red255\green255\blue255;\red2\green2\blue2;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgenericrgb\c784\c784\c784;\csgenericrgb\c0\c0\c0;}
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs34 \cf2 \
-\pard\tx816\pardeftab816\pardirnatural\partightenfactor0
-\cf3 // Table is based on Baechle TR, Earle RW, Wathen D (2000). Essentials of Strength Training and Conditioning\
-// by way of \cf4 https://exrx.net/Calculators/OneRepMax. \cf3 Also see \cf4 https://www.nsca.com/contentassets/61d813865e264c6e852cadfe247eae52/nsca_training_load_chart.pdf\cf3 .\cf2 \
-\pard\tx816\pardeftab816\pardirnatural\partightenfactor0
-\cf5 func\cf2  \cf6 get1RM\cf2 (\cf6 _\cf2  weight: \cf7 Double\cf2 , \cf6 _\cf2  reps: \cf7 Int\cf2 ) -> \cf7 Double\cf2 ? \{\
-    \cf3 //  reps                    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15\cf2 \
-    \cf5 let\cf2  percents: [\cf7 Double\cf2 ] = [\cf8 100\cf2 , \cf8 95\cf2 , \cf8 93\cf2 , \cf8 90\cf2 , \cf8 87\cf2 , \cf8 85\cf2 , \cf8 83\cf2 , \cf8 80\cf2 , \cf8 77\cf2 , \cf8 75\cf2 , \cf8 72\cf2 , \cf8 67\cf2 , \cf8 66\cf2 , \cf8 66\cf2 , \cf8 65\cf2 ]\
-    \cf5 if\cf2  reps > \cf8 0\cf2  && reps - \cf8 1\cf2  < percents.\cf7 count\cf2  \{\
-        \cf5 let\cf2  percent = percents[reps - \cf8 1\cf2 ]/\cf8 100.0\cf2 \
-        \cf5 let\cf2  max = weight*(\cf8 2.0\cf2  - percent)\
-        \cf5 return\cf2  max.\cf9 rounded\cf2 (.\cf9 toNearestOrEven\cf2 )\
-    \}\
-    \cf5 return\cf2  \cf5 nil\cf2 \
-\}\
-\pard\tx816\pardeftab816\pardirnatural\partightenfactor0
-
-\f1\fs48 \cf10 \
-\'95\'a0Add a Percentage info\
-	- will need to handle case where base exercise is missing\
-	- need to handle case where base exercise is durations or percentage\
-\'95\'a0Pick one of \'93Workset\'94 or \'93Work set\'94\
+\f0\fs48 \cf2 \'95\'a0Use \'93Workset\'94 instead of \'93Work set\'94\
 \'95 Rename current exercises so that they start with DB\
 	- make sure history updates too\
 	- try this first with the sim\
@@ -49,7 +24,7 @@
 \'95 Use Form views?\
 	- https://www.simpleswiftguide.com/swiftui-form-tutorial-how-to-create-and-use-form-in-swiftui/\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
-\cf10 \'95 Can replace Either with Result\
+\cf2 \'95 Can replace Either with Result\
 \'95\'a0ios 14 supports MenuPickerStyle and InlinePickerStyle\
 \'95 Can do a better job reserving space for keyboard?\
 	- see https://quickbirdstudios.com/blog/swiftui-architecture-redux-mvvm/#:~:text=Instead%20of%20UIKit's%20rather%20imperative,every%20time%20the%20state%20changes.\
@@ -87,8 +62,8 @@
 	- wait a month after last action and provide a new recommendation (or tell them they're doing well)\
 \'95\'a0Heart rate can tell you if over trained? Can we hook into other app's medical data?\
 
-\f2\b \'95\'a0
-\f1\b0 Do much better showing long term trends\
+\f1\b \'95\'a0
+\f0\b0 Do much better showing long term trends\
 	- both overall and for an exercise\
 	- include actions taken in response to a recommendation\
 	- probably should also allow for user notes\
@@ -104,19 +79,19 @@
 \'95 Should there be an option to email program?\
 	- maybe history too\
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
-\cf10 \'95\'a0Search older TODOs\
+\cf2 \'95\'a0Search older TODOs\
 \'95 Need to support metric units\
 \'95 Will need to do better with the initial program\
 	- probably want to use a wizard (strength/hypertrophy/cardio, equipment, age, sex (m/f/either), days/week)\
 	- give them some options\
 	- mention that they can customize recomendations\
 
-\f0\fs34 \cf2 \
+\f2\fs34 \cf3 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b\fs48 \cf10 SwiftUI\
+\f1\b\fs48 \cf2 SwiftUI\
 
-\f1\b0 good summary of @State etc\
+\f0\b0 good summary of @State etc\
 	https://sarunw.com/posts/data-in-swiftui-3\
 	https://www.raywenderlich.com/11781349-understanding-data-flow-in-swiftui\
 view communication\
@@ -126,35 +101,35 @@ https://spin.atomicobject.com/2020/08/28/ergonomic-struct-updates-in-swift\
 AppState, Inspector, etc\
 	https://nalexn.github.io/clean-architecture-swiftui/\
 
-\f2\b \
+\f1\b \
 MVVM\
 
-\f1\b0 View -> ViewModel -> Model\
+\f0\b0 View -> ViewModel -> Model\
 	references are all one way\
 \ul 	initing a view with the same args should always result in the same view\ulnone \
 	ViewModel has state associatd with the view\
 		eg state of UI controls, like what the selection is\
 		\
 
-\f2\b Combine\
+\f1\b Combine\
 	
-\f1\b0 https://developer.apple.com/documentation/combine\
+\f0\b0 https://developer.apple.com/documentation/combine\
 	https://heckj.github.io/swiftui-notes/#when-to-use-combine\
 used for async events\
 note that user input can be thought of as an async event\
 can be useful for validation\
 	https://peterfriese.dev/swift-combine-love
-\f2\b \
+\f1\b \
 \
 \
 Edit Program\
 
-\f1\b0 \
+\f0\b0 \
 Name: [Covid]\
 Current Week: [1]\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
-\cf10 \ul \ulc10 Workouts\ulnone \
+\cf2 \ul \ulc2 Workouts\ulnone \
 \ul Exercises\ulnone \
 \
 \ul Cancel\ulnone             \ul OK\ulnone \
@@ -162,29 +137,29 @@ Current Week: [1]\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b \cf10 Edit Workouts\
+\f1\b \cf2 Edit Workouts\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f1\b0 \cf10 Cardio\
+\f0\b0 \cf2 Cardio\
 Lower\
 Upper\
 \
 \ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
 \f3\i adds a new empty workout
-\f1\i0 \
+\f0\i0 \
 \
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f2\b \cf10 Edit Exercises\
+\f1\b \cf2 Edit Exercises\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f1\b0 \cf10 Bench\
+\f0\b0 \cf2 Bench\
 OHP\
 Pull Ups\
 \
 \ul Cancel\ulnone       \ul Add\ulnone   \ul OK\ulnone       
 \f3\i adds a default exercise
-\f1\i0 \
+\f0\i0 \
 \
 }

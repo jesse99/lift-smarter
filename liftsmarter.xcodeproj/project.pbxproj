@@ -54,6 +54,7 @@
 		37D00973273F6A7600E8966E /* ProgramsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00972273F6A7600E8966E /* ProgramsView.swift */; };
 		37D00975273F6B9800E8966E /* ModelVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00974273F6B9800E8966E /* ModelVM.swift */; };
 		37D009772740770E00E8966E /* PercentageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D009762740770E00E8966E /* PercentageView.swift */; };
+		37D009792741988500E8966E /* EditPercentageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D009782741988500E8966E /* EditPercentageView.swift */; };
 		37D53893271CBE6C006B3833 /* ExerciseInfoVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */; };
 		37D53895271CDEBF006B3833 /* NoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53894271CDEBF006B3833 /* NoteView.swift */; };
 		37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D53896271D21E8006B3833 /* EditNoteView.swift */; };
@@ -143,6 +144,7 @@
 		37D00972273F6A7600E8966E /* ProgramsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramsView.swift; sourceTree = "<group>"; };
 		37D00974273F6B9800E8966E /* ModelVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelVM.swift; sourceTree = "<group>"; };
 		37D009762740770E00E8966E /* PercentageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PercentageView.swift; sourceTree = "<group>"; };
+		37D009782741988500E8966E /* EditPercentageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPercentageView.swift; sourceTree = "<group>"; };
 		37D53892271CBE6C006B3833 /* ExerciseInfoVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseInfoVM.swift; sourceTree = "<group>"; };
 		37D53894271CDEBF006B3833 /* NoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteView.swift; sourceTree = "<group>"; };
 		37D53896271D21E8006B3833 /* EditNoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNoteView.swift; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 				377791C126EEAF8A00EC5028 /* EditDurationsView.swift */,
 				37A3C5E6270E8BAD00BFA8CC /* EditFixedRepsView.swift */,
 				3742BFC02726210D006D43E0 /* EditMaxRepsView.swift */,
+				37D009782741988500E8966E /* EditPercentageView.swift */,
 				3742BFC4272A3F67006D43E0 /* EditRepRangesView.swift */,
 				3742BFC6272A40B2006D43E0 /* EditRepsSetView.swift */,
 				3742BFBC2725E970006D43E0 /* EditRepTotalView.swift */,
@@ -493,6 +496,7 @@
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
 				3742BFC5272A3F67006D43E0 /* EditRepRangesView.swift in Sources */,
 				37A3C5DF2708D65700BFA8CC /* ExerciseVM.swift in Sources */,
+				37D009792741988500E8966E /* EditPercentageView.swift in Sources */,
 				3718979D2708D40B00351C5A /* EditExercisesView.swift in Sources */,
 				373AB0D3271F486400F9898B /* ExerciseInfo.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,

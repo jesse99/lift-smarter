@@ -313,7 +313,7 @@ extension ExerciseVM {
             case .maxReps(let info):
                 info.expectedWeight = weight
             case .percentage:
-                ASSERT(false, "no setting weight for percentage")
+                break
             case .repRanges(let info):
                 info.expectedWeight = weight
             case .repTotal(let info):
@@ -656,7 +656,7 @@ extension ExerciseVM {
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
                         .font(.callout)
-//                        .sheet(isPresented: modal) {EditMaxRepsView(exerciseName, einfo)}
+                        .sheet(isPresented: modal) {EditPercentageView(self, einfo)}
                     Spacer()
                     Menu("Percentage") {
                         Button("Cancel", action: {})
@@ -828,6 +828,55 @@ extension ExerciseVM {
             )
         }
     }
+    
+    // EditPercentageView
+    func baseNamePicker(_ baseName: Binding<String>, _ onHelp: @escaping HelpFunc) -> AnyView {
+        func menuColor() -> Color {
+            if let base = self.program.instances.first(where: {$0.name == baseName.wrappedValue}) {
+                switch base.exercise.info {
+                case .durations, .percentage, .repTotal:
+                    return .red
+                default:
+                    return .blue
+                }
+            } else {
+                return .red
+            }
+        }
+        
+        func entries() -> [ListEntry] {
+            let candidates = self.program.instances.filter({
+                switch $0.exercise.info {
+                case .durations, .percentage, .repTotal:
+                    return false
+                default:
+                    return $0.name != baseName.wrappedValue
+                }
+            })
+            var entries: [ListEntry] = []
+            for (i, candidate) in candidates.enumerated() {
+                if entries.first(where: {$0.name == candidate.name}) == nil {
+                    entries.append(ListEntry(candidate.name, .black, i))
+                }
+            }
+            return entries.sorted(by: {$0.name < $1.name})
+        }
+        
+        return AnyView(
+            HStack {
+                Text("Base Bame:").font(.headline)
+                Menu(baseName.wrappedValue) {
+                    ForEach(entries()) {entry in
+                        Button(entry.name, action: {baseName.wrappedValue = entry.name})
+                    }
+                    Button("Cancel", action: {})
+                }.font(.callout).foregroundColor(menuColor())
+                Spacer()
+                Button("?", action: onHelp).font(.callout).padding(.trailing)
+            }.padding(.leading)
+        )
+    }
+
 }
 
 // Editing

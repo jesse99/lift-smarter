@@ -31,6 +31,17 @@ class ProgramVM: ObservableObject {
             return self.model.program.exercises.map({ExerciseVM(program, $0)})
         }
     }
+
+    // Note that this can return duplicate exercises if an exercise is used within more than one workout.
+    var instances: [InstanceVM] {
+        get {
+            var instances: [InstanceVM] = []
+            for workout in self.workouts {
+                instances.append(contentsOf: workout.instances)
+            }
+            return instances
+        }
+    }
     
     var userNoteKeys: [String] {
         get {return Array(self.model.userNotes.keys)}

@@ -24,7 +24,7 @@ struct PickerEntry: Hashable, Identifiable {
 /// from the list which then sets the text field (and re-populates the list).
 struct PickerView: View {
     typealias Populate = (String) -> [(String, Color)]
-    typealias Confirm = (String) -> Void
+    typealias Confirm = (String) -> Void    // called with the result of the pick
     typealias Selected = (String) -> Int?   // scroll returned index into view
 
     let title: String
