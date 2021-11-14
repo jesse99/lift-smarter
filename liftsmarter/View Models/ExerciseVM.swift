@@ -40,11 +40,44 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
     }
     
     var apparatus: Apparatus {
-        get {return self.exercise.apparatus}
+        get {
+            switch self.exercise.info {
+            case .percentage(let info):
+                if let base = self.program.exercises.first(where: {$0.name == info.baseName}) {
+                    return base.apparatus
+                }
+                return self.exercise.apparatus
+            default:
+                return self.exercise.apparatus
+            }
+        }
+    }
+
+    func getClosest(_ target: Double) -> Either<String, ActualWeights> {
+        switch self.apparatus {
+        case .dualPlates(barWeight: let bar, let plates):
+            let actuals = plates.getClosest(target - bar, dual: true)
+            return .right(ActualWeights(total: actuals.total + bar, weights: actuals.weights))
+        case .fixedWeights(name: let name):
+            if let name = name {
+                let model = self.program.model(self.exercise)
+                if let fws = model.fixedWeights[name] {
+                    return .right(fws.getClosest(target))
+                } else {
+                    return .left("There is no fixed weight set named \(name)")
+                }
+            } else {
+                return .left("No fixed weights activated")
+            }
+        case .singlePlates(let plates):
+            return .right(plates.getClosest(target, dual: false))
+        default:
+            return .right(ActualWeights(total: target, weights: [ActualWeight(weight: target, label: "")]))
+        }
     }
 
     func getClosestBelow(_ target: Double) -> Either<String, ActualWeights> {
-        switch self.exercise.apparatus {
+        switch self.apparatus {
         case .dualPlates(barWeight: let bar, let plates):
             let actuals = plates.getClosestBelow(target - bar, dual: true)
             return .right(ActualWeights(total: actuals.total + bar, weights: actuals.weights))
@@ -68,7 +101,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
 
     var activeFWSName: String {
         get {
-            if case .fixedWeights(let name) = self.exercise.apparatus {
+            if case .fixedWeights(let name) = self.apparatus {
                 return name ?? ""
             } else {
                 ASSERT(false, "should only be called for fixedWeights")
@@ -90,7 +123,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.restSecs.count
         case .percentage(let info):
-            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+            if let base = self.program.exercises.first(where: {$0.name == info.baseName}) {
                 return base.numSets()
             }
             return 0
@@ -109,7 +142,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.expectedReps.at(setIndex) ?? info.expectedReps.last ?? 1
         case .percentage(let info):
-            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+            if let base = self.program.exercises.first(where: {$0.name == info.baseName}) {
                 return base.expectedReps(setIndex: setIndex)
             }
             return 0
@@ -122,7 +155,7 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
         
-    var expectedWeight: Double {
+    var baseExpectedWeight: Double {
         switch self.exercise.info {
         case .durations(let info):
             return info.expectedWeight
@@ -131,14 +164,28 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.expectedWeight
         case .percentage(let info):
-            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
-                return info.percent*base.expectedWeight
+            if let base = self.program.exercises.first(where: {$0.name == info.baseName}) {
+                return info.percent*base.baseExpectedWeight
             }
             return 0.0
         case .repRanges(let info):
             return info.expectedWeight
         case .repTotal(let info):
             return info.expectedWeight
+        }
+    }
+    
+    func expectedWeight(_ setIndex: Int) -> Double {
+        switch self.exercise.info {
+        case .percentage(let info):
+            if let base = self.program.exercises.first(where: {$0.name == info.baseName}) {
+                return info.percent*base.expectedWeight(setIndex)
+            }
+            return 0.0
+        case .repRanges(let info):
+            return self.baseExpectedWeight * (info.sets.at(setIndex)?.percent ?? WeightPercent(0.0))
+        default:
+            return self.baseExpectedWeight
         }
     }
 
@@ -157,24 +204,24 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
     }
         
     func advancedWeight() -> Double? {
-        switch self.exercise.apparatus {
+        switch self.apparatus {
         case .bodyWeight:
             return nil
             
         case .dualPlates(barWeight: let bar, let plates):
-            if let weight = plates.getAbove(self.expectedWeight - bar, dual: true) {
+            if let weight = plates.getAbove(self.baseExpectedWeight - bar, dual: true) {
                 return weight.total + bar
             }
             return nil
 
         case .fixedWeights(name: let name):
-            if let name = name, let fws = self.program.getFixedWeights()[name], let weight = fws.getAbove(self.expectedWeight) {
+            if let name = name, let fws = self.program.getFixedWeights()[name], let weight = fws.getAbove(self.baseExpectedWeight) {
                 return weight.total
             }
             return nil
             
         case .singlePlates(let plates):
-            let weight = plates.getAbove(self.expectedWeight, dual: false)
+            let weight = plates.getAbove(self.baseExpectedWeight, dual: false)
             return weight?.total
         }
     }
@@ -425,7 +472,19 @@ extension ExerciseVM {
             }
         }
         
+        func shouldDisable() -> Bool {
+            switch self.info {
+            case .percentage:
+                return true
+            default:
+                return false
+            }
+        }
+        
         func buttonColor(_ bar: Double, _ plates: Plates, dual: Bool) -> Color {
+            if shouldDisable() {    // kinda lame, shouldn't even call this function if it should be disabled
+                return .gray
+            }
             if var weight = Double(text.wrappedValue) {
                 weight -= bar
                 let actual = plates.getClosestBelow(weight, dual: dual)
@@ -459,7 +518,7 @@ extension ExerciseVM {
         }
         
         // This isn't currently shared but it's complex enough that we define it here to hide it away.
-        switch self.exercise.apparatus {
+        switch self.apparatus {
         case .bodyWeight:
             return weightField()
 
@@ -470,6 +529,7 @@ extension ExerciseVM {
                     Button(text.wrappedValue, action: {modal.wrappedValue = true})
                         .font(.body)
                         .foregroundColor(buttonColor(bar, plates, dual: true))
+                        .disabled(shouldDisable())
                         .sheet(isPresented: modal) {
                             PickerView(title: "Weight", prompt: "Value:", initial: text.wrappedValue, populate: {populate(bar, $0, plates, dual: true)}, confirm: confirm, selected: {text in select(bar, text, plates, dual: true)}, type: .decimalPad)
                         }
@@ -486,6 +546,7 @@ extension ExerciseVM {
                         Button(text.wrappedValue, action: {modal.wrappedValue = true})
                             .font(.body)
                             .foregroundColor(buttonColor(fws))
+                            .disabled(shouldDisable())
                             .sheet(isPresented: modal) {
                                 PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, selected: {text in select(text, fws)}, type: .decimalPad)
                             }
@@ -504,6 +565,7 @@ extension ExerciseVM {
                     Button(text.wrappedValue, action: {modal.wrappedValue = true})
                         .font(.body)
                         .foregroundColor(buttonColor(0.0, plates, dual: false))
+                        .disabled(shouldDisable())
                         .sheet(isPresented: modal) {
                             PickerView(title: "Weight", prompt: "Value:", initial: text.wrappedValue, populate: {populate(0.0, $0, plates, dual: false)}, confirm: confirm, selected: {text in select(0.0, text, plates, dual: false)}, type: .decimalPad)
                         }
@@ -656,28 +718,55 @@ extension ExerciseVM {
 
     func apparatusView(_ apparatus: Binding<Apparatus>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
         func change(_ newValue: Apparatus) {
-            if newValue.caseIndex() != self.exercise.apparatus.caseIndex() {
+            if newValue.caseIndex() != self.apparatus.caseIndex() {
                 apparatus.wrappedValue = newValue
             } else {
                 // If the user is swtching back to the original apparatus then use the original settings.
-                apparatus.wrappedValue = self.exercise.apparatus
+                apparatus.wrappedValue = self.apparatus
             }
         }
         
-        let plates2 = Plates([
-            Plate(weight: 45, count: 4, type: .standard),
-            Plate(weight: 35, count: 4, type: .standard),
-            Plate(weight: 25, count: 4, type: .standard),
-            Plate(weight: 10, count: 4, type: .standard),
-            Plate(weight: 5, count: 4, type: .standard)
-        ])
-        let plates1 = Plates([
-            Plate(weight: 45, count: 2, type: .standard),   // don't need to use as many plates here and Plates.getAll is kinda slow with single plates
-            Plate(weight: 35, count: 2, type: .standard),
-            Plate(weight: 25, count: 2, type: .standard),
-            Plate(weight: 10, count: 2, type: .standard),
-            Plate(weight: 5, count: 2, type: .standard)
-        ])
+        func fixedApparatus() -> Bool {
+            switch self.info {
+            case .percentage:
+                return true
+            default:
+                return false
+            }
+        }
+        
+        func buildMenu(_ title: String) -> AnyView {
+            let plates2 = Plates([
+                Plate(weight: 45, count: 4, type: .standard),
+                Plate(weight: 35, count: 4, type: .standard),
+                Plate(weight: 25, count: 4, type: .standard),
+                Plate(weight: 10, count: 4, type: .standard),
+                Plate(weight: 5, count: 4, type: .standard)
+            ])
+            let plates1 = Plates([
+                Plate(weight: 45, count: 2, type: .standard),   // don't need to use as many plates here and Plates.getAll is kinda slow with single plates
+                Plate(weight: 35, count: 2, type: .standard),
+                Plate(weight: 25, count: 2, type: .standard),
+                Plate(weight: 10, count: 2, type: .standard),
+                Plate(weight: 5, count: 2, type: .standard)
+            ])
+
+            if fixedApparatus() {
+                return AnyView(
+                    Button(title, action: {})
+                        .font(.callout).padding(.leading).disabled(true))
+            } else {
+                return AnyView(
+                    Menu(title) {
+                        Button("Body Weight", action:   {change(.bodyWeight)})
+                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
+                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Single Plates", action: {change(.singlePlates(plates1))})
+                        Button("Cancel", action: {})
+                    }.font(.callout).padding(.leading))
+            }
+        }
+        
         switch apparatus.wrappedValue {
         case .bodyWeight:
             return AnyView(
@@ -686,13 +775,7 @@ extension ExerciseVM {
                         .font(.callout).disabled(true)
                     Spacer()
                 
-                    Menu("Body Weight") {
-                        Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
-                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates1))})
-                        Button("Cancel", action: {})
-                    }.font(.callout).padding(.leading)
+                    buildMenu("Body Weight")
                     Spacer()
                     
                     Button("?", action: {onHelp("Includes an optional arbitrary weight.")}).font(.callout)
@@ -707,13 +790,7 @@ extension ExerciseVM {
                         .sheet(isPresented: modal) {EditPlatesView(apparatus)}
                     Spacer()
                 
-                    Menu("Dual Plates") {
-                        Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
-                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates1))})
-                        Button("Cancel", action: {})
-                    }.font(.callout).padding(.leading)
+                    buildMenu("Dual Plates")
                     Spacer()
                     
                     Button("?", action: {onHelp("Barbells, leg press, etc.")}).font(.callout)
@@ -728,13 +805,7 @@ extension ExerciseVM {
                         .sheet(isPresented: modal) {EditFWSsView(self.program, apparatus)}
                     Spacer()
                 
-                    Menu("Fixed Weights") {
-                        Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
-                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates1))})
-                        Button("Cancel", action: {})
-                    }.font(.callout).padding(.leading)
+                    buildMenu("Fixed Weights")
                     Spacer()
                     
                     Button("?", action: {onHelp("Dumbbells, kettlebells, cable machines, etc.")}).font(.callout)
@@ -749,13 +820,7 @@ extension ExerciseVM {
                         .sheet(isPresented: modal) {EditPlatesView(apparatus)}
                     Spacer()
                 
-                    Menu("Single Plates") {
-                        Button("Body Weight", action:   {change(.bodyWeight)})
-                        Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, plates2))})
-                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
-                        Button("Single Plates", action: {change(.singlePlates(plates1))})
-                        Button("Cancel", action: {})
-                    }.font(.callout).padding(.leading)
+                    buildMenu("Single Plates")
                     Spacer()
                     
                     Button("?", action: {onHelp("T-Bar rows, landmines, etc.")}).font(.callout)

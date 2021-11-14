@@ -25,7 +25,7 @@ struct EditExerciseView: View {
         
         self._name = State(initialValue: instance.name)
         self._formalName = State(initialValue: instance.formalName)
-        self._weight = State(initialValue: friendlyWeight(instance.exercise.expectedWeight))
+        self._weight = State(initialValue: friendlyWeight(instance.exercise.baseExpectedWeight))
         self._allowRest = State(initialValue: instance.exercise.allowRest)
         self._info = State(initialValue: instance.exercise.info)
         self._apparatus = State(initialValue: instance.exercise.apparatus.clone())
@@ -144,7 +144,7 @@ struct EditExerciseView: View {
             if self.info != self.instance.exercise.info {   // note that this ignores current
                 self.instance.exercise.setInfo(self.info)
                 self.instance.exercise.setWeight(weight)
-            } else if weight != self.instance.exercise.expectedWeight {
+            } else if weight != self.instance.exercise.baseExpectedWeight {
                 self.instance.exercise.setWeight(weight)
             }
             if self.apparatus != self.instance.exercise.apparatus {

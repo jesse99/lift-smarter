@@ -225,7 +225,7 @@ extension InstanceVM {
 
     func resetCurrent() {
         self.willChange()
-        self.instance.info.resetCurrent(self.exercise.expectedWeight)  // current applies to an exercise not all of them
+        self.instance.info.resetCurrent(self.exercise.baseExpectedWeight)  // current applies to an exercise not all of them
     }
 
     func appendCurrent(_ reps: Int? = nil, now: Date = Date()) {
@@ -341,29 +341,34 @@ extension InstanceVM {
 // UI
 extension InstanceVM {
     // DurationsView, FixedRepsView, etc
-    func title() -> String {
+    func title(_ index: Int? = nil) -> String {
+        let setIndex = index ?? self.setIndex
         switch self.instance.info {
-        case .repTotal(let info):
+        case .repTotal:
             switch self.progress() {
             case .notStarted, .started:
-                return "Set \(info.current.setIndex+1)"
+                return "Set \(setIndex+1)"
             case .finished:
-                if info.current.setIndex == 1 {
+                if setIndex == 1 {
                     return "Finished"
                 } else {
-                    return "Finished using \(info.current.setIndex) sets"
+                    return "Finished using \(setIndex) sets"
                 }
             }
             
         case .percentage(let info):
-            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
-                switch base.info {
+            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+                switch base.exercise.info {
                 case .durations:
                     return "'\(info.baseName)' cannot be a durations exercise"
                 case .percentage:
                     return "'\(info.baseName)' cannot be a percentage exercise"
                 default:
-                    break
+                    if setIndex < self.exercise.numSets() {
+                        return base.title(setIndex)
+                    } else {
+                        return "Finished"
+                    }
                 }
             } else {
                 return "'\(info.baseName)' exercise is missing"
@@ -372,18 +377,17 @@ extension InstanceVM {
         case .repRanges(let info):
             switch self.progress() {
             case .notStarted, .started:
-                let index = info.current.setIndex
                 let numWarmups = info.sets.filter({$0.stage == .warmup}).count
                 let numWorksets = info.sets.filter({$0.stage == .workset}).count
                 let numBackoff = info.sets.filter({$0.stage == .backoff}).count
 
-                switch info.sets[index].stage {
+                switch info.sets[setIndex].stage {
                 case .warmup:
-                    return "Warmup \(index + 1) of \(numWarmups)"
+                    return "Warmup \(setIndex + 1) of \(numWarmups)"
                 case .workset:
-                    return "Workset \(index - numWarmups + 1) of \(numWorksets)"
+                    return "Workset \(setIndex - numWarmups + 1) of \(numWorksets)"
                 case .backoff:
-                    return "Backoff \(index - numWarmups - numWorksets + 1) of \(numBackoff)"
+                    return "Backoff \(setIndex - numWarmups - numWorksets + 1) of \(numBackoff)"
                 }
 
             case .finished:
@@ -396,7 +400,7 @@ extension InstanceVM {
         let numSets = self.exercise.numSets()
         switch self.progress() {
         case .notStarted, .started:
-            return "Set \(self.setIndex + 1) of \(numSets)"
+            return "Set \(setIndex + 1) of \(numSets)"
         case .finished:
             if numSets == 1 {
                 return "Finished"
@@ -411,6 +415,7 @@ extension InstanceVM {
         
         var weight = 0.0
         var percent = WeightPercent(1.0)
+        var useBelow = true
         switch self.instance.info {
         case .durations(let info):
             weight = info.expectedWeight
@@ -448,15 +453,17 @@ extension InstanceVM {
             }
 
         case .percentage(let info):
-            weight = self.exercise.expectedWeight
             let numSets = self.exercise.numSets()
             if info.current.setIndex < numSets {
+                weight = self.exercise.expectedWeight(info.current.setIndex)
                 let reps = self.exercise.expectedReps(setIndex: info.current.setIndex)
                 if reps == 1 {
                     text = "1 rep"
                 } else {
                     text = "\(reps) reps"
                 }
+                
+                useBelow = info.percent >= 1.0
             }
 
         case .repRanges(let info):
@@ -467,6 +474,8 @@ extension InstanceVM {
                 
                 let min = info.expectedReps.at(info.current.setIndex)?.reps ?? set.reps.min
                 text = repRangeLabel(min, set.reps.max, suffix: "")
+                
+                useBelow = set.stage == .workset
             }
             
         case .repTotal(let info):
@@ -489,7 +498,7 @@ extension InstanceVM {
         }
 
         if weight > 0.0 {
-            let closest = exercise.getClosestBelow(weight*percent)
+            let closest = useBelow ? exercise.getClosestBelow(weight*percent) : exercise.getClosest(weight*percent)
             if case .right(let weight) = closest {
                 let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
                 text += suffix
@@ -538,8 +547,8 @@ extension InstanceVM {
                 weight = info.expectedWeight
             }
 
-        case .percentage:
-            weight = self.exercise.expectedWeight
+        case .percentage(let info):
+            weight = self.exercise.expectedWeight(info.current.setIndex)
 
         case .repRanges(let info):
             if info.current.setIndex < info.sets.count {
@@ -572,7 +581,7 @@ extension InstanceVM {
         // This is per the exercise not the instance. That's probably want people want though it does seem slightly confusing.
         var count = 0
         if let records = program.model(instance).history.records[self.name] {
-            let weight = self.exercise.expectedWeight
+            let weight = self.exercise.baseExpectedWeight
             var sets: [ActualSet]
             
             switch self.exercise.info {
@@ -641,28 +650,37 @@ extension InstanceVM {
     func implicitTimer(delta: Int = 0) -> TimerView {
         switch self.instance.info {
         case .durations(let info):
-            let title = self.getSetTimerTitle("Set", delta)
+            let title = self.getSetTimerTitle("Set", delta: delta)
             return TimerView(title: title, duration: info.sets[self.setIndex + delta].secs, secondDuration: self.restDuration())
 
         case .fixedReps(let info):
-            let title = self.getSetTimerTitle("Set", delta)
+            let title = self.getSetTimerTitle("Set", delta: delta)
             return TimerView(title: title, duration: info.sets[self.setIndex + delta].restSecs)
 
         case .maxReps(let info):
-            let title = self.getSetTimerTitle("Set", delta)
+            let title = self.getSetTimerTitle("Set", delta: delta)
             return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
         case .percentage(let info):
-            let title = self.getSetTimerTitle("Set", delta)
+            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+                if case .repRanges = base.exercise.info {
+                    let title = base.getSetTimerTitle("", index: self.setIndex, delta: delta)
+                    return TimerView(title: title, duration: info.rest)
+                } else {
+                    let title = base.getSetTimerTitle("Set", index: self.setIndex, delta: delta)
+                    return TimerView(title: title, duration: info.rest)
+                }
+            }
+            let title = self.getSetTimerTitle("Set", index: self.setIndex, delta: delta)
             return TimerView(title: title, duration: info.rest)
 
         case .repRanges(let info):
-            let title = self.getSetTimerTitle("", delta)
+            let title = self.getSetTimerTitle("", delta: delta)
             let set = info.currentSet(delta)
             return TimerView(title: title, duration: set.restSecs)
 
         case .repTotal(let info):
-            let title = self.getSetTimerTitle("Set", delta)
+            let title = self.getSetTimerTitle("Set", delta: delta)
             return TimerView(title: title, duration: info.rest)
         }
     }
@@ -739,6 +757,18 @@ extension InstanceVM {
 
     // WorkoutView
     func workoutLabel() -> ([String], String, Int) {
+        switch self.instance.info {
+        case .percentage(let info):
+            if let base = self.workout.instances.first(where: {$0.name == info.baseName}) {
+                return base.workoutLabel(percent: info.percent, useMax: false)
+            }
+        default:
+            break
+        }
+        return self.workoutLabel(percent: 1.0, useMax: true)
+    }
+    
+    private func workoutLabel(percent: Double, useMax: Bool) -> ([String], String, Int) {
         func getRepLabel(_ reps: Int) -> String {
             if reps == 1 {
                 return "1 rep"
@@ -750,8 +780,9 @@ extension InstanceVM {
         func getRepRangeLabel(_ info: RepRangesInfo, _ index: Int, _ workset: RepsSet, ignoreWeight: Bool = false) -> String {
             let numWarmups = info.sets.filter({$0.stage == .warmup}).count
             let min = info.expectedReps.at(index + numWarmups)?.reps ?? workset.reps.min
-            let suffix = ignoreWeight ? "" : weightSuffix(workset.percent, info.expectedWeight)
-            return repRangeLabel(min, workset.reps.max, suffix: suffix)
+            let wp = WeightPercent(percent*workset.percent.value)
+            let suffix = ignoreWeight ? "" : weightSuffix(wp, info.expectedWeight)
+            return repRangeLabel(min, useMax ? workset.reps.max : min, suffix: suffix)
         }
         
         var setStrs: [String] = []
@@ -761,11 +792,11 @@ extension InstanceVM {
         switch self.instance.info {
         case .durations(let info):
             setStrs = info.sets.map({"\($0.secs)s"})
-            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
+            trailer = weightSuffix(WeightPercent(percent), info.expectedWeight)
 
         case .fixedReps(let info):
             setStrs = info.sets.map({getRepLabel($0.reps.reps)})
-            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
+            trailer = weightSuffix(WeightPercent(percent), info.expectedWeight)
             limit = 6
 
         case .maxReps(let info):
@@ -774,19 +805,16 @@ extension InstanceVM {
             } else {
                 setStrs = info.expectedReps.map({getRepLabel($0)})
             }
-            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
+            trailer = weightSuffix(WeightPercent(percent), info.expectedWeight)
 
         case .percentage:
-            let numSets = self.exercise.numSets()
-            let reps = (0..<numSets).map({self.exercise.expectedReps(setIndex: $0)})
-            setStrs = reps.map({getRepLabel($0)})
-            trailer = weightSuffix(WeightPercent(1.0), self.exercise.expectedWeight)
-            limit = 6
+            log(.Error, "Should have a percentage exercise based on a percentage exercise")
 
         case .repRanges(let info):
             let worksets = info.sets.filter({$0.stage == .workset})
             if worksets.all({abs($0.percent.value - worksets.first!.percent.value) < 0.01}) {
-                trailer = weightSuffix(worksets.first!.percent, info.expectedWeight)
+                let wp = WeightPercent(percent*worksets.first!.percent)
+                trailer = weightSuffix(wp, info.expectedWeight)
                 setStrs = worksets.mapi({getRepRangeLabel(info, $0, $1, ignoreWeight: true)})
             } else {
                 setStrs = worksets.mapi({getRepRangeLabel(info, $0, $1)})
@@ -798,14 +826,14 @@ extension InstanceVM {
             } else {
                 setStrs = ["\(info.total) reps over \(info.expectedReps.count) sets"]
             }
-            trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
+            trailer = weightSuffix(WeightPercent(percent), info.expectedWeight)
         }
         
         return (setStrs, trailer, limit)
     }
     
-    private func getSetTimerTitle(_ prefix: String, _ delta: Int = 0) -> String {
-        let i = self.setIndex + delta
+    private func getSetTimerTitle(_ prefix: String, index: Int? = nil, delta: Int = 0) -> String {
+        let i = (index ?? self.setIndex) + delta
         switch self.instance.info {
         case .repRanges(let info):
             let numWarmups = info.sets.filter({$0.stage == .warmup}).count
@@ -817,12 +845,12 @@ extension InstanceVM {
                 return "Warmup \(prefix) \(i+1) of \(numWarmups)"
             case .workset:
                 if numWarmups == 0 && numBackoff == 0 {
-                    return "Work Set \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
+                    return "Workset \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
                 } else {
-                    return "Work Set \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
+                    return "Workset \(prefix) \(i+1 - numWarmups) of \(numWorksets)"
                 }
             case .backoff:
-                return "Bbackoff \(prefix) \(i+1 - numWarmups - numWorksets) of \(numBackoff)"
+                return "Backoff \(prefix) \(i+1 - numWarmups - numWorksets) of \(numBackoff)"
             }
         default:
             let numSets = self.exercise.numSets()
