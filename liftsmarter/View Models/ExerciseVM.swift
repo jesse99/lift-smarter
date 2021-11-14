@@ -89,10 +89,56 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             return info.sets.count
         case .maxReps(let info):
             return info.restSecs.count
+        case .percentage(let info):
+            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+                return base.numSets()
+            }
+            return 0
         case .repRanges(let info):
             return info.sets.count
         case .repTotal(_):
             return nil
+        }
+    }
+
+    // Usually the expectedReps method in InstanceVM is used instead.
+    func expectedReps(setIndex: Int) -> Int? {
+        switch self.exercise.info {
+        case .fixedReps(let info):
+            return info.sets.at(setIndex)?.reps.reps ?? 1
+        case .maxReps(let info):
+            return info.expectedReps.at(setIndex) ?? 1
+        case .percentage(let info):
+            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+                return base.expectedReps(setIndex: setIndex) ?? 0
+            }
+            return 0
+        case .repRanges(let info):
+            return info.expectedReps.at(setIndex)?.reps ?? info.sets[setIndex].reps.min
+        case .repTotal(let info):
+            return info.expectedReps.at(setIndex) ?? 1
+        case .durations:
+            return nil
+        }
+    }
+        
+    var expectedWeight: Double {
+        switch self.exercise.info {
+        case .durations(let info):
+            return info.expectedWeight
+        case .fixedReps(let info):
+            return info.expectedWeight
+        case .maxReps(let info):
+            return info.expectedWeight
+        case .percentage(let info):
+            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+                return info.percent*base.expectedWeight
+            }
+            return 0.0
+        case .repRanges(let info):
+            return info.expectedWeight
+        case .repTotal(let info):
+            return info.expectedWeight
         }
     }
 
@@ -110,21 +156,6 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
         
-    var expectedWeight: Double {
-        switch self.exercise.info {
-        case .durations(let info):
-            return info.expectedWeight
-        case .fixedReps(let info):
-            return info.expectedWeight
-        case .maxReps(let info):
-            return info.expectedWeight
-        case .repRanges(let info):
-            return info.expectedWeight
-        case .repTotal(let info):
-            return info.expectedWeight
-        }
-    }
-
     func advancedWeight() -> Double? {
         switch self.exercise.apparatus {
         case .bodyWeight:
@@ -182,6 +213,8 @@ extension ExerciseVM {
                 info.resetExpected()
             case .maxReps(let info):
                 info.resetExpected()
+            case .percentage(let info):
+                info.resetExpected()
             case .repRanges(let info):
                 info.resetExpected()
             case .repTotal(let info):
@@ -212,6 +245,8 @@ extension ExerciseVM {
                 info.expectedWeight = weight
             case .maxReps(let info):
                 info.expectedWeight = weight
+            case .percentage(_):
+                ASSERT(false, "no advancing for percentage")
             case .repRanges(let info):
                 info.expectedWeight = weight
                 info.expectedReps = []
@@ -230,6 +265,8 @@ extension ExerciseVM {
                 info.expectedWeight = weight
             case .maxReps(let info):
                 info.expectedWeight = weight
+            case .percentage(_):
+                ASSERT(false, "no setting weight for percentage")
             case .repRanges(let info):
                 info.expectedWeight = weight
             case .repTotal(let info):
@@ -500,6 +537,7 @@ extension ExerciseVM {
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
                         Button("Max Reps", action: {change(defaultMaxReps())})
                         Button("Fixed Reps", action:   {change(defaultFixedReps())})
                         Button("Durations", action: {change(defaultDurations())})
@@ -520,6 +558,7 @@ extension ExerciseVM {
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
                         Button("Max Reps", action: {change(defaultMaxReps())})
                         Button("Fixed Reps", action:   {change(defaultFixedReps())})
                         Button("Durations", action: {change(defaultDurations())})
@@ -540,12 +579,34 @@ extension ExerciseVM {
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
                         Button("Max Reps", action: {change(defaultMaxReps())})
                         Button("Fixed Reps", action:   {change(defaultFixedReps())})
                         Button("Durations", action: {change(defaultDurations())})
                     }.font(.callout).padding(.leading)
                     Spacer()
                     Button("?", action: {onHelp("As many reps as possible for each set.")}).font(.callout)
+                }.padding()
+            )
+
+        case .percentage(_):
+            return AnyView(
+                HStack {
+                    Button("Edit", action: {modal.wrappedValue = true})
+                        .font(.callout)
+//                        .sheet(isPresented: modal) {EditMaxRepsView(exerciseName, einfo)}
+                    Spacer()
+                    Menu("Percentage") {
+                        Button("Cancel", action: {})
+                        Button("Rep Total", action: {change(defaultRepTotal())})
+                        Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
+                        Button("Max Reps", action: {change(defaultMaxReps())})
+                        Button("Fixed Reps", action:   {change(defaultFixedReps())})
+                        Button("Durations", action: {change(defaultDurations())})
+                    }.font(.callout).padding(.leading)
+                    Spacer()
+                    Button("?", action: {onHelp("Do what is expected for another exercise but scale weight by a percentage.")}).font(.callout)
                 }.padding()
             )
 
@@ -560,6 +621,7 @@ extension ExerciseVM {
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
                         Button("Max Reps", action: {change(defaultMaxReps())})
                         Button("Fixed Reps", action:   {change(defaultFixedReps())})
                         Button("Durations", action: {change(defaultDurations())})
@@ -580,6 +642,7 @@ extension ExerciseVM {
                         Button("Cancel", action: {})
                         Button("Rep Total", action: {change(defaultRepTotal())})
                         Button("Rep Ranges", action: {change(defaultRepRanges())})
+                        Button("Percentage", action: {change(defaultPercentage())})
                         Button("Max Reps", action: {change(defaultMaxReps())})
                         Button("Fixed Reps", action:   {change(defaultFixedReps())})
                         Button("Durations", action: {change(defaultDurations())})

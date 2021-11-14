@@ -33,6 +33,10 @@ class History: Storable {
                 self.completed = info.current.startDate
                 self.weight = info.current.weight
                 self.sets = info.currentReps.map({.reps(count: $0, percent: 1.0)})
+            case .percentage(let info):
+                self.completed = info.current.startDate
+                self.weight = info.current.weight
+                self.sets = info.currentReps.map({.reps(count: $0, percent: info.percent)})
             case .repRanges(let info):
                 self.completed = info.current.startDate
                 self.weight = info.current.weight

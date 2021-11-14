@@ -24,7 +24,10 @@ extension ExerciseInfo {
             let e = info.expectedReps.map({$0.description})
             return ["rest": joinedX(r), "target": t, "expected": joinedX(e)]
 
-        case .repRanges(_):
+        case .percentage(let info):
+            return ["percent": Int(100.0*info.percent).description, "rest": info.rest.description, "baseName": info.baseName]
+
+        case .repRanges:
             ASSERT(false, "use the other editing method")
             return [:]
 
@@ -91,7 +94,7 @@ extension ExerciseInfo {
         // Note that we don't use comma separated lists because that's more visual noise and
         // because some locales use commas for the decimal points.
         switch self {
-        case .durations(_):
+        case .durations:
             switch coalesce(parseTimes(table["durations"]!, label: "durations"),
                             parseTimes(table["target"]!, label: "target", emptyOK: true),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true)) {
@@ -117,7 +120,7 @@ extension ExerciseInfo {
                 return .left(err)
             }
 
-        case .fixedReps(_):
+        case .fixedReps:
             switch coalesce(parseIntList(table["reps"]!, label: "reps"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true)) {
             case .right((let rr, var r)):
@@ -141,7 +144,7 @@ extension ExerciseInfo {
                 return .left(err)
             }
 
-        case .maxReps(_):
+        case .maxReps:
             switch coalesce(parseTimes(table["rest"]!, label: "rest", zeroOK: true),    // this controls how many sets there are so it cannot be empty
                             parseOptionalInt(table["target"]!, label: "target reps"),   // TODO: should the edit view have an explicit num sets text field?
                             parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {
@@ -157,10 +160,25 @@ extension ExerciseInfo {
                 return .left(err)
             }
 
-        case .repRanges(_):
+        case .percentage:
+            switch coalesce(parseInt(table["percent"]!, label: "percent"),
+                            parseTimes(table["rest"]!, label: "rest", zeroOK: true, emptyOK: true, multipleOK: false)) {
+            case .right((let p, let r)):
+                if p < 0 {
+                    return .left("Percent must be greater than zero")
+                } else {
+                    // Base name might not refer to a real exercise but that's OK because the user may be in the process of
+                    // setting the exercises up (and the exercise view will tell him what's going on).
+                    return .right(.percentage(PercentageInfo(percent: Double(p)/100.0, rest: r.at(0) ?? 0, baseName: table["baseName"]!)))
+                }
+            case .left(let err):
+                return .left(err)
+            }
+
+        case .repRanges:
             return .left("use the other parse function")
 
-        case .repTotal(_):
+        case .repTotal:
             switch coalesce(parseInt(table["total"]!, label: "total"),
                             parseTimes(table["rest"]!, label: "rest", zeroOK: true, multipleOK: false),
                             parseIntList(table["expected"]!, label: "expected reps", emptyOK: true)) {

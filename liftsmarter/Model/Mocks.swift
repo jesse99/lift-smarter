@@ -24,6 +24,11 @@ func defaultRepRanges() -> ExerciseInfo {
     return .repRanges(info)
 }
 
+func defaultPercentage() -> ExerciseInfo {
+    let info = PercentageInfo(percent: 0.6, rest: 120, baseName: "")
+    return .percentage(info)
+}
+
 func defaultRepTotal() -> ExerciseInfo {
     let info = RepTotalInfo(total: 24, rest: 60)
     return .repTotal(info)
@@ -129,6 +134,11 @@ func mockProgram() -> Program {
         return Exercise("Split Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .repRanges(info))
     }
 
+    func lightSquats() -> Exercise {
+        let info = PercentageInfo(percent: 0.6, rest: 120, baseName: "Split Squat")
+        return Exercise("Light Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .percentage(info))
+    }
+
     func lunge() -> Exercise {
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 150, stage: .workset)
         let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0, stage: .workset)
@@ -182,7 +192,7 @@ func mockProgram() -> Program {
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
     let mobilityExercises = [foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
-    let lowerExercises = [foamRolling(), splitSquats(), lunge()]
+    let lowerExercises = [foamRolling(), splitSquats(), lightSquats(), lunge()]
     let upperExercises = [foamRolling(), planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     
     let rehab = Workout("Rehab", rehabExercises, schedule: .days([.saturday, .sunday, .tuesday, .thursday, .friday]))
@@ -200,7 +210,7 @@ func mockProgram() -> Program {
     let exercises = [
         shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch(),
         foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis(),
-        splitSquats(), lunge(),
+        splitSquats(), lightSquats(), lunge(),
         planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     return Program("Home", workouts, exercises, weeksStart: date)
 

@@ -72,6 +72,8 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
                 return info.current.setIndex
             case .maxReps(let info):
                 return info.current.setIndex
+            case .percentage(let info):
+                return info.current.setIndex
             case .repRanges(let info):
                 return info.current.setIndex
             case .repTotal(let info):
@@ -88,6 +90,8 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
             case .fixedReps(let info):
                 return info.current.startDate
             case .maxReps(let info):
+                return info.current.startDate
+            case .percentage(let info):
                 return info.current.startDate
             case .repRanges(let info):
                 return info.current.startDate
@@ -164,16 +168,7 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
     }
     
     func expectedReps() -> Int? {
-        switch self.instance.info {
-        case .maxReps(let info):
-            return info.expectedReps.at(info.current.setIndex) ?? 1
-        case .repRanges(let info):
-            return info.expectedReps.at(info.current.setIndex)?.reps ?? info.sets[info.current.setIndex].reps.min
-        case .repTotal(let info):
-            return info.expectedReps.at(info.current.setIndex) ?? 1
-        case .durations, .fixedReps:
-            return nil
-        }
+        return self.exercise.expectedReps(setIndex: self.setIndex)
     }
         
     func currentIsUnexpected() -> Bool {
@@ -184,8 +179,8 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
             return info.expectedReps != info.currentReps
         case .repTotal(let info):
             return info.expectedReps != info.currentReps
-        case .durations, .fixedReps:
-            return false
+        case .durations, .fixedReps, .percentage:
+            return false    // by definition these can't have unexpected
         }
     }
 
@@ -272,6 +267,17 @@ extension InstanceVM {
             info.currentReps.append(reps!)
             finished = info.current.setIndex == info.restSecs.count
 
+        case .percentage(let info):
+            if info.current.setIndex == 0 {
+                info.current.startDate = now
+            }
+
+            ASSERT(reps == nil, "reps is for repRanges and repTotal")
+            let reps = self.exercise.expectedReps(setIndex: info.current.setIndex) ?? 1
+            info.current.setIndex += 1
+            info.currentReps.append(reps)
+            finished = info.current.setIndex == self.exercise.numSets()
+
         case .repRanges(let info):
             if info.current.setIndex == 0 {
                 info.current.startDate = now
@@ -314,7 +320,7 @@ extension InstanceVM {
     // all the exercises
     func updateExpected() {
         switch self.instance.info {
-        case .durations(_), .fixedReps(_):
+        case .durations, .fixedReps, .percentage:
             ASSERT(false, "nonsensical")
 
         case .maxReps(let info):
@@ -351,6 +357,21 @@ extension InstanceVM {
                     return "Finished using \(info.current.setIndex) sets"
                 }
             }
+            
+        case .percentage(let info):
+            if let base = self.program.exercises.findLast({$0.name == info.baseName}) {
+                switch base.info {
+                case .durations:
+                    return "'\(info.baseName)' cannot be a durations exercise"
+                case .percentage:
+                    return "'\(info.baseName)' cannot be a percentage exercise"
+                default:
+                    break
+                }
+            } else {
+                return "'\(info.baseName)' exercise is missing"
+            }
+            
         case .repRanges(let info):
             switch self.progress() {
             case .notStarted, .started:
@@ -372,16 +393,18 @@ extension InstanceVM {
                 return "Finished"
             }
         default:
-            let numSets = self.exercise.numSets()!
-            switch self.progress() {
-            case .notStarted, .started:
-                return "Set \(self.setIndex + 1) of \(numSets)"
-            case .finished:
-                if numSets == 1 {
-                    return "Finished"
-                } else {
-                    return "Finished all \(numSets) sets"
-                }
+            break
+        }
+        
+        let numSets = self.exercise.numSets()!
+        switch self.progress() {
+        case .notStarted, .started:
+            return "Set \(self.setIndex + 1) of \(numSets)"
+        case .finished:
+            if numSets == 1 {
+                return "Finished"
+            } else {
+                return "Finished all \(numSets) sets"
             }
         }
     }
@@ -425,6 +448,20 @@ extension InstanceVM {
             } else {
                 weight = info.expectedWeight
                 text = "AMRAP"
+            }
+
+        case .percentage(let info):
+            weight = self.exercise.expectedWeight
+            if let numSets = self.exercise.numSets() {
+                if info.current.setIndex < numSets {
+                    if let reps = self.exercise.expectedReps(setIndex: info.current.setIndex) {
+                        if reps == 1 {
+                            text = "1 rep"
+                        } else {
+                            text = "\(reps) reps"
+                        }
+                    }
+                }
             }
 
         case .repRanges(let info):
@@ -506,6 +543,9 @@ extension InstanceVM {
                 weight = info.expectedWeight
             }
 
+        case .percentage:
+            weight = self.exercise.expectedWeight
+
         case .repRanges(let info):
             if info.current.setIndex < info.sets.count {
                 let set = info.currentSet()
@@ -547,6 +587,9 @@ extension InstanceVM {
                 sets = info.sets.map({.reps(count: $0.reps.reps, percent: 1.0)})
             case .maxReps(let info):
                 sets = info.expectedReps.map({.reps(count: $0, percent: 1.0)})
+            case .percentage(let info):
+                let numSets = self.exercise.numSets() ?? 0
+                sets = (0..<numSets).map({.reps(count: self.exercise.expectedReps(setIndex: $0) ?? 1, percent: info.percent)})
             case .repRanges(let info):
                 let worksets = info.expectedReps.filter({$0.stage == .workset})
                 sets = worksets.map({.reps(count: $0.reps, percent: $0.percent)})
@@ -614,6 +657,10 @@ extension InstanceVM {
             let title = self.getSetTimerTitle("Set", delta)
             return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
 
+        case .percentage(let info):
+            let title = self.getSetTimerTitle("Set", delta)
+            return TimerView(title: title, duration: info.rest)
+
         case .repRanges(let info):
             let title = self.getSetTimerTitle("", delta)
             let set = info.currentSet(delta)
@@ -663,6 +710,9 @@ extension InstanceVM {
                 secs = info.restSecs.last!
             }
 
+        case .percentage(let info):
+            secs = info.rest
+
         case .repRanges(let info):
             let set = info.currentSet()
             return set.restSecs
@@ -677,15 +727,17 @@ extension InstanceVM {
     // ExerciseView
     func view(_ program: ProgramVM) -> AnyView {
         switch self.instance.info {
-        case .durations(_):
+        case .durations:
             return AnyView(DurationsView(program, self))
-        case .fixedReps(_):
+        case .fixedReps:
             return AnyView(FixedRepsView(program, self))
-        case .maxReps(_):
+        case .maxReps:
             return AnyView(MaxRepsView(program, self))
-        case .repRanges(_):
+        case .percentage:
+            return AnyView(PercentageView(program, self))
+        case .repRanges:
             return AnyView(RepRangesView(program, self))
-        case .repTotal(_):
+        case .repTotal:
             return AnyView(RepTotalView(program, self))
         }
     }
@@ -728,6 +780,13 @@ extension InstanceVM {
                 setStrs = info.expectedReps.map({getRepLabel($0)})
             }
             trailer = weightSuffix(WeightPercent(1.0), info.expectedWeight)
+
+        case .percentage:
+            let numSets = self.exercise.numSets() ?? 0
+            let reps = (0..<numSets).map({self.exercise.expectedReps(setIndex: $0) ?? 1})
+            setStrs = reps.map({getRepLabel($0)})
+            trailer = weightSuffix(WeightPercent(1.0), self.exercise.expectedWeight)
+            limit = 6
 
         case .repRanges(let info):
             let worksets = info.sets.filter({$0.stage == .workset})

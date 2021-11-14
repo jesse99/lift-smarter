@@ -135,6 +135,16 @@ class Program: Storable {
                 ASSERT(info.current.setIndex <= info.restSecs.count, "setIndex must match sets")
             }
             
+        case .percentage(let info):
+            ASSERT(info.percent >= 0.0, "percent must be >= 0")  // we'll allow percents greater than 100 (people may want to do a heavy verision of an exercise)
+            if inProgram {
+                ASSERT(info.currentReps.count == 0, "current is workout specific")
+                ASSERT(info.current.setIndex == 0, "current is workout specific")
+                ASSERT(info.current.weight == 0.0, "current is workout specific")
+            } else {
+                // TODO: could compare currentReps against base expected
+            }
+
         case .repRanges(let info):
             ASSERT(info.sets.first(where: {$0.stage == .workset}) != nil, "must have at least one workset")
             
@@ -204,6 +214,13 @@ class Program: Storable {
             default:
                 ASSERT(false, "workout exercise and program exercise infos don't match")
             }
+        case .percentage(let info):
+            switch parent.info {
+            case .percentage(let pinfo):
+                self.validateInfos(info, pinfo)
+            default:
+                ASSERT(false, "workout exercise and program exercise infos don't match")
+            }
         case .repRanges(let info):
             switch parent.info {
             case .repRanges(let pinfo):
@@ -238,6 +255,12 @@ class Program: Storable {
         ASSERT(info.targetReps == parent.targetReps, "targetReps must match")
         ASSERT(info.expectedWeight == parent.expectedWeight, "expectedWeight must match")
         ASSERT(info.expectedReps == parent.expectedReps, "expectedReps must match")
+    }
+
+    private func validateInfos(_ info: PercentageInfo, _ parent: PercentageInfo) {
+        ASSERT(info.percent == parent.percent, "percents must match")
+        ASSERT(info.rest == parent.rest, "rests must match")
+        ASSERT(info.baseName == parent.baseName, "baseNames must match")
     }
 
     private func validateInfos(_ info: RepRangesInfo, _ parent: RepRangesInfo) {

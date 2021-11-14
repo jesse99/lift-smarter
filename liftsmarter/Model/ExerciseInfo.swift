@@ -213,6 +213,58 @@ final class MaxRepsInfo: Equatable, Storable {
     }
 }
 
+/// Use same reps as those expected for a base exercise, weight is a percentage of the base.
+final class PercentageInfo: Equatable, Storable {
+    var percent: Double
+    var rest: Int
+    var baseName: String    // exercise name, can be missing, can't be durations or percentage
+        
+    var current = Current()
+    var currentReps: [Int] = []           // what the user has done so far
+
+    init(percent: Double, rest: Int, baseName: String) {
+        self.percent = percent
+        self.rest = rest
+        self.baseName = baseName
+    }
+    
+    required init(from store: Store) {
+        self.percent = store.getDbl("percent")
+        self.rest = store.getInt("rest")
+        self.baseName = store.getStr("baseName")
+        self.current = store.getObj("current")
+        self.currentReps = store.getIntArray("currentReps")
+    }
+
+    func save(_ store: Store) {
+        store.addDbl("percent", percent)
+        store.addInt("rest", rest)
+        store.addStr("baseName", baseName)
+        store.addObj("current", current)
+        store.addIntArray("currentReps", currentReps)
+    }
+
+    func clone() -> PercentageInfo {
+        let store = Store()
+        store.addObj("self", self)
+        let result: PercentageInfo = store.getObj("self")
+        return result
+    }
+
+    func resetCurrent(weight: Double) {
+        self.current.reset(weight: weight)
+        self.currentReps = []
+    }
+    
+    func resetExpected() {
+        // nothing to do
+    }
+
+    static func == (lhs: PercentageInfo, rhs: PercentageInfo) -> Bool {
+        return sameWeight(lhs.percent, rhs.percent) && lhs.rest == rhs.rest && lhs.baseName == rhs.baseName
+    }
+}
+
 struct ActualRepRange: Equatable, Storable {
     let reps: Int
     let percent: Double
@@ -358,6 +410,7 @@ enum ExerciseInfo: Equatable {
     case durations(DurationsInfo)
     case fixedReps(FixedRepsInfo)
     case maxReps(MaxRepsInfo)
+    case percentage(PercentageInfo)
     case repRanges(RepRangesInfo)
     case repTotal(RepTotalInfo)
     // TODO:   case untimed(restSecs: [Int])
@@ -376,6 +429,9 @@ extension ExerciseInfo: Storable {
         case "maxReps":
             self = .maxReps(store.getObj("info"))
             
+        case "percentage":
+            self = .percentage(store.getObj("info"))
+
         case "repRanges":
             self = .repRanges(store.getObj("info"))
 
@@ -399,6 +455,10 @@ extension ExerciseInfo: Storable {
 
         case .maxReps(let info):
             store.addStr("type", "maxReps")
+            store.addObj("info", info)
+
+        case .percentage(let info):
+            store.addStr("type", "percentage")
             store.addObj("info", info)
 
         case .repRanges(let info):
@@ -428,6 +488,8 @@ extension ExerciseInfo {
             info.resetCurrent(weight: weight)
         case .maxReps(let info):
             info.resetCurrent(weight: weight)
+        case .percentage(let info):
+            info.resetCurrent(weight: weight)
         case .repRanges(let info):
             info.resetCurrent(weight: weight)
         case .repTotal(let info):
@@ -447,6 +509,8 @@ extension ExerciseInfo {
             return 3
         case .repTotal(_):
             return 4
+        case .percentage(_):
+            return 5
         }
     }
 }
