@@ -376,7 +376,7 @@ extension ExerciseVM {
         return true
     }
 
-    func weightPicker(_ text: Binding<String>, _ modal: Binding<Bool>, _ onEdit: @escaping (String) -> Void, _ onHelp: @escaping HelpFunc) -> AnyView {
+    func weightPicker(_ apparatus: Apparatus, _ text: Binding<String>, _ modal: Binding<Bool>, _ onEdit: @escaping (String) -> Void, _ onHelp: @escaping HelpFunc) -> AnyView {
         // Some apparatus can have large jumps (10 lbs is common for dumbbells, 15 can happen on cable machines).
         // But if the weight the user wants to use is way off what they can do then we'll highlight that.
         let badWeight = 20.0
@@ -518,7 +518,7 @@ extension ExerciseVM {
         }
         
         // This isn't currently shared but it's complex enough that we define it here to hide it away.
-        switch self.apparatus {
+        switch apparatus {
         case .bodyWeight:
             return weightField()
 
@@ -718,6 +718,7 @@ extension ExerciseVM {
 
     func apparatusView(_ apparatus: Binding<Apparatus>, _ modal: Binding<Bool>, _ onHelp: @escaping Help2Func) -> AnyView {
         func change(_ newValue: Apparatus) {
+            self.program.willChange()
             if newValue.caseIndex() != self.apparatus.caseIndex() {
                 apparatus.wrappedValue = newValue
             } else {

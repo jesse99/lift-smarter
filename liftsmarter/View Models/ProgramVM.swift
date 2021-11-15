@@ -738,17 +738,22 @@ extension ProgramVM {
 
     func modify(_ exercise: Exercise, callback: (Exercise) -> Void) {
         self.willChange()
+        
+        var exercises: [Exercise] = []
         let canonical = self.model.program.exercises.first(where: {$0.name == exercise.name})!
-        callback(canonical)
+        exercises.append(canonical)
         
         for workout in self.workouts {
             for candidate in workout.instances {
                 if candidate.name == exercise.name {
                     candidate.willChange()
-                    callback(candidate.exercise(self.model))
+                    exercises.append(candidate.exercise(self.model))
                 }
             }
         }
+        
+        // We gather up all the exercises in case we're changing their names.
+        exercises.forEach(callback)
     }
 }
 

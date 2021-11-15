@@ -51,6 +51,13 @@ class Program: Storable {
         store.addObjArray("exerciseClipboard", exerciseClipboard)
     }
 
+    func clone() -> Program {
+        let store = Store()
+        store.addObj("self", self)
+        let result: Program = store.getObj("self")
+        return result
+    }
+
     // TODO: can we put this behind a flag? or maybe only when run on a sim or one of my devices? Use #if DEBUG?
     func validate() {
         ASSERT(!self.name.isBlankOrEmpty(), "program name cannot be empty")

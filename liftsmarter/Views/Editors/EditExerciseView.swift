@@ -42,12 +42,12 @@ struct EditExerciseView: View {
                     Text("Formal Name:").font(.headline)
                     Button(self.getFormalName(), action: {self.formalNameModal = true})
                         .font(.callout)
-                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: "Formal Name", prompt: "Name:", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
+                        .sheet(isPresented: self.$formalNameModal) {PickerView(title: self.instance.name, prompt: "Name:", initial: self.formalName, populate: matchFormalName, confirm: self.onEditedFormalName)}
                     Spacer()
                     Button("?", action: self.onFormalNameHelp).font(.callout).padding(.trailing)
                 }.padding(.leading)
                 
-                self.instance.exercise.weightPicker(self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
+                self.instance.exercise.weightPicker(self.apparatus, self.$weight, self.$weightsModal, self.onEdited, self.onWeightHelp)
                 
                 Toggle("Respect Rest Weeks", isOn: self.$allowRest).padding(.trailing).padding(.leading)
                 

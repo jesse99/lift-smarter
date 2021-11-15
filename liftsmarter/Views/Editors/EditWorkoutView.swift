@@ -155,8 +155,8 @@ struct EditWorkoutView: View {
                     self.workout.setNextCyclic(self.nextCyclic)
                 }
             }
-        case .left(_):
-            ASSERT(false, "validate should have prevented this from executing")
+        case .left(let err):
+            ASSERT(false, "validate should have prevented this from executing: \(err)")
         }
 
         app.saveState()

@@ -219,6 +219,6 @@ func mockProgram() -> Program {
 func mockModel() -> Model {
     let program = mockProgram()
     let model = Model(program)
-    model.fixedWeights = ["Dumbbells": FixedWeightSet([5, 10, 20, 25, 35]), "Cable machine": FixedWeightSet([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
+    model.fixedWeights = ["Dumbbells": FixedWeightSet([5, 10, 15, 20, 25, 30, 40, 50]), "Cable machine": FixedWeightSet([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
     return model
 }

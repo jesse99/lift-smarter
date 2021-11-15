@@ -46,6 +46,7 @@ struct ProgramsView: View {
             buttons.append(.default(Text("Activate"), action: self.onActivate))
             buttons.append(.destructive(Text("Delete"), action: self.onDelete))
         }
+        buttons.append(.default(Text("Duplicate"), action: self.onDuplicate))
         buttons.append(.cancel(Text("Cancel"), action: {}))
 
         return buttons
@@ -58,6 +59,10 @@ struct ProgramsView: View {
     private func onDelete() {
         self.confirmAlert = true
         self.alertMesg = "Of \(self.selection!.name)"
+    }
+    
+    private func onDuplicate() {
+        self.model.duplicate(self.selection!.index)
     }
     
     private func doDelete() {

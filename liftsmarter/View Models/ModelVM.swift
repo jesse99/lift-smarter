@@ -47,6 +47,24 @@ extension ModelVM {
         self.willChange()
         self.model.programs.remove(at: index)
     }
+
+    func duplicate(_ index: Int) {
+        self.willChange()
+
+        var program = self.model.programs[index]
+        var name = program.name
+        var count = 2
+        while self.model.programs.first(where: {$0.name == name}) != nil {
+            name = "\(name) \(count)"
+            count += 1
+        }
+        
+        program = program.clone()
+        program.name = name
+        
+        self.model.programs.append(program)
+        self.model.programs.sort(by: {$0.name < $1.name})
+    }
 }
 
 // UI
