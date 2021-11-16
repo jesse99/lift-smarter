@@ -296,7 +296,9 @@ extension ExerciseVM {
                 ASSERT(false, "no advancing for percentage")
             case .repRanges(let info):
                 info.expectedWeight = weight
-                info.expectedReps = []
+                if info.sets.any({$0.reps.min < ($0.reps.max ?? $0.reps.min)}) {
+                    info.expectedReps = []
+                }
             case .repTotal(let info):
                 info.expectedWeight = weight
             }

@@ -295,7 +295,7 @@ final class RepRangesInfo: Equatable, Storable {
     var sets: [RepsSet]
     
     var expectedWeight = 0.0
-    var expectedReps: [ActualRepRange]   // includes warmup, work, and backoff sets
+    var expectedReps: [ActualRepRange]   // includes warmup, work, and backoff sets, reset to empty when weight is advanced
     
     var current = Current()
     var currentReps: [ActualRepRange] = []   // includes warmup, work, and backoff sets

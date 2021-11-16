@@ -173,7 +173,13 @@ class InstanceVM: Equatable, Identifiable, ObservableObject {
         case .maxReps(let info):
             return info.expectedReps != info.currentReps
         case .repRanges(let info):
-            return info.expectedReps != info.currentReps
+            if !info.expectedReps.isEmpty {
+                return info.expectedReps != info.currentReps
+            } else {
+                // Don't bother asking the user to update expected if the default expected works.
+                let expected = info.sets.map({ActualRepRange(reps: $0.reps.min, percent: $0.percent.value, stage: $0.stage)})
+                return info.expectedReps != expected
+            }
         case .repTotal(let info):
             return info.expectedReps != info.currentReps
         case .durations, .fixedReps, .percentage:
@@ -499,7 +505,7 @@ extension InstanceVM {
             }
         }
 
-        if weight > 0.0 {
+        if weight > 0.0 && !self.finished {
             let closest = useBelow ? exercise.getClosestBelow(weight*percent) : exercise.getClosest(weight*percent)
             if case .right(let weight) = closest {
                 let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
@@ -533,8 +539,28 @@ extension InstanceVM {
             return result
         }
         
+        func subSub(_ weight: Double, _ percent: WeightPercent, _ useBelow: Bool) -> String {
+            let closest = useBelow ? exercise.getClosestBelow(weight*percent) : exercise.getClosest(weight*percent)
+            if case .right(let weight) = closest {
+                let parts: [String] = weight.weights.map({
+                    if $0.label.isEmpty {
+                        return friendlyWeight($0.weight)
+                    } else {
+                        return friendlyWeight($0.weight) + " " + $0.label
+                    }
+                })
+                return combine(parts).joined(separator: " + ")
+            }
+            return ""
+        }
+        
+        if self.finished {
+            return ""
+        }
+
         var weight = 0.0
         var percent = WeightPercent(1.0)
+        var useBelow = true
         switch self.instance.info {
         case .durations(let info):
             weight = info.expectedWeight
@@ -551,30 +577,31 @@ extension InstanceVM {
 
         case .percentage(let info):
             weight = self.exercise.expectedWeight(info.current.setIndex)
+            useBelow = info.percent >= 1.0
 
         case .repRanges(let info):
             if info.current.setIndex < info.sets.count {
                 let set = info.currentSet()
                 weight = info.expectedWeight
                 percent = set.percent
+                useBelow = set.stage == .workset
             }
-            
+
         case .repTotal(let info):
             weight = info.expectedWeight
         }
-
-        if weight > 0.0 {
-            let closest = exercise.getClosestBelow(weight*percent)
-            if case .right(let weight) = closest, (weight.weights.first?.weight ?? 0.0) > 0.0 {
-                let parts: [String] = weight.weights.map({
-                    if $0.label.isEmpty {
-                        return friendlyWeight($0.weight)
-                    } else {
-                        return friendlyWeight($0.weight) + " " + $0.label
-                    }
-                })
-                return combine(parts).joined(separator: " + ")
+        
+        switch self.exercise.apparatus {
+        case .bodyWeight:
+            // The sub-sub title is used to break down the weight into component parts (like plates).
+            // That doesn't make sense for body-weight so we do nothing.
+            return ""
+        case .fixedWeights(name: let name):
+            if let name = name, let fws = self.program.getFixedWeights()[name], fws.extraAdds > 0 {
+                return subSub(weight, percent, useBelow)
             }
+        default:
+            return subSub(weight, percent, useBelow)
         }
         return ""
     }
