@@ -86,6 +86,14 @@ class History: Storable {
             store.addObjArray("\(name)-records", records)
         }
     }
+    
+    func renamed(oldExercise: String, newExercise: String) {
+        if self.records[newExercise] == nil {
+            let history = self.records[oldExercise]
+            self.records[newExercise] = history
+            self.records[oldExercise] = nil   // note that we leep the old info if we didn't move it over
+        }
+    }
 }
 
 extension ActualSet: Storable {

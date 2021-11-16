@@ -240,6 +240,12 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
 // Mutators
 extension ExerciseVM {
     func setName(_ name: String) {
+        for workout in self.program.workouts {
+            workout.renamed(oldExercise: self.exercise.name, newExercise: name)
+        }
+        
+        self.program.model(self.exercise).history.renamed(oldExercise: self.exercise.name, newExercise: name)
+
         self.program.modify(self.exercise, callback: {$0.name = name})
     }
     

@@ -60,7 +60,15 @@ extension WorkoutVM {
             self.workout.name = name
         }
     }
-    
+        
+    func renamed(oldExercise: String, newExercise: String) {
+        if self.workout.completed[newExercise] == nil {
+            let date = self.workout.completed[oldExercise]
+            self.workout.completed[newExercise] = date
+            self.workout.completed[oldExercise] = nil   // note that we keep the old info if we didn't move it over
+        }
+    }
+
     func setInstances(_ instances: [InstanceVM]) {
         self.willChange()
         self.workout.exercises = instances.map({$0.exercise(self.workout).clone()})

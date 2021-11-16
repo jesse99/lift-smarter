@@ -145,9 +145,9 @@ struct EditWorkoutView: View {
     }
 
     private func onOK() {
-        self.workout.setName(self.name)
         switch self.workout.parse(self.name, self.schedule, self.scheduleText, self.subSchedule, self.subScheduleText) {
         case .right(let schedule):
+            self.workout.setName(self.name)
             self.workout.setSchedule(schedule)
             
             if self.hasDatePicker {
