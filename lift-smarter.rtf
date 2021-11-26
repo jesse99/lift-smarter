@@ -6,7 +6,19 @@
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs48 \cf2 \'95\'a0Cardio says \'93today\'94 after 7pm or so	\
+\f0\fs48 \cf2 https://www.amazon.com/gp/product/B08GHGTGQ2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B08GHGTGQ2&linkCode=as2&tag=helentag-20&linkId=179b6ffba6a6be0823e10d0885570a2e\
+\
+\'95 Really need a way to have multiple plate sets:\
+	- add one for deadlifts, use bumpers, skip 2.5 plates for now\
+	- later could add one for OHP that uses 1.25 magnets\
+\'95 Would be nice to somehow show next steps in implicit timer\
+	- could we have a translucent overlay?\
+	- or maybe a tap to dismiss centered view?\
+\'95 Would be great if there was a way to terminate rep total exercises\
+\'95 After editing cable machine weights the \'93Cable machine\'94 list item title said \'93Dumbbells\'94\
+\
+\'95\'a0Cardio workout says \'93today\'94 after 7pm or so	\
+	- tho OHP workout was OK\
 	- see if we can repro this with a unit test\
 \'95\'a0Add a new gym type program\
 	- do some testing with a hi, low, hi program\
@@ -86,6 +98,7 @@
 	- probably want to use a wizard (strength/hypertrophy/cardio, equipment, age, sex (m/f/either), days/week)\
 	- give them some options\
 	- mention that they can customize recomendations\
+\pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
 \f2\fs34 \cf3 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
@@ -107,12 +120,14 @@ MVVM\
 
 \f0\b0 View -> ViewModel -> Model\
 	references are all one way\
-\ul 	initing a view with the same args should always result in the same view\ulnone \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
+\cf2 \ul \ulc2 	initing a view with the same args should always result in the same view\ulnone \
 	ViewModel has state associatd with the view\
 		eg state of UI controls, like what the selection is\
 		\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab816\pardirnatural\partightenfactor0
 
-\f1\b Combine\
+\f1\b \cf2 Combine\
 	
 \f0\b0 https://developer.apple.com/documentation/combine\
 	https://heckj.github.io/swiftui-notes/#when-to-use-combine\

@@ -31,11 +31,15 @@ struct NoteView: View {
         VStack {
             Text(self.formalName).font(.largeTitle)
             if #available(iOS 15.0, *) {
-                Text(self.markup())
-                    .font(.callout)
-                    .padding()
+                ScrollViewReader {scrollView in
+                    ScrollView(.vertical) {
+                        Text(self.markup())
+                            .font(.callout)
+                            .padding()
+                    }
+                }
             } else {
-                HTMLStringView(htmlContent: self.markup())
+                HTMLStringView(htmlContent: self.markup())  // TODO: make this scrollable?
                     .padding()
             }
             Spacer()
