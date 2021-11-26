@@ -66,16 +66,16 @@ class ProgramVM: ObservableObject {
         return HistoryVM(self.model)
     }
     
-    func getFixedWeights() -> [String: FixedWeightSet] {
-        return self.model.fixedWeights
+    func getBellsSet() -> [String: Bells] {
+        return self.model.bellsSet
     }
 
     func getPlatesSet() -> [String: Plates] {
         return self.model.platesSet
     }
 
-    func getFWS(_ name: String) -> FixedWeightSet? {
-        return self.model.fixedWeights[name]
+    func getBells(_ name: String) -> Bells? {
+        return self.model.bellsSet[name]
     }
 
     func willChange() {
@@ -198,41 +198,41 @@ extension ProgramVM {
         self.model.userNotes[formalName] = note
     }
     
-    func setFWS(_ name: String, _ fws: FixedWeightSet) {
+    func setBells(_ name: String, _ bells: Bells) {
         self.willChange()
-        self.model.fixedWeights[name] = fws
+        self.model.bellsSet[name] = bells
     }
     
-    func addFWS(_ name: String) {
+    func addBells(_ name: String) {
         self.willChange()
-        self.model.fixedWeights[name] = FixedWeightSet()
+        self.model.bellsSet[name] = Bells()
     }
     
-    func delFWS(_ name: String) {
+    func delBells(_ name: String) {
         self.willChange()
-        self.model.fixedWeights[name] = nil
+        self.model.bellsSet[name] = nil
     }
     
-    func setFWS(_ weights: [String: FixedWeightSet]) {
+    func setBellsSet(_ weights: [String: Bells]) {
         self.willChange()
-        self.model.fixedWeights = weights
+        self.model.bellsSet = weights
     }
     
-    func addFixedWeight(_ name: String, _ first: Double, _ step: Double, _ last: Double) {
+    func addBellRange(_ name: String, _ first: Double, _ step: Double, _ last: Double) {
         self.willChange()
 
-        if self.model.fixedWeights[name] == nil {
-            self.model.fixedWeights[name] = FixedWeightSet([])
+        if self.model.bellsSet[name] == nil {
+            self.model.bellsSet[name] = Bells([])
         }
-        let fws = self.model.fixedWeights[name]!
+        let bells = self.model.bellsSet[name]!
         
         var weight = first
         while weight <= last {
-            fws.weights.add(weight)
+            bells.weights.add(weight)
             weight += step
         }
         
-        self.model.fixedWeights[name] = fws
+        self.model.bellsSet[name] = bells
     }
 
     func setPlates(_ name: String, _ plates: Plates) {
@@ -250,11 +250,10 @@ extension ProgramVM {
         self.model.platesSet[name] = nil
     }
     
-    func setPlates(_ platesSet: [String: Plates]) {
+    func setPlatesSet(_ platesSet: [String: Plates]) {
         self.willChange()
         self.model.platesSet = platesSet
     }
-    
 }
 
 struct Confirmation: Identifiable {

@@ -35,34 +35,34 @@ struct PairedEntry: Identifiable {
     }
 }
 
-/// Used to edit a single FixedWeightSet.
-struct EditFWSView: View {
+/// Used to edit a single Bells object.
+struct EditBellsView: View {
     enum ActiveAlert {case deleteSelected, deleteAll}
 
     let program: ProgramVM
     let originalName: String
     @State var name: String
-    @State var fws: FixedWeightSet
+    @State var bells: Bells
     @State var showEditActions = false
     @State var showAdd = false
     @State var showEdit = false
     @State var showAlert = false
-    @State var alertAction: EditFWSView.ActiveAlert = .deleteSelected
+    @State var alertAction: EditBellsView.ActiveAlert = .deleteSelected
     @State var selection: ListEntry? = nil
-    @State var edited = 0   // hack because FixedWeightSet is a class now so @State doesn't work with it
+    @State var edited = 0   // hack because Bells is a class now so @State doesn't work with it
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
     init(_ program: ProgramVM, _ name: String) {
         self.program = program
         self.originalName = name
-        self._fws = State(initialValue: program.getFWS(name)?.clone() ?? FixedWeightSet([]))
+        self._bells = State(initialValue: program.getBells(name)?.clone() ?? Bells([]))
         self._name = State(initialValue: name)
     }
     
     var body: some View {
         VStack() {
-            Text("Fixed Weights").font(.largeTitle)
+            Text("Weights").font(.largeTitle)
 
             wordsField("Name", self.$name, self.onEditedName)
             Divider().background(Color.black)
@@ -77,7 +77,7 @@ struct EditFWSView: View {
                         self.showEditActions = true
                     }
             }
-            .sheet(isPresented: self.$showEdit) {EditTextView(title: "\(self.name) Weight", content: friendlyWeight(self.fws.weights[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
+            .sheet(isPresented: self.$showEdit) {EditTextView(title: "\(self.name) Weight", content: friendlyWeight(self.bells.weights[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout).id(self.edited)
 
@@ -88,7 +88,7 @@ struct EditFWSView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: false, onEdit: self.onAddedWeight)}
+                    .sheet(isPresented: self.$showAdd) {AddBellRangeView(self.program, self.originalName, self.$bells, extra: false, onEdit: self.onAddedWeight)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -105,14 +105,14 @@ struct EditFWSView: View {
             } else {
                 return Alert(
                     title: Text("Confirm delete all"),
-                    message: Text("\(self.fws.weights.count) weights"),
+                    message: Text("\(self.bells.weights.count) weights"),
                     primaryButton: .destructive(Text("Delete")) {self.doDeleteAll()},
                     secondaryButton: .default(Text("Cancel")))
             }}
     }
 
     private func getEntries() -> [ListEntry] {
-        return self.fws.weights.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
+        return self.bells.weights.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
     }
     
     private func editButtons() -> [ActionSheet.Button] {
@@ -130,7 +130,7 @@ struct EditFWSView: View {
         self.error = ""
 
         if text != self.originalName {
-            if self.program.getFWS(text) != nil {
+            if self.program.getBells(text) != nil {
                 self.error = "Name already exists"
             }
         }
@@ -138,10 +138,10 @@ struct EditFWSView: View {
     
     private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
-        let originalWeight = self.fws.weights[self.selection!.index]
+        let originalWeight = self.bells.weights[self.selection!.index]
         if differentWeight(newWeight, originalWeight) {
-            self.fws.weights.remove(at: self.selection!.index)
-            self.fws.weights.add(newWeight)
+            self.bells.weights.remove(at: self.selection!.index)
+            self.bells.weights.add(newWeight)
             self.edited += 1
         }
     }
@@ -164,11 +164,11 @@ struct EditFWSView: View {
     }
 
     private func doDelete() {
-        self.fws.weights.remove(at: self.selection!.index)
+        self.bells.weights.remove(at: self.selection!.index)
     }
     
     private func doDeleteAll() {
-        self.fws = FixedWeightSet([])
+        self.bells = Bells([])
     }
     
     private func onDelete() {
@@ -195,10 +195,10 @@ struct EditFWSView: View {
 
     private func onOK() {
         if self.name != self.originalName {
-            self.program.delFWS(self.originalName)
-            self.program.setFWS(self.name, self.fws)
-        } else if self.fws != program.getFWS(self.name) {
-            self.program.setFWS(self.name, self.fws)
+            self.program.delBells(self.originalName)
+            self.program.setBells(self.name, self.bells)
+        } else if self.bells != program.getBells(self.name) {
+            self.program.setBells(self.name, self.bells)
         }
 
         app.saveState()
@@ -206,11 +206,11 @@ struct EditFWSView: View {
     }
 }
 
-struct EditFWSView_Previews: PreviewProvider {
+struct EditBellsView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(ModelVM(model), model)
 
     static var previews: some View {
-        EditFWSView(program, "Dumbbells")
+        EditBellsView(program, "Dumbbells")
     }
 }

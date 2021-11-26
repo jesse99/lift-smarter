@@ -1,22 +1,17 @@
 //  Created by Jesse Vorisek on 9/9/21.
 import Foundation
 
-// TODO:
-// support magnets/extra on fixedWeights
-// support pairedPlates and singlePlates
-// support bumpers, may want to use a PlateWeightSet here, plates have a weight/count
-// support magnets
 enum Apparatus: Equatable {
+    /// This is used for dumbbels, kettlebells, cable machines, etc. Name references a Bells object.
+    /// If name is nil then the user hasn't activated a Bells set yet.
+    case bells(name: String?)
+
     /// Typically these are unweighted but users can enter an arbitrary weight if they are using a plate,
     /// kettlebell, chains, milk jug, or whatever (this comes from Expected).
     case bodyWeight
 
     /// Barbell, leg press, etc. Name references a Plates object. If name is nil then the user hasn't activated a Plates yet.
     case dualPlates(barWeight: Double, _ name: String?)
-
-    /// This is used for dumbbels, kettlebells, cable machines, etc. Name references a FixedWeights object.
-    /// If name is nil then the user hasn't activated a FixedWeight set yet.
-    case fixedWeights(name: String?)
 
     /// T-bar row, landmine, etc.
     case singlePlates(_ name: String?)
@@ -35,7 +30,7 @@ extension Apparatus: Storable {
             
         case "fixedWeights":
             let name = store.hasKey("name") ? store.getStr("name") : nil
-            self = .fixedWeights(name: name)
+            self = .bells(name: name)
             
         case "singlePlates":
             let name = store.hasKey("name") ? store.getStr("name") : nil
@@ -58,7 +53,7 @@ extension Apparatus: Storable {
                 store.addStr("name", name)
             }
 
-        case .fixedWeights(name: let name):
+        case .bells(name: let name):
             store.addStr("type", "fixedWeights")
             if let name = name {
                 store.addStr("name", name)
@@ -78,7 +73,7 @@ extension Apparatus {
         switch self {
         case .bodyWeight:
             return 0
-        case .fixedWeights(name: _):
+        case .bells(name: _):
             return 1
         case .dualPlates(barWeight: _, _):
             return 2
@@ -91,7 +86,7 @@ extension Apparatus {
         switch self {
         case .bodyWeight:
             return self
-        case .fixedWeights(name: _):
+        case .bells(name: _):
             return self
         case .dualPlates(barWeight: let bar, let name):
             return .dualPlates(barWeight: bar, name)

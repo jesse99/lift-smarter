@@ -67,15 +67,15 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             } else {
                 return .left("No plates activated")
             }
-        case .fixedWeights(name: let name):
+        case .bells(name: let name):
             if let name = name {
-                if let fws = model.fixedWeights[name] {
-                    return .right(fws.getClosest(target))
+                if let bells = model.bellsSet[name] {
+                    return .right(bells.getClosest(target))
                 } else {
-                    return .left("There is no fixed weight set named \(name)")
+                    return .left("There is no bells named \(name)")
                 }
             } else {
-                return .left("No fixed weights activated")
+                return .left("No bells activated")
             }
         case .singlePlates(let name):
             if let name = name {
@@ -106,15 +106,15 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             } else {
                 return .left("No plates activated")
             }
-        case .fixedWeights(name: let name):
+        case .bells(name: let name):
             if let name = name {
-                if let fws = model.fixedWeights[name] {
-                    return .right(fws.getClosestBelow(target))
+                if let bells = model.bellsSet[name] {
+                    return .right(bells.getClosestBelow(target))
                 } else {
-                    return .left("There is no fixed weight set named \(name)")
+                    return .left("There are no bells named \(name)")
                 }
             } else {
-                return .left("No fixed weights activated")
+                return .left("No bells activated")
             }
         case .singlePlates(let name):
             if let name = name {
@@ -131,17 +131,6 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
         }
     }
 
-    var activeFWSName: String {
-        get {
-            if case .fixedWeights(let name) = self.apparatus {
-                return name ?? ""
-            } else {
-                ASSERT(false, "should only be called for fixedWeights")
-                return ""
-            }
-        }
-    }
-    
     var info: ExerciseInfo {
         get {return self.exercise.info}
     }
@@ -246,8 +235,8 @@ class ExerciseVM: Equatable, Identifiable, ObservableObject {
             }
             return nil
 
-        case .fixedWeights(name: let name):
-            if let name = name, let fws = self.program.getFixedWeights()[name], let weight = fws.getAbove(self.baseExpectedWeight) {
+        case .bells(name: let name):
+            if let name = name, let bells = self.program.getBellsSet()[name], let weight = bells.getAbove(self.baseExpectedWeight) {
                 return weight.total
             }
             return nil
@@ -312,10 +301,6 @@ extension ExerciseVM {
         })
     }
 
-    func setActiveFixedWeight(_ name: String?) {
-        self.program.modify(self.exercise, callback: {$0.apparatus = .fixedWeights(name: name)})
-    }
-    
     func setInfo(_ info: ExerciseInfo) { 
         self.program.modify(self.exercise, callback: {$0.info = info.clone()})
         
@@ -424,10 +409,10 @@ extension ExerciseVM {
         // But if the weight the user wants to use is way off what they can do then we'll highlight that.
         let badWeight = 20.0
         
-        func populate(_ text: String, _ fws: FixedWeightSet) -> [(String, Color)] {
+        func populate(_ text: String, _ bells: Bells) -> [(String, Color)] {
             if let desired = Double(text) {
-                let actual = fws.getClosestBelow(desired)    // for worksets we use closest below
-                return fws.getAll().map({
+                let actual = bells.getClosestBelow(desired)    // for worksets we use closest below
+                return bells.getAll().map({
                     if sameWeight($0.total, actual.total) {
                         if abs(desired - actual.total) > badWeight {
                             return (friendlyWeight($0.total), .red)
@@ -439,7 +424,7 @@ extension ExerciseVM {
                     }
                 })
             } else {
-                return fws.getAll().map({return (friendlyWeight($0.total), .black)})
+                return bells.getAll().map({return (friendlyWeight($0.total), .black)})
             }
         }
         
@@ -463,10 +448,10 @@ extension ExerciseVM {
             }
         }
         
-        func select(_ text: String, _ fws: FixedWeightSet) -> Int? {
+        func select(_ text: String, _ bells: Bells) -> Int? {
             if let desired = Double(text) {
-                let actual = fws.getClosestBelow(desired)
-                let entries = fws.getAll()
+                let actual = bells.getClosestBelow(desired)
+                let entries = bells.getAll()
                 for i in 0..<entries.count {
                     let candidate = entries[i]
                     if sameWeight(candidate.total, actual.total) {
@@ -502,9 +487,9 @@ extension ExerciseVM {
             return nil
         }
         
-        func buttonColor(_ fws: FixedWeightSet) -> Color {
+        func buttonColor(_ bells: Bells) -> Color {
             if let weight = Double(text.wrappedValue) {
-                let actual = fws.getClosestBelow(weight)
+                let actual = bells.getClosestBelow(weight)
                 if weight > 0.0 && abs(actual.total - weight) > badWeight {
                     return .red
                 } else {
@@ -585,17 +570,17 @@ extension ExerciseVM {
                 return weightField()
             }
 
-        case .fixedWeights(let theName):
-            if let name = theName, let fws = self.program.getFWS(name) {
+        case .bells(let theName):
+            if let name = theName, let bells = self.program.getBells(name) {
                 return AnyView(
                     HStack {
                         Text("Weight:").font(.headline)
                         Button(text.wrappedValue, action: {modal.wrappedValue = true})
                             .font(.body)
-                            .foregroundColor(buttonColor(fws))
+                            .foregroundColor(buttonColor(bells))
                             .disabled(shouldDisable())
                             .sheet(isPresented: modal) {
-                                PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, fws)}, confirm: confirm, selected: {text in select(text, fws)}, type: .decimalPad)
+                                PickerView(title: name, prompt: "Value:", initial: text.wrappedValue, populate: {populate($0, bells)}, confirm: confirm, selected: {text in select(text, bells)}, type: .decimalPad)
                             }
                         Spacer()
                         Button("?", action: onHelp).font(.callout).padding(.trailing)
@@ -797,7 +782,7 @@ extension ExerciseVM {
                     Menu(title) {
                         Button("Body Weight", action:   {change(.bodyWeight)})
                         Button("Dual Plates", action:   {change(.dualPlates(barWeight: 45, nil))})
-                        Button("Fixed Weights", action: {change(.fixedWeights(name: nil))})
+                        Button("Other Weights", action: {change(.bells(name: nil))})
                         Button("Single Plates", action: {change(.singlePlates(nil))})
                         Button("Cancel", action: {})
                     }.font(.callout).padding(.leading))
@@ -834,15 +819,15 @@ extension ExerciseVM {
                 }.padding()
             )
 
-        case .fixedWeights:
+        case .bells:
             return AnyView(
                 HStack {
                     Button("Edit", action: {modal.wrappedValue = true})
                         .font(.callout)
-                        .sheet(isPresented: modal) {EditFWSsView(self.program, apparatus)}
+                        .sheet(isPresented: modal) {EditBellsSetView(self.program, apparatus)}
                     Spacer()
                 
-                    buildMenu("Fixed Weights")
+                    buildMenu("Other Weights")
                     Spacer()
                     
                     Button("?", action: {onHelp("Dumbbells, kettlebells, cable machines, etc.")}).font(.callout)

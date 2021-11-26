@@ -125,7 +125,7 @@ struct EditPlatesView: View {
         self.error = ""
 
         if text != self.originalName {
-            if self.program.getFWS(text) != nil {
+            if self.program.getBellsSet()[text] != nil {
                 self.error = "Name already exists"
             }
         }

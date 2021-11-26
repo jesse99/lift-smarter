@@ -1,13 +1,13 @@
 //  Created by Jesse Vorisek on 10/9/21.
 import SwiftUI
 
-/// Used to edit the list of FixedWeightSet's. Also used to activate one of the sets.
-struct EditFWSsView: View {
+/// Used to edit the list of Bells objects. Also used to activate one of the sets.
+struct EditBellsSetView: View {
     let program: ProgramVM
     let apparatus: Binding<Apparatus>
-    let originalWeights: [String: FixedWeightSet]
+    let originalWeights: [String: Bells]
     let originalName: String?
-    @State var fwsName: String?
+    @State var bellsName: String?
     @State var showEditActions: Bool = false
     @State var selection: ListEntry? = nil
     @State var addingSheet: Bool = false
@@ -22,25 +22,25 @@ struct EditFWSsView: View {
         self.program = program
         self.apparatus = apparatus
         
-        var weights: [String: FixedWeightSet] = [:]
-        for (name, fws) in program.getFixedWeights() {
-            weights[name] = fws.clone()
+        var weights: [String: Bells] = [:]
+        for (name, bells) in program.getBellsSet() {
+            weights[name] = bells.clone()
         }
         self.originalWeights = weights
 
-        if case .fixedWeights(let name) = apparatus.wrappedValue {
+        if case .bells(let name) = apparatus.wrappedValue {
             self.originalName = name
-            self._fwsName = State(initialValue: name)
+            self._bellsName = State(initialValue: name)
         } else {
-            ASSERT(false, "should only be called for fixedWeights")
+            ASSERT(false, "should only be called for bells")
             self.originalName = nil
-            self._fwsName = State(initialValue: nil)
+            self._bellsName = State(initialValue: nil)
         }
     }
     
     var body: some View {
         VStack() {
-            Text("Fixed Weight List").font(.largeTitle)
+            Text("Weights List").font(.largeTitle)
 
             List(self.getEntries()) {entry in
                 VStack() {
@@ -53,7 +53,7 @@ struct EditFWSsView: View {
                     }
             }
             .sheet(isPresented: self.$editingSheet) {
-                EditFWSView(self.program, self.selection!.name)
+                EditBellsView(self.program, self.selection!.name)
             }
             .sheet(isPresented: self.$editingExtraSheet) {
                 EditExtrasView(self.program, self.selection!.name)
@@ -85,14 +85,14 @@ struct EditFWSsView: View {
     }
 
     private func getEntries() -> [ListEntry] {
-        let names = self.program.getFixedWeights().keys.sorted()
-        return names.mapi({ListEntry($1, $1 == self.fwsName ? .blue : .black, $0)})
+        let names = self.program.getBellsSet().keys.sorted()
+        return names.mapi({ListEntry($1, $1 == self.bellsName ? .blue : .black, $0)})
     }
 
     private func editButtons() -> [ActionSheet.Button] {
         var buttons: [ActionSheet.Button] = []
 
-        if self.fwsName == self.selection!.name {
+        if self.bellsName == self.selection!.name {
             buttons.append(.default(Text("Deactivate"), action: self.onDeactivate))
         } else {
             buttons.append(.default(Text("Activate"), action: self.onActivate))
@@ -107,11 +107,11 @@ struct EditFWSsView: View {
     }
 
     private func onActivate() {
-        self.fwsName = self.selection!.name
+        self.bellsName = self.selection!.name
     }
 
     private func onDeactivate() {
-        self.fwsName = nil
+        self.bellsName = nil
     }
 
     private func onDelete() {
@@ -120,7 +120,7 @@ struct EditFWSsView: View {
 
             for workout in self.program.workouts {
                 for instance in workout.instances {
-                    if case .fixedWeights(let iname) = instance.exercise.apparatus, iname == name {
+                    if case .bells(let iname) = instance.exercise.apparatus, iname == name {
                         if uses.first(where: {$0 == instance.name}) == nil {
                             uses.append(instance.name)
                         }
@@ -147,23 +147,23 @@ struct EditFWSsView: View {
     }
     
     private func doDelete() {
-        self.program.delFWS(self.selection!.name)    
-        if self.fwsName == self.selection!.name {
-            self.fwsName = nil
+        self.program.delBells(self.selection!.name)    
+        if self.bellsName == self.selection!.name {
+            self.bellsName = nil
         }
     }
 
     private func onDuplicate() {
         let name = self.selection!.name
-        if let fws = self.program.getFixedWeights()[name] {
+        if let bells = self.program.getBellsSet()[name] {
             var newName = name
             for i in 2... {
                 newName = name + " \(i)"
-                if self.program.getFWS(newName) == nil {
+                if self.program.getBells(newName) == nil {
                     break
                 }
             }
-            self.program.setFWS(newName, fws.clone())
+            self.program.setBells(newName, bells.clone())
         }
     }
 
@@ -188,25 +188,25 @@ struct EditFWSsView: View {
             return "Need a name"
         }
         
-        return self.program.getFWS(name) != nil ? "Name already exists" : ""
+        return self.program.getBells(name) != nil ? "Name already exists" : ""
     }
 
     private func onAdded(_ name: String) {
-        self.program.addFWS(name)
+        self.program.addBells(name)
     }
 
     private func onCancel() {
-        self.program.setFWS(self.originalWeights)
+        self.program.setBellsSet(self.originalWeights)
         self.presentation.wrappedValue.dismiss()
     }
 
     private func onOK() {
-        self.apparatus.wrappedValue = .fixedWeights(name: self.fwsName)
+        self.apparatus.wrappedValue = .bells(name: self.bellsName)
         self.presentation.wrappedValue.dismiss()
     }
 }
 
-struct EditFWSsView_Previews: PreviewProvider {
+struct EditBellsSetView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(ModelVM(model), model)
     static let workout = model.program.workouts[0]
@@ -214,6 +214,6 @@ struct EditFWSsView_Previews: PreviewProvider {
     static var apparatus = Binding.constant(exercise.apparatus)
 
     static var previews: some View {
-        EditFWSsView(program, apparatus)
+        EditBellsSetView(program, apparatus)
     }
 }

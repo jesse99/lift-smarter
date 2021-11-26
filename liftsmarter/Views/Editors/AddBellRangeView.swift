@@ -1,11 +1,11 @@
 //  Created by Jesse Vorisek on 10/9/21.
 import SwiftUI
 
-/// Used to add one or more weights to a FixedWeightSet.
-struct AddFixedWeightsView: View {
+/// Used to add one or more weights to a Bells.
+struct AddBellRangeView: View {
     let program: ProgramVM
     let name: String
-    let fws: Binding<FixedWeightSet>
+    let bells: Binding<Bells>
     let extra: Bool
     let onEdit: () -> Void
     @State var first = ""
@@ -16,10 +16,10 @@ struct AddFixedWeightsView: View {
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
     
-    init(_ program: ProgramVM, _ name: String, _ fws: Binding<FixedWeightSet>, extra: Bool, onEdit: @escaping () -> Void) {
+    init(_ program: ProgramVM, _ name: String, _ bells: Binding<Bells>, extra: Bool, onEdit: @escaping () -> Void) {
         self.program = program
         self.name = name
-        self.fws = fws
+        self.bells = bells
         self.extra = extra
         self.onEdit = onEdit
     }
@@ -82,21 +82,21 @@ struct AddFixedWeightsView: View {
                 if let s = Double(self.step), let m = Double(self.max) {
                     var weight = f
                     while weight <= m {
-                        self.fws.wrappedValue.extra.add(weight)
+                        self.bells.wrappedValue.extra.add(weight)
                         weight += s
                     }
                 } else {
-                    self.fws.wrappedValue.extra.add(f)
+                    self.bells.wrappedValue.extra.add(f)
                 }
             } else {
                 if let s = Double(self.step), let m = Double(self.max) {
                     var weight = f
                     while weight <= m {
-                        self.fws.wrappedValue.weights.add(weight)
+                        self.bells.wrappedValue.weights.add(weight)
                         weight += s
                     }
                 } else {
-                    self.fws.wrappedValue.weights.add(f)
+                    self.bells.wrappedValue.weights.add(f)
                 }
             }
             self.onEdit()
@@ -105,17 +105,16 @@ struct AddFixedWeightsView: View {
     }
 }
 
-struct AddFixedWeightsView_Previews: PreviewProvider {
+struct AddBellRangeView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(ModelVM(model), model)
-    static var fws = Binding.constant(program.getFWS("Dumbbells")!)
+    static var bells = Binding.constant(program.getBells("Dumbbells")!)
 
     static var previews: some View {
-        AddFixedWeightsView(program, "Dumbbells", fws, extra: false, onEdit: AddFixedWeightsView_Previews.onEdited
+        AddBellRangeView(program, "Dumbbells", bells, extra: false, onEdit: AddBellRangeView_Previews.onEdited
         )
     }
     
     static func onEdited() {
-        
     }
 }

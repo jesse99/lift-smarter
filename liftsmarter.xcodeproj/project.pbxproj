@@ -40,15 +40,15 @@
 		37A3C5DF2708D65700BFA8CC /* ExerciseVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5DE2708D65700BFA8CC /* ExerciseVM.swift */; };
 		37A3C5E12709120D00BFA8CC /* WorkoutLabelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E02709120D00BFA8CC /* WorkoutLabelTests.swift */; };
 		37A3C5E3270D5EA400BFA8CC /* FixedRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E2270D5EA400BFA8CC /* FixedRepsView.swift */; };
-		37A3C5E5270D62D500BFA8CC /* FixedWeightSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E4270D62D500BFA8CC /* FixedWeightSet.swift */; };
+		37A3C5E5270D62D500BFA8CC /* Bells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E4270D62D500BFA8CC /* Bells.swift */; };
 		37A3C5E7270E8BAD00BFA8CC /* EditFixedRepsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E6270E8BAD00BFA8CC /* EditFixedRepsView.swift */; };
 		37A3C5EA270FDA0000BFA8CC /* EditExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5E9270FDA0000BFA8CC /* EditExerciseView.swift */; };
 		37A3C5ED2711469800BFA8CC /* PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5EC2711469800BFA8CC /* PickerView.swift */; };
 		37A3C5EF271147F400BFA8CC /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5EE271147F400BFA8CC /* Notes.swift */; };
 		37A3C5F22712115000BFA8CC /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F12712115000BFA8CC /* Components.swift */; };
-		37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F32712504400BFA8CC /* EditFWSsView.swift */; };
-		37A3C5F6271252DB00BFA8CC /* EditFWSView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */; };
-		37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */; };
+		37A3C5F42712504400BFA8CC /* EditBellsSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F32712504400BFA8CC /* EditBellsSetView.swift */; };
+		37A3C5F6271252DB00BFA8CC /* EditBellsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F5271252DB00BFA8CC /* EditBellsView.swift */; };
+		37A3C5F8271259B700BFA8CC /* AddBellRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddBellRangeView.swift */; };
 		37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8826F1956800AC85DE /* TimerView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
 		37D00973273F6A7600E8966E /* ProgramsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00972273F6A7600E8966E /* ProgramsView.swift */; };
@@ -66,7 +66,7 @@
 		37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA1F26EAD65200D0AD8E /* ContentView.swift */; };
 		37ECEA2226EAD65300D0AD8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2126EAD65300D0AD8E /* Assets.xcassets */; };
 		37ECEA2526EAD65300D0AD8E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37ECEA2426EAD65300D0AD8E /* Preview Assets.xcassets */; };
-		37ECEA2F26EAD65300D0AD8E /* FixedWeightSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */; };
+		37ECEA2F26EAD65300D0AD8E /* BellsSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA2E26EAD65300D0AD8E /* BellsSetTests.swift */; };
 		37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4826EAD74A00D0AD8E /* Program.swift */; };
 		37ECEA4B26EAD85B00D0AD8E /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4A26EAD85B00D0AD8E /* Model.swift */; };
 		37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA4C26EAD93900D0AD8E /* Workout.swift */; };
@@ -131,15 +131,15 @@
 		37A3C5DE2708D65700BFA8CC /* ExerciseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseVM.swift; sourceTree = "<group>"; };
 		37A3C5E02709120D00BFA8CC /* WorkoutLabelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLabelTests.swift; sourceTree = "<group>"; };
 		37A3C5E2270D5EA400BFA8CC /* FixedRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedRepsView.swift; sourceTree = "<group>"; };
-		37A3C5E4270D62D500BFA8CC /* FixedWeightSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWeightSet.swift; sourceTree = "<group>"; };
+		37A3C5E4270D62D500BFA8CC /* Bells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bells.swift; sourceTree = "<group>"; };
 		37A3C5E6270E8BAD00BFA8CC /* EditFixedRepsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFixedRepsView.swift; sourceTree = "<group>"; };
 		37A3C5E9270FDA0000BFA8CC /* EditExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseView.swift; sourceTree = "<group>"; };
 		37A3C5EC2711469800BFA8CC /* PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerView.swift; sourceTree = "<group>"; };
 		37A3C5EE271147F400BFA8CC /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
 		37A3C5F12712115000BFA8CC /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
-		37A3C5F32712504400BFA8CC /* EditFWSsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFWSsView.swift; sourceTree = "<group>"; };
-		37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFWSView.swift; sourceTree = "<group>"; };
-		37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFixedWeightsView.swift; sourceTree = "<group>"; };
+		37A3C5F32712504400BFA8CC /* EditBellsSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBellsSetView.swift; sourceTree = "<group>"; };
+		37A3C5F5271252DB00BFA8CC /* EditBellsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBellsView.swift; sourceTree = "<group>"; };
+		37A3C5F7271259B700BFA8CC /* AddBellRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBellRangeView.swift; sourceTree = "<group>"; };
 		37A6DC8826F1956800AC85DE /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
 		37D00972273F6A7600E8966E /* ProgramsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramsView.swift; sourceTree = "<group>"; };
@@ -159,7 +159,7 @@
 		37ECEA2126EAD65300D0AD8E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		37ECEA2426EAD65300D0AD8E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		37ECEA2A26EAD65300D0AD8E /* liftsmarterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = liftsmarterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWeightSetTests.swift; sourceTree = "<group>"; };
+		37ECEA2E26EAD65300D0AD8E /* BellsSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BellsSetTests.swift; sourceTree = "<group>"; };
 		37ECEA4826EAD74A00D0AD8E /* Program.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Program.swift; sourceTree = "<group>"; };
 		37ECEA4A26EAD85B00D0AD8E /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		37ECEA4C26EAD93900D0AD8E /* Workout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workout.swift; sourceTree = "<group>"; };
@@ -215,12 +215,12 @@
 			isa = PBXGroup;
 			children = (
 				37A3C5E8270FD9CC00BFA8CC /* Exercises */,
-				37A3C5F7271259B700BFA8CC /* AddFixedWeightsView.swift */,
+				37A3C5F7271259B700BFA8CC /* AddBellRangeView.swift */,
+				37A3C5F5271252DB00BFA8CC /* EditBellsView.swift */,
+				37A3C5F32712504400BFA8CC /* EditBellsSetView.swift */,
 				37A3C5E9270FDA0000BFA8CC /* EditExerciseView.swift */,
 				3718979C2708D40B00351C5A /* EditExercisesView.swift */,
 				37E5C7FF2738491700C60157 /* EditExtrasView.swift */,
-				37A3C5F5271252DB00BFA8CC /* EditFWSView.swift */,
-				37A3C5F32712504400BFA8CC /* EditFWSsView.swift */,
 				37D53896271D21E8006B3833 /* EditNoteView.swift */,
 				37FC754D273CBA5700874917 /* EditPlateView.swift */,
 				37F752022751613600B63C65 /* EditPlatesSetView.swift */,
@@ -295,7 +295,7 @@
 		37ECEA2D26EAD65300D0AD8E /* liftsmarterTests */ = {
 			isa = PBXGroup;
 			children = (
-				37ECEA2E26EAD65300D0AD8E /* FixedWeightSetTests.swift */,
+				37ECEA2E26EAD65300D0AD8E /* BellsSetTests.swift */,
 				37FC754B273A546F00874917 /* PlatesTest.swift */,
 				371897942700EB2000351C5A /* ScheduleTests.swift */,
 				37A3C5E02709120D00BFA8CC /* WorkoutLabelTests.swift */,
@@ -307,9 +307,9 @@
 			isa = PBXGroup;
 			children = (
 				37ECEA5426EB07F500D0AD8E /* Apparatus.swift */,
+				37A3C5E4270D62D500BFA8CC /* Bells.swift */,
 				37ECEA5026EAD9F200D0AD8E /* Exercise.swift */,
 				373AB0D2271F486400F9898B /* ExerciseInfo.swift */,
-				37A3C5E4270D62D500BFA8CC /* FixedWeightSet.swift */,
 				3718978626F6955A00351C5A /* History.swift */,
 				37ECEA6626ED4A0F00D0AD8E /* Logs.swift */,
 				37ECEA6426ED2FE700D0AD8E /* Mocks.swift */,
@@ -485,7 +485,7 @@
 				37A3C5E3270D5EA400BFA8CC /* FixedRepsView.swift in Sources */,
 				37ECEA6526ED2FE700D0AD8E /* Mocks.swift in Sources */,
 				377791BD26EE7C2B00EC5028 /* ExerciseView.swift in Sources */,
-				37A3C5F42712504400BFA8CC /* EditFWSsView.swift in Sources */,
+				37A3C5F42712504400BFA8CC /* EditBellsSetView.swift in Sources */,
 				37ECEA5726EB0BAE00D0AD8E /* Sets.swift in Sources */,
 				3742BFC12726210D006D43E0 /* EditMaxRepsView.swift in Sources */,
 				3718978526F65E0900351C5A /* TimeIntervalExtension.swift in Sources */,
@@ -493,7 +493,7 @@
 				3742BFC7272A40B2006D43E0 /* EditRepsSetView.swift in Sources */,
 				37ECEA4926EAD74A00D0AD8E /* Program.swift in Sources */,
 				37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */,
-				37A3C5E5270D62D500BFA8CC /* FixedWeightSet.swift in Sources */,
+				37A3C5E5270D62D500BFA8CC /* Bells.swift in Sources */,
 				37E5C8002738491700C60157 /* EditExtrasView.swift in Sources */,
 				377791B526ED725D00EC5028 /* UIColorExtension.swift in Sources */,
 				377791B826ED98AA00EC5028 /* ProgramView.swift in Sources */,
@@ -514,7 +514,7 @@
 				37FC7550273CBF0C00874917 /* EditPlatesView.swift in Sources */,
 				37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */,
 				37ECEA4D26EAD93900D0AD8E /* Workout.swift in Sources */,
-				37A3C5F6271252DB00BFA8CC /* EditFWSView.swift in Sources */,
+				37A3C5F6271252DB00BFA8CC /* EditBellsView.swift in Sources */,
 				37D53897271D21E8006B3833 /* EditNoteView.swift in Sources */,
 				37A3C5EF271147F400BFA8CC /* Notes.swift in Sources */,
 				37ECEA5526EB07F500D0AD8E /* Apparatus.swift in Sources */,
@@ -541,7 +541,7 @@
 				3718979126F96DE800351C5A /* StringExtension.swift in Sources */,
 				37A6DC8926F1956800AC85DE /* TimerView.swift in Sources */,
 				37ECEA4F26EAD9DB00D0AD8E /* Asserts.swift in Sources */,
-				37A3C5F8271259B700BFA8CC /* AddFixedWeightsView.swift in Sources */,
+				37A3C5F8271259B700BFA8CC /* AddBellRangeView.swift in Sources */,
 				3742BFBF27261018006D43E0 /* MaxRepsView.swift in Sources */,
 				37D00973273F6A7600E8966E /* ProgramsView.swift in Sources */,
 			);
@@ -554,7 +554,7 @@
 				37FC754C273A546F00874917 /* PlatesTest.swift in Sources */,
 				371897952700EB2000351C5A /* ScheduleTests.swift in Sources */,
 				37A3C5E12709120D00BFA8CC /* WorkoutLabelTests.swift in Sources */,
-				37ECEA2F26EAD65300D0AD8E /* FixedWeightSetTests.swift in Sources */,
+				37ECEA2F26EAD65300D0AD8E /* BellsSetTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

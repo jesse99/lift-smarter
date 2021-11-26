@@ -13,7 +13,7 @@ func differentWeight(_ lhs: Double, _ rhs: Double) -> Bool {
 
 struct ActualWeight {
     let weight: Double   // 45 for a plate, 35 for a dumbbell, 2.5 for a magnet, 1.2.5 for an extra weight
-    let label: String    // "", "bumper", or "magnet" for a plate and "" or "extra" for a fixed weight (extra because it could be a cable machine)
+    let label: String    // "", "bumper", or "magnet" for a plate and "" or "extra" for bells (extra because it could be a cable machine)
 }
 
 struct ActualWeights {
@@ -21,7 +21,7 @@ struct ActualWeights {
     let weights: [ActualWeight]
 }
 
-struct FixedWeights: Equatable, Sequence, Storable {
+struct BellWeights: Equatable, Sequence, Storable {
     init() {
         self.weights = []
     }
@@ -40,7 +40,7 @@ struct FixedWeights: Equatable, Sequence, Storable {
 
     mutating func add(_ weight: Double) {
         if let index = self.weights.firstIndex(where: {$0 >= weight}) {
-            if self.weights[index] != weight {            // ValidateFixedWeightRange allows overlapping ranges so we need to test for dupes
+            if self.weights[index] != weight {            // overlapping ranges are allowed so we need to test for dupes
                 self.weights.insert(weight, at: index)
                 self.edited += 1
             }
@@ -92,7 +92,7 @@ struct FixedWeights: Equatable, Sequence, Storable {
         return result
     }
 
-    static func ==(lhs: FixedWeights, rhs: FixedWeights) -> Bool {
+    static func ==(lhs: BellWeights, rhs: BellWeights) -> Bool {
         return lhs.weights == rhs.weights
     }
     
@@ -101,20 +101,20 @@ struct FixedWeights: Equatable, Sequence, Storable {
 }
 
 /// List of arbitrary weights, e.g. for dumbbells or a cable machine.
-class FixedWeightSet: Equatable, Storable {
-    var weights: FixedWeights
-    var extra: FixedWeights     // TODO: should we support multiples of the same extra weight? maybe by allowing duplicate weights in the list? people could just explicity add the duplicate (eg add a 5.0 extra for two 2.5 extras)
+class Bells: Equatable, Storable {
+    var weights: BellWeights
+    var extra: BellWeights     // TODO: should we support multiples of the same extra weight? maybe by allowing duplicate weights in the list? people could just explicity add the duplicate (eg add a 5.0 extra for two 2.5 extras)
     var extraAdds: Int          // number of extra weights that can be added to the main weight
 
     init() {
-        self.weights = FixedWeights()
-        self.extra = FixedWeights()
+        self.weights = BellWeights()
+        self.extra = BellWeights()
         self.extraAdds = 1
     }
     
     init(_ weights: [Double], extra: [Double] = [], extraAdds: Int = 1) {
-        self.weights = FixedWeights(weights)
-        self.extra = FixedWeights(extra)
+        self.weights = BellWeights(weights)
+        self.extra = BellWeights(extra)
         self.extraAdds = extraAdds
     }
     
@@ -130,14 +130,14 @@ class FixedWeightSet: Equatable, Storable {
         store.addInt("extraAdds", extraAdds)
     }
 
-    func clone() -> FixedWeightSet {
+    func clone() -> Bells {
         let store = Store()
         store.addObj("self", self)
-        let result: FixedWeightSet = store.getObj("self")
+        let result: Bells = store.getObj("self")
         return result
     }
 
-    static func ==(lhs: FixedWeightSet, rhs: FixedWeightSet) -> Bool {
+    static func ==(lhs: Bells, rhs: Bells) -> Bool {
         return lhs.weights == rhs.weights && lhs.extra == rhs.extra && lhs.extraAdds == rhs.extraAdds
     }
     

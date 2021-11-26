@@ -226,7 +226,7 @@ struct EditPlatesSetView: View {
     }
 
     private func onCancel() {
-        self.program.setPlates(self.originalPlates)
+        self.program.setPlatesSet(self.originalPlates)
         self.presentation.wrappedValue.dismiss()
     }
 

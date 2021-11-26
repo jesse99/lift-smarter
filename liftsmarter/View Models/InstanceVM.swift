@@ -596,8 +596,8 @@ extension InstanceVM {
             // The sub-sub title is used to break down the weight into component parts (like plates).
             // That doesn't make sense for body-weight so we do nothing.
             return ""
-        case .fixedWeights(name: let name):
-            if let name = name, let fws = self.program.getFixedWeights()[name], fws.extraAdds > 0 {
+        case .bells(name: let name):
+            if let name = name, let bells = self.program.getBellsSet()[name], bells.extraAdds > 0 {
                 return subSub(weight, percent, useBelow)
             }
         default:

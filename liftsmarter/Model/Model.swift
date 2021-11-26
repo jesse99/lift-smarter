@@ -11,7 +11,7 @@ class Model: Storable {
     // within arrays we need to explicitly call objectWillChange.send to inform views that the state changed
     // (this is the "nested ObservableObject" problem).
     var program: Program                        // this is the active program (and is a reference to an object in programs)
-    var fixedWeights: [String: FixedWeightSet] = [:]    // TODO: can we come up with more sensible names?
+    var bellsSet: [String: Bells] = [:]    
     var platesSet: [String: Plates] = [:]
     var history: History
     var userNotes: [String: String] = [:]       // this overrides defaultNotes
@@ -43,7 +43,7 @@ class Model: Storable {
 
         var names = store.getStrArray("fixedWeights-names")
         for (i, name) in names.enumerated() {
-            self.fixedWeights[name] = store.getObj("fixedWeights-\(i)")
+            self.bellsSet[name] = store.getObj("fixedWeights-\(i)")
         }
 
         self.history = store.getObj("history")
@@ -70,10 +70,10 @@ class Model: Storable {
         store.addObjArray("programs", programs)
         store.addStr("active-program", program.name)
 
-        var names = Array(self.fixedWeights.keys)
+        var names = Array(self.bellsSet.keys)
         store.addStrArray("fixedWeights-names", names)
         for (i, name) in names.enumerated() {
-            store.addObj("fixedWeights-\(i)", self.fixedWeights[name]!)
+            store.addObj("fixedWeights-\(i)", self.bellsSet[name]!)
         }
 
         names = Array(self.platesSet.keys)
@@ -112,9 +112,9 @@ class Model: Storable {
         ASSERT(self.programs.isSorted({$0.name < $1.name}), "programs should be sorted (and unique)")
 
         var instances = Set<ObjectIdentifier>()
-        for (_, fws) in self.fixedWeights {
-            let id = ObjectIdentifier(fws)
-            ASSERT(!instances.contains(id), "fws's must be unique")
+        for (_, bells) in self.bellsSet {
+            let id = ObjectIdentifier(bells)
+            ASSERT(!instances.contains(id), "bells's must be unique")
             instances.update(with: id)
         }
 

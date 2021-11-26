@@ -155,12 +155,12 @@ func mockProgram() -> Program {
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60, stage: .workset)
         let info = RepRangesInfo(sets: [warmup] + [work, work, work])
         info.expectedWeight = 16.4
-        return Exercise("Split Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .repRanges(info))
+        return Exercise("Split Squat", "Body-weight Split Squat", .bells(name: "Dumbbells"), .repRanges(info))
     }
 
     func lightSquats() -> Exercise {
         let info = PercentageInfo(percent: 0.6, rest: 120, baseName: "Split Squat")
-        return Exercise("Light Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .percentage(info))
+        return Exercise("Light Squat", "Body-weight Split Squat", .bells(name: "Dumbbells"), .percentage(info))
     }
 
     func deadlift() -> Exercise {
@@ -176,7 +176,7 @@ func mockProgram() -> Program {
         let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0, stage: .workset)
         let info = RepRangesInfo(sets: [work, work, work2])
         info.expectedWeight = 16.4
-        return Exercise("Lunge", "Dumbbell Lunge", .fixedWeights(name: "Dumbbells"), .repRanges(info))
+        return Exercise("Lunge", "Dumbbell Lunge", .bells(name: "Dumbbells"), .repRanges(info))
     }
 
     // Upper
@@ -206,20 +206,20 @@ func mockProgram() -> Program {
     func curls() -> Exercise {
         let info = MaxRepsInfo(restSecs: [90, 90, 90], targetReps: nil)
         info.expectedWeight = 16.4
-        return Exercise("Curls", "Hammer Curls", .fixedWeights(name: "Dumbbells"), .maxReps(info))
+        return Exercise("Curls", "Hammer Curls", .bells(name: "Dumbbells"), .maxReps(info))
      }
 
     func latRaise() -> Exercise {
         let work = RepsSet(reps: RepRange(min: 4, max: 12), restSecs: 120, stage: .workset)
         let info = RepRangesInfo(sets: [work, work, work])
         info.expectedWeight = 8.2
-        return Exercise("Lateral Raise", "Side Lateral Raise", .fixedWeights(name: "Dumbbells"), .repRanges(info))
+        return Exercise("Lateral Raise", "Side Lateral Raise", .bells(name: "Dumbbells"), .repRanges(info))
     }
 
     func tricepPress() -> Exercise {
         let work = FixedRepsSet(reps: FixedReps(15), restSecs: 0)
         let info = ExerciseInfo.fixedReps(FixedRepsInfo(reps: [work]))
-        return Exercise("Triceps Press", "Standing Triceps Press", .fixedWeights(name: "Dumbbells"), info)
+        return Exercise("Triceps Press", "Standing Triceps Press", .bells(name: "Dumbbells"), info)
     }
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
@@ -251,6 +251,6 @@ func mockProgram() -> Program {
 func mockModel() -> Model {
     let program = mockProgram()
     let model = Model(program)
-    model.fixedWeights = ["Dumbbells": FixedWeightSet([5, 10, 15, 20, 25, 30, 40, 50]), "Cable machine": FixedWeightSet([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
+    model.bellsSet = ["Dumbbells": Bells([5, 10, 15, 20, 25, 30, 40, 50]), "Cable machine": Bells([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
     return model
 }

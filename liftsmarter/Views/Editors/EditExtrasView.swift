@@ -1,21 +1,21 @@
 //  Created by Jesse Vorisek on 11/7/21.
 import SwiftUI
 
-/// Used to edit the extra weights in a FixedWeightSet.
+/// Used to edit the extra weights in a Bells object.
 struct EditExtrasView: View {
     enum ActiveAlert {case deleteSelected, deleteAll}
 
     let program: ProgramVM
     let originalName: String
     @State var extraAdds: String
-    @State var fws: FixedWeightSet
+    @State var bells: Bells
     @State var showEditActions = false
     @State var showAdd = false
     @State var showEdit = false
     @State var showAlert = false
     @State var alertAction: EditExtrasView.ActiveAlert = .deleteSelected
     @State var selection: ListEntry? = nil
-    @State var edited = 0   // hack because FixedWeightSet is a class now so @State doesn't work with it
+    @State var edited = 0   // hack because Bells is a class now so @State doesn't work with it
     @State var error = ""
     @Environment(\.presentationMode) private var presentation
 
@@ -23,14 +23,14 @@ struct EditExtrasView: View {
         self.program = program
         self.originalName = name
         
-        let fws = program.getFWS(name)?.clone() ?? FixedWeightSet([])
-        self._fws = State(initialValue: fws)
-        self._extraAdds = State(initialValue: fws.extraAdds.description)
+        let bells = program.getBells(name)?.clone() ?? Bells([])
+        self._bells = State(initialValue: bells)
+        self._extraAdds = State(initialValue: bells.extraAdds.description)
     }
     
     var body: some View {
         VStack() {
-            Text("Extra Fixed Weights").font(.largeTitle)
+            Text("Extra Weights").font(.largeTitle)
 
             intField("Max to use", self.$extraAdds, self.onEditedExtraAdds)
             Divider().background(Color.black)
@@ -45,7 +45,7 @@ struct EditExtrasView: View {
                         self.showEditActions = true
                     }
             }
-            .sheet(isPresented: self.$showEdit) {EditTextView(title: "Weight", content: friendlyWeight(self.fws.extra[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
+            .sheet(isPresented: self.$showEdit) {EditTextView(title: "Weight", content: friendlyWeight(self.bells.extra[self.selection!.index]), validator: self.onValidWeight, sender: self.onEditedWeight)}
             Spacer()
             Text(self.error).foregroundColor(.red).font(.callout).id(self.edited)
 
@@ -56,7 +56,7 @@ struct EditExtrasView: View {
                 Spacer()
                 Button("Add", action: onAdd)
                     .font(.callout)
-                    .sheet(isPresented: self.$showAdd) {AddFixedWeightsView(self.program, self.originalName, self.$fws, extra: true, onEdit: self.onAddedWeight)}
+                    .sheet(isPresented: self.$showAdd) {AddBellRangeView(self.program, self.originalName, self.$bells, extra: true, onEdit: self.onAddedWeight)}
                 Button("OK", action: onOK).font(.callout).disabled(!self.error.isEmpty)
             }
             .padding()
@@ -74,14 +74,14 @@ struct EditExtrasView: View {
             } else {
                 return Alert(
                     title: Text("Confirm delete all"),
-                    message: Text("\(self.fws.extra.count) weights"),
+                    message: Text("\(self.bells.extra.count) weights"),
                     primaryButton: .destructive(Text("Delete")) {self.doDeleteAll()},
                     secondaryButton: .default(Text("Cancel")))
             }}
     }
 
     private func getEntries() -> [ListEntry] {
-        return self.fws.extra.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
+        return self.bells.extra.mapi {ListEntry(friendlyUnitsWeight($1), .black, $0)}
     }
     
     private func editButtons() -> [ActionSheet.Button] {
@@ -101,8 +101,8 @@ struct EditExtrasView: View {
     
     private func onValidate() {
         if let count = Int(self.extraAdds) {
-            if count <= self.fws.extra.count {
-                self.fws.extraAdds = count
+            if count <= self.bells.extra.count {
+                self.bells.extraAdds = count
                 self.error = ""
             } else {
                 self.error = "Max to use can't be larger than the number of weights"
@@ -114,10 +114,10 @@ struct EditExtrasView: View {
     
     private func onEditedWeight(_ text: String) {
         let newWeight = Double(text)!
-        let originalWeight = self.fws.extra[self.selection!.index]
+        let originalWeight = self.bells.extra[self.selection!.index]
         if differentWeight(newWeight, originalWeight) {
-            self.fws.extra.remove(at: self.selection!.index)
-            self.fws.extra.add(newWeight)
+            self.bells.extra.remove(at: self.selection!.index)
+            self.bells.extra.add(newWeight)
             self.edited += 1
         }
     }
@@ -141,12 +141,12 @@ struct EditExtrasView: View {
     }
 
     private func doDelete() {
-        self.fws.extra.remove(at: self.selection!.index)
+        self.bells.extra.remove(at: self.selection!.index)
         self.onValidate()
     }
     
     private func doDeleteAll() {
-        self.fws = FixedWeightSet([])
+        self.bells = Bells([])
         self.onValidate()
     }
     
@@ -173,8 +173,8 @@ struct EditExtrasView: View {
     }
 
     private func onOK() {
-        if self.fws != program.getFWS(self.originalName) {
-            self.program.setFWS(self.originalName, self.fws)
+        if self.bells != program.getBells(self.originalName) {
+            self.program.setBells(self.originalName, self.bells)
         }
 
         app.saveState()
