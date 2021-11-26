@@ -11,7 +11,8 @@ class Model: Storable {
     // within arrays we need to explicitly call objectWillChange.send to inform views that the state changed
     // (this is the "nested ObservableObject" problem).
     var program: Program                        // this is the active program (and is a reference to an object in programs)
-    var fixedWeights: [String: FixedWeightSet] = [:]
+    var fixedWeights: [String: FixedWeightSet] = [:]    // TODO: can we come up with more sensible names?
+    var platesSet: [String: Plates] = [:]
     var history: History
     var userNotes: [String: String] = [:]       // this overrides defaultNotes
     var logs: Logs
@@ -23,6 +24,7 @@ class Model: Storable {
         self.programs = [program]
         self.history = History()
         self.logs = Logs()
+        self.initPlates()
         self.validate()
     }
 
@@ -52,6 +54,15 @@ class Model: Storable {
         }
 
         self.logs = store.getObj("logs")
+        if store.hasKey("plates-names") {
+            names = store.getStrArray("plates-names", ifMissing: [])
+            for (i, name) in names.enumerated() {
+                self.platesSet[name] = store.getObj("plates-\(i)")
+            }
+        } else {
+            self.initPlates()
+        }
+
         self.validate()
     }
 
@@ -63,6 +74,12 @@ class Model: Storable {
         store.addStrArray("fixedWeights-names", names)
         for (i, name) in names.enumerated() {
             store.addObj("fixedWeights-\(i)", self.fixedWeights[name]!)
+        }
+
+        names = Array(self.platesSet.keys)
+        store.addStrArray("plates-names", names)
+        for (i, name) in names.enumerated() {
+            store.addObj("plates-\(i)", self.platesSet[name]!)
         }
 
         store.addObj("history", history)
@@ -77,6 +94,16 @@ class Model: Storable {
         dirty = false
     }
     
+    // Plates are a lot less variable that dumbbells or cable machines so we'll go ahead and initialize them here.
+    // Typically all that'll happen after is that users will remove a few plates and sometimes add micro-plates or magnets.
+    func initPlates() {
+        ASSERT(self.platesSet.isEmpty, "plates set should be empty")
+        
+        self.platesSet["Deadlift"] = defaultDeadPlates
+        self.platesSet["Dual"] = defaultDualPlates
+        self.platesSet["Single"] = defaultSinglePlates
+    }
+    
     func validate() {
         ASSERT(self.programs.contains(where: {self.program === $0}), "program should reference a program in programs")
         for program in self.programs {
@@ -88,6 +115,13 @@ class Model: Storable {
         for (_, fws) in self.fixedWeights {
             let id = ObjectIdentifier(fws)
             ASSERT(!instances.contains(id), "fws's must be unique")
+            instances.update(with: id)
+        }
+
+        instances = Set<ObjectIdentifier>()
+        for (_, plates) in self.platesSet {
+            let id = ObjectIdentifier(plates)
+            ASSERT(!instances.contains(id), "plates must be unique")
             instances.update(with: id)
         }
     }

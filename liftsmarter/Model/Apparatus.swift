@@ -11,15 +11,15 @@ enum Apparatus: Equatable {
     /// kettlebell, chains, milk jug, or whatever (this comes from Expected).
     case bodyWeight
 
-    /// Barbell, leg press, etc.
-    case dualPlates(barWeight: Double, _ plates: Plates)
+    /// Barbell, leg press, etc. Name references a Plates object. If name is nil then the user hasn't activated a Plates yet.
+    case dualPlates(barWeight: Double, _ name: String?)
 
     /// This is used for dumbbels, kettlebells, cable machines, etc. Name references a FixedWeights object.
     /// If name is nil then the user hasn't activated a FixedWeight set yet.
     case fixedWeights(name: String?)
 
     /// T-bar row, landmine, etc.
-    case singlePlates(_ plates: Plates)
+    case singlePlates(_ name: String?)
 }
 
 extension Apparatus: Storable {
@@ -30,14 +30,16 @@ extension Apparatus: Storable {
             self = .bodyWeight
             
         case "dualPlates":
-            self = .dualPlates(barWeight: store.getDbl("barWeight"), store.getObj("plates"))
+            let name = store.hasKey("name") ? store.getStr("name") : nil
+            self = .dualPlates(barWeight: store.getDbl("barWeight"), name)
             
         case "fixedWeights":
             let name = store.hasKey("name") ? store.getStr("name") : nil
             self = .fixedWeights(name: name)
             
         case "singlePlates":
-            self = .singlePlates(store.getObj("plates"))
+            let name = store.hasKey("name") ? store.getStr("name") : nil
+            self = .singlePlates(name)
             
         default:
             ASSERT(false, "loading apparatus had unknown type: \(tname)"); abort()
@@ -49,10 +51,12 @@ extension Apparatus: Storable {
         case .bodyWeight:
             store.addStr("type", "bodyWeight")
 
-        case .dualPlates(barWeight: let bar, let plates):
+        case .dualPlates(barWeight: let bar, let name):
             store.addStr("type", "dualPlates")
             store.addDbl("barWeight", bar)
-            store.addObj("plates", plates)
+            if let name = name {
+                store.addStr("name", name)
+            }
 
         case .fixedWeights(name: let name):
             store.addStr("type", "fixedWeights")
@@ -60,9 +64,11 @@ extension Apparatus: Storable {
                 store.addStr("name", name)
             }
 
-        case .singlePlates(let plates):
+        case .singlePlates(let name):
             store.addStr("type", "singlePlates")
-            store.addObj("plates", plates)
+            if let name = name {
+                store.addStr("name", name)
+            }
         }
     }
 }
@@ -87,10 +93,10 @@ extension Apparatus {
             return self
         case .fixedWeights(name: _):
             return self
-        case .dualPlates(barWeight: let bar, let plates):
-            return .dualPlates(barWeight: bar, plates.clone())
-        case .singlePlates(let plates):
-            return .singlePlates(plates.clone())
+        case .dualPlates(barWeight: let bar, let name):
+            return .dualPlates(barWeight: bar, name)
+        case .singlePlates(let name):
+            return .singlePlates(name)
         }
     }
 }

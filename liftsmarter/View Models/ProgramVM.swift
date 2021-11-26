@@ -70,6 +70,10 @@ class ProgramVM: ObservableObject {
         return self.model.fixedWeights
     }
 
+    func getPlatesSet() -> [String: Plates] {
+        return self.model.platesSet
+    }
+
     func getFWS(_ name: String) -> FixedWeightSet? {
         return self.model.fixedWeights[name]
     }
@@ -230,6 +234,27 @@ extension ProgramVM {
         
         self.model.fixedWeights[name] = fws
     }
+
+    func setPlates(_ name: String, _ plates: Plates) {
+        self.willChange()
+        self.model.platesSet[name] = plates
+    }
+    
+    func addPlates(_ name: String, dual: Bool) {
+        self.willChange()
+        self.model.platesSet[name] = dual ? defaultDualPlates : defaultSinglePlates
+    }
+    
+    func delPlates(_ name: String) {
+        self.willChange()
+        self.model.platesSet[name] = nil
+    }
+    
+    func setPlates(_ platesSet: [String: Plates]) {
+        self.willChange()
+        self.model.platesSet = platesSet
+    }
+    
 }
 
 struct Confirmation: Identifiable {

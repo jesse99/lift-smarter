@@ -18,6 +18,9 @@ extension Array {
     }
         
     func isSorted(_ legit: (Element, Element) -> Bool) -> Bool {
+        if self.isEmpty {
+            return true
+        }
         for i in 0..<self.count - 1 {
             if !legit(self[i], self[i + 1]) {
                 return false

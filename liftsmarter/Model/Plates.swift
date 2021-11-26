@@ -28,7 +28,7 @@ struct Plate: Equatable, Storable {
 }
 
 /// List of plates, bumpers, and magnets
-class Plates: Equatable, Storable {
+class Plates: Equatable, Sequence, Storable {
     init(_ plates: [Plate] = []) {
         ASSERT(plates.isSorted({$0.weight >= $1.weight}), "plates should be largest to smallest")
         self.plates = plates
@@ -63,7 +63,11 @@ class Plates: Equatable, Storable {
         }
     }
     
-    func delete(at: Int) {
+    func makeIterator() -> Array<Plate>.Iterator {
+        return self.plates.makeIterator()
+    }
+
+    func remove(at: Int) {
         self.plates.remove(at: at)
         self.cache1 = []
         self.cache2 = []

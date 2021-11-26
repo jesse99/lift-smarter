@@ -80,6 +80,7 @@
 		37ECEA6726ED4A0F00D0AD8E /* Logs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6626ED4A0F00D0AD8E /* Logs.swift */; };
 		37ECEA6926ED4A3300D0AD8E /* LogsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */; };
 		37ECEA6C26ED5B1F00D0AD8E /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECEA6B26ED5B1F00D0AD8E /* LogView.swift */; };
+		37F752032751613600B63C65 /* EditPlatesSetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37F752022751613600B63C65 /* EditPlatesSetView.swift */; };
 		37FC754C273A546F00874917 /* PlatesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754B273A546F00874917 /* PlatesTest.swift */; };
 		37FC754E273CBA5700874917 /* EditPlateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754D273CBA5700874917 /* EditPlateView.swift */; };
 		37FC7550273CBF0C00874917 /* EditPlatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FC754F273CBF0C00874917 /* EditPlatesView.swift */; };
@@ -172,6 +173,7 @@
 		37ECEA6626ED4A0F00D0AD8E /* Logs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logs.swift; sourceTree = "<group>"; };
 		37ECEA6826ED4A3300D0AD8E /* LogsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsVM.swift; sourceTree = "<group>"; };
 		37ECEA6B26ED5B1F00D0AD8E /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		37F752022751613600B63C65 /* EditPlatesSetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlatesSetView.swift; sourceTree = "<group>"; };
 		37FC754B273A546F00874917 /* PlatesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatesTest.swift; sourceTree = "<group>"; };
 		37FC754D273CBA5700874917 /* EditPlateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlateView.swift; sourceTree = "<group>"; };
 		37FC754F273CBF0C00874917 /* EditPlatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPlatesView.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 				37A3C5F32712504400BFA8CC /* EditFWSsView.swift */,
 				37D53896271D21E8006B3833 /* EditNoteView.swift */,
 				37FC754D273CBA5700874917 /* EditPlateView.swift */,
+				37F752022751613600B63C65 /* EditPlatesSetView.swift */,
 				37FC754F273CBF0C00874917 /* EditPlatesView.swift */,
 				371897922700DDA500351C5A /* EditProgramView.swift */,
 				3718979A2706BB2800351C5A /* EditTextView.swift */,
@@ -501,6 +504,7 @@
 				373AB0D3271F486400F9898B /* ExerciseInfo.swift in Sources */,
 				377791BF26EE9AE700EC5028 /* WorkoutView.swift in Sources */,
 				377791CE26F0383300EC5028 /* WorkoutVM.swift in Sources */,
+				37F752032751613600B63C65 /* EditPlatesSetView.swift in Sources */,
 				37DBB452272F68D200A29438 /* Notifications.swift in Sources */,
 				37D00975273F6B9800E8966E /* ModelVM.swift in Sources */,
 				37FC754E273CBA5700874917 /* EditPlateView.swift in Sources */,

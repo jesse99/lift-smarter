@@ -1,6 +1,30 @@
 //  Created by Jesse Vorisek on 9/11/21.
 import Foundation
 
+let defaultDeadPlates = Plates([
+    Plate(weight: 45, count: 4, type: .bumper),
+    Plate(weight: 35, count: 4, type: .bumper),
+    Plate(weight: 25, count: 4, type: .bumper),
+    Plate(weight: 10, count: 4, type: .standard),
+    Plate(weight: 5, count: 4, type: .standard)
+])
+
+let defaultDualPlates = Plates([
+    Plate(weight: 45, count: 4, type: .standard),
+    Plate(weight: 35, count: 4, type: .standard),
+    Plate(weight: 25, count: 4, type: .standard),
+    Plate(weight: 10, count: 4, type: .standard),
+    Plate(weight: 5, count: 4, type: .standard)
+])
+
+let defaultSinglePlates = Plates([
+    Plate(weight: 45, count: 2, type: .standard),   // don't need to use as many plates here and Plates.getAll is kinda slow with single plates
+    Plate(weight: 35, count: 2, type: .standard),
+    Plate(weight: 25, count: 2, type: .standard),
+    Plate(weight: 10, count: 2, type: .standard),
+    Plate(weight: 5, count: 2, type: .standard)
+])
+
 func defaultDurations() -> ExerciseInfo {
     let set = DurationSet(secs: 120, restSecs: 0)
     let info = DurationsInfo(sets: [set, set])
@@ -139,6 +163,14 @@ func mockProgram() -> Program {
         return Exercise("Light Squat", "Body-weight Split Squat", .fixedWeights(name: "Dumbbells"), .percentage(info))
     }
 
+    func deadlift() -> Exercise {
+        let warmup = RepsSet(reps: RepRange(min: 4, max: 4), percent: WeightPercent(0.7), restSecs: 90, stage: .warmup)
+        let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 3*60, stage: .workset)
+        let info = RepRangesInfo(sets: [warmup] + [work, work, work])
+        info.expectedWeight = 225
+        return Exercise("Deadlift", "Deadlift", .dualPlates(barWeight: 56, "Deadlift"), .repRanges(info))
+    }
+
     func lunge() -> Exercise {
         let work = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 150, stage: .workset)
         let work2 = RepsSet(reps: RepRange(min: 4, max: 8), restSecs: 0, stage: .workset)
@@ -192,7 +224,7 @@ func mockProgram() -> Program {
     
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
     let mobilityExercises = [foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
-    let lowerExercises = [foamRolling(), splitSquats(), lightSquats(), lunge()]
+    let lowerExercises = [foamRolling(), splitSquats(), lightSquats(), lunge(), deadlift()]
     let upperExercises = [foamRolling(), planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     
     let rehab = Workout("Rehab", rehabExercises, schedule: .days([.saturday, .sunday, .tuesday, .thursday, .friday]))
@@ -210,7 +242,7 @@ func mockProgram() -> Program {
     let exercises = [
         shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch(),
         foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis(),
-        splitSquats(), lightSquats(), lunge(),
+        splitSquats(), lightSquats(), lunge(), deadlift(),
         planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     return Program("Home", workouts, exercises, weeksStart: date)
 
