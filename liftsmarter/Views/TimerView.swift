@@ -7,7 +7,6 @@ struct TimerView: View {
     @State var duration: Int
     @State var secondDuration: Int = 0    // used to wait twice
     @State private var startTime = Date()
-    @State private var elapsed: Int = 0
     @State private var label: String = ""
     @State private var waiting: Bool = true
     @State private var resting: Bool = false
@@ -43,7 +42,6 @@ struct TimerView: View {
             self.duration = self.secondDuration
             self.secondDuration = 0
             self.startTime = Date()
-            self.elapsed = 0
             self.resting = true
             self.waiting = true
         } else {
@@ -96,7 +94,7 @@ struct TimerView_Previews: PreviewProvider {
     }
 }
 
-fileprivate func secsToShortDurationName(_ interval: Double) -> String {
+func secsToShortDurationName(_ interval: Double) -> String {
     let secs = Int(round(interval))
     let mins = interval/60.0
     let hours = interval/3600.0

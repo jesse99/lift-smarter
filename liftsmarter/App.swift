@@ -45,6 +45,10 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
             }
             if let secs = TimerView.remaining {
                 self.notifications.add(afterSecs: secs)
+            } else {
+                if let secs = restTimers.map({$0.value.remaining}).min() {
+                    self.notifications.add(afterSecs: secs)
+                }
             }
         } else if newPhase == .active {
             self.notifications.remove()

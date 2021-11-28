@@ -93,7 +93,7 @@ struct RepTotalView: View {
     
     private func onRepsPressed(_ reps: Int) {
         self.instance.appendCurrent(reps)
-        self.implicitTimerModal = self.instance.restDuration() > 0
+        self.implicitTimerModal = self.instance.restDuration(implicit: true) > 0
     }
     
     private func onUpdateExpected() {

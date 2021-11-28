@@ -10,14 +10,14 @@ struct RepRangesView: View {
     @State var updateRepsModal = false
     @State var updateExpectedAlert = false
     @State var advanceWeightAlert = false
-    @State var implicitTimerModal = false
-    @State var explicitTimerModal = false
     @State var recentModal = false
+    @State var rest = RestState(id: "", duration: 60)
     @Environment(\.presentationMode) var presentation
 
     init(_ program: ProgramVM, _ instance: InstanceVM) {
         self.program = program
         self.instance = instance
+        self._rest = State(initialValue: RestState(id: instance.id, duration: 60))
     }
     
     var body: some View {
@@ -32,27 +32,40 @@ struct RepRangesView: View {
                 Spacer()
 
                 Group {
-                    Button(instance.nextLabel(), action: onNext)
-                        .font(.system(size: 40.0))
-                        .sheet(isPresented: $updateRepsModal) {
-                            let expected = self.instance.expectedReps()
-                            RepsPickerView(initial: expected, min: 1, dismissed: self.onRepsPressed)
+                    if case .exercising = self.rest.state {
+                        Button(instance.nextLabel(), action: onNext)
+                            .font(.system(size: 40.0))
+                            .sheet(isPresented: $updateRepsModal) {
+                                let expected = self.instance.expectedReps()
+                                RepsPickerView(initial: expected, min: 1, dismissed: self.onRepsPressed)
+                            }
+                            .alert(isPresented: $updateExpectedAlert) { () -> Alert in
+                                Alert(title: Text("Do you want to update expected reps?"),
+                                    primaryButton:   .default(Text("Yes"), action: self.onUpdateExpected),
+                                    secondaryButton: .default(Text("No"),  action: self.popView))}
+                        Spacer().frame(height: 50)
+                        Button("Start Timer", action: {self.rest.restart(.timing, self.instance.restDuration(implicit: false))})
+                            .font(.system(size: 20.0))
+                            .onReceive(timer.timer) {_ in self.resetIfNeeded()}
+                            .alert(isPresented: $advanceWeightAlert) { () -> Alert in
+                                Alert(title: Text("Do you want to advance the weight?"),
+                                    primaryButton: .default(Text("Yes"), action: self.doAdvanceWeight),
+                                    secondaryButton: .default(Text("No"), action: self.popView)
+                                )}
+                    } else {
+                        Text(self.rest.label).font(.system(size: 40)).foregroundColor(self.rest.color)
+                        Spacer().frame(height: 50)
+                        if case .resting = self.rest.state {
+                            Button("Stop Resting", action: {self.self.rest.stop()})
+                                .font(.system(size: 20.0))
+                                .onReceive(rest.timer.timer) {_ in self.rest.onTimer()}
+                        } else {
+                            Button("Stop Timer", action: {self.self.rest.stop()})
+                                .font(.system(size: 20.0))
+                                .onReceive(rest.timer.timer) {_ in self.rest.onTimer()}
                         }
-                        .alert(isPresented: $updateExpectedAlert) { () -> Alert in
-                            Alert(title: Text("Do you want to update expected reps?"),
-                                primaryButton:   .default(Text("Yes"), action: self.onUpdateExpected),
-                                secondaryButton: .default(Text("No"),  action: self.popView))}
-                        .sheet(isPresented: self.$implicitTimerModal) {instance.implicitTimer(delta: -1)}
-                    Spacer().frame(height: 50)
-                        .alert(isPresented: $advanceWeightAlert) { () -> Alert in
-                            Alert(title: Text("Do you want to advance the weight?"),
-                                primaryButton: .default(Text("Yes"), action: self.doAdvanceWeight),
-                                secondaryButton: .default(Text("No"), action: self.popView)
-                            )}
+                    }
 
-                    Button("Start Timer", action: onStartTimer)
-                        .font(.system(size: 20.0))
-                        .sheet(isPresented: self.$explicitTimerModal) {instance.explicitTimer()}
                     Spacer()
                     Button(instance.notesLabel(), action: {self.recentModal = true})
                         .font(.callout)
@@ -62,18 +75,21 @@ struct RepRangesView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.instance.started)
+                Button("Reset", action: self.onReset)
+                    .font(.callout)
+                    .disabled(!self.instance.started || self.rest.timer.running)
                 Spacer()
-                Button("Note", action: onStartNote)
+                Button("Note", action: self.onStartNote)
                     .font(.callout)
+                    .disabled(self.rest.timer.running)
                     .sheet(isPresented: self.$noteModal) {NoteView(self.program, formalName: self.instance.formalName)}
-                Button("Edit", action: onEdit)
+                Button("Edit", action: self.onEdit)
                     .font(.callout)
+                    .disabled(self.rest.timer.running)
                     .sheet(isPresented: self.$editModal, onDismiss: self.onEdited) {EditExerciseView(self.program, self.instance)}
             }
             .padding()
-            .onReceive(timer.timer) {_ in self.resetIfNeeded()}
-            .onAppear {self.resetIfNeeded(); self.timer.restart()}
+            .onAppear {self.resetIfNeeded(); self.timer.restart(); self.rest.restore()}
             .onDisappear() {self.timer.stop()}
         }
     }
@@ -106,7 +122,10 @@ struct RepRangesView: View {
     }
     
     private func onRepsPressed(_ reps: Int) {
-        self.implicitTimerModal = self.instance.restDuration() > 0
+        let restSecs = self.instance.restDuration(implicit: true)
+        if restSecs > 0 {
+            self.rest.restart(.resting, restSecs)
+        }
         self.instance.appendCurrent(reps)
     }
     
@@ -126,10 +145,6 @@ struct RepRangesView: View {
 
     func onReset() {
         self.instance.resetCurrent()
-    }
-    
-    private func onStartTimer() {
-        self.explicitTimerModal = true
     }
     
     private func onEdit() {

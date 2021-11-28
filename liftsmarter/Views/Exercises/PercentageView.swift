@@ -67,7 +67,7 @@ struct PercentageView: View {
             instance.resetCurrent()
             app.saveState()
             self.presentation.wrappedValue.dismiss()
-        } else if self.instance.restDuration() > 0 {
+        } else if self.instance.restDuration(implicit: true) > 0 {
             self.implicitTimerModal = true
         } else {
             self.onNextCompleted()
