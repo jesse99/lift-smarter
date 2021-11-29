@@ -7,14 +7,14 @@ struct DurationsView: View {
     @ObservedObject var instance: InstanceVM
     @State var editModal = false
     @State var noteModal = false
-    @State var implicitTimerModal = false
-    @State var explicitTimerModal = false
+    @State var rest = RestState(id: "", restSecs: 60)
     @State var recentModal = false
     @Environment(\.presentationMode) var presentation
 
     init(_ program: ProgramVM, _ instance: InstanceVM) {
         self.program = program
         self.instance = instance
+        self._rest = State(initialValue: RestState(id: instance.id, restSecs: 60))
     }
     
     var body: some View {
@@ -29,14 +29,26 @@ struct DurationsView: View {
                 Spacer()
 
                 Group {
-                    Button(instance.nextLabel(), action: onNext)
-                        .font(.system(size: 40.0))
-                        .sheet(isPresented: self.$implicitTimerModal, onDismiss: self.onNextCompleted) {instance.implicitTimer()}
-                    Spacer().frame(height: 50)
+                    if case .exercising = self.rest.state {
+                        Button(instance.nextLabel(), action: onNext)
+                            .font(.system(size: 40.0))
+                        Spacer().frame(height: 50)
 
-                    Button("Start Timer", action: onStartTimer)
-                        .font(.system(size: 20.0))
-                        .sheet(isPresented: self.$explicitTimerModal) {instance.explicitTimer()}
+                        Button("Start Timer", action: {self.rest.restart(.timing, self.instance.restDuration(implicit: false))})
+                            .font(.system(size: 20.0))
+                    } else {
+                        Text(self.rest.label).font(.system(size: 40)).foregroundColor(self.rest.color)
+                        Spacer().frame(height: 50)
+                        if case .resting = self.rest.state {
+                            Button("Stop Resting", action: {self.rest.stop()})
+                                .font(.system(size: 20.0))
+                                .onReceive(rest.timer.timer) {_ in self.rest.onTimer()}
+                        } else {
+                            Button("Stop Timer", action: {self.rest.stop()})
+                                .font(.system(size: 20.0))
+                                .onReceive(rest.timer.timer) {_ in self.rest.onTimer()}
+                        }
+                    }
                     Spacer()
                     Button(instance.notesLabel(), action: {self.recentModal = true})
                         .font(.callout)
@@ -46,18 +58,22 @@ struct DurationsView: View {
 
             Divider()
             HStack {
-                Button("Reset", action: {self.onReset()}).font(.callout).disabled(!self.instance.started)
+                Button("Reset", action: self.onReset)
+                    .font(.callout)
+                    .disabled(!self.instance.started || self.rest.timer.running)
                 Spacer()
-                Button("Note", action: onStartNote)
+                Button("Note", action: self.onStartNote)
                     .font(.callout)
+                    .disabled(self.rest.timer.running)
                     .sheet(isPresented: self.$noteModal) {NoteView(self.program, formalName: self.instance.formalName)}
-                Button("Edit", action: onEdit)
+                Button("Edit", action: self.onEdit)
                     .font(.callout)
+                    .disabled(self.rest.timer.running)
                     .sheet(isPresented: self.$editModal, onDismiss: self.onEdited) {EditExerciseView(self.program, self.instance)}
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
-            .onAppear {self.resetIfNeeded(); self.timer.restart()}
+            .onAppear {self.resetIfNeeded(); self.timer.restart(); self.rest.restore()}
             .onDisappear() {self.timer.stop()}
         }
     }
@@ -68,7 +84,16 @@ struct DurationsView: View {
             app.saveState()
             self.presentation.wrappedValue.dismiss()
         } else {
-            self.implicitTimerModal = true
+            let restSecs = self.instance.restDuration(implicit: true)
+            switch self.instance.exercise.info {
+            case .durations(let info):
+                let index = info.current.setIndex
+                self.rest.restart(.waiting, restSecs, info.sets[index].secs)
+            default:
+                ASSERT(false, "expected durations")
+            }
+                
+            instance.appendCurrent()
         }
     }
     
@@ -78,10 +103,6 @@ struct DurationsView: View {
     
     func onReset() {
         self.instance.resetCurrent()
-    }
-    
-    private func onStartTimer() {
-        self.explicitTimerModal = true
     }
     
     private func onEdit() {

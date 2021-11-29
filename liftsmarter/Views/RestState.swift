@@ -15,6 +15,7 @@ var restTimers: [String: SavedRestState] = [:]
 struct RestState {
     enum State {
         case exercising // waiting for the user to finish a set
+        case waiting    // user has started the set and we're timing it (e.g. a durations exercise)
         case resting    // implicit timer used when the set has rest secs
         case timing     // explicit timer used when the user presses the Start Timer button
     }
@@ -25,7 +26,8 @@ struct RestState {
     var color = Color.black
     let timer = RestartableTimer(every: 1, tolerance: 0.5, start: false)
     var startTime = Date()
-    var duration: Int
+    var timedSecs = 0         // for waiting this is the secs for a timed exercise, otherwise not used
+    var restSecs: Int         // amount of time to rest
     var expired = false
     
     mutating func restore() {
@@ -37,16 +39,29 @@ struct RestState {
         }
     }
 
-    mutating func restart(_ state: RestState.State, _ duration: Int) {
+    mutating func restart(_ state: RestState.State, _ restSecs: Int, _ timedSecs: Int = 0) {
         self.state = state
         self.startTime = Date()
-        self.duration = duration
+        self.restSecs = restSecs
+        self.timedSecs = timedSecs
         self.expired = false
         self.label = ""
         self.timer.restart()
     }
 
     mutating func stop() {
+        restTimers[self.id] = nil
+        let center = UNUserNotificationCenter.current()
+        center.removeAllPendingNotificationRequests()
+        center.removeAllDeliveredNotifications()
+
+        if case .waiting = self.state {
+            if self.restSecs > 0 {
+                self.restart(.resting, self.restSecs, self.timedSecs)
+                return
+            }
+        }
+        UIApplication.shared.isIdleTimerDisabled = false    // TODO: do we need to do this?
         self.state = .exercising
         self.timer.stop()
     }
@@ -54,7 +69,12 @@ struct RestState {
     // This will count down to duration seconds and, if the count down goes far enough past
     // duration, revert back to the normal exercising view.
     mutating func onTimer() {
-        let secs = Double(self.duration) - Date().timeIntervalSince(self.startTime)
+        var secs: Double
+        if case .waiting = self.state {
+            secs = Double(self.timedSecs) - Date().timeIntervalSince(self.startTime)
+        } else {
+            secs = Double(self.restSecs) - Date().timeIntervalSince(self.startTime)
+        }
         if secs > 0.0 {
             self.label = secsToShortDurationName(secs)
         } else if secs >= -2 {
@@ -69,7 +89,7 @@ struct RestState {
             return
         }
 
-        if !self.expired {
+        if secs > 0 {
             self.color = .red
         } else {
             self.color = .green  // TODO: better to use DarkGreen

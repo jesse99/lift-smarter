@@ -11,13 +11,13 @@ struct RepRangesView: View {
     @State var updateExpectedAlert = false
     @State var advanceWeightAlert = false
     @State var recentModal = false
-    @State var rest = RestState(id: "", duration: 60)
+    @State var rest = RestState(id: "", restSecs: 60)
     @Environment(\.presentationMode) var presentation
 
     init(_ program: ProgramVM, _ instance: InstanceVM) {
         self.program = program
         self.instance = instance
-        self._rest = State(initialValue: RestState(id: instance.id, duration: 60))
+        self._rest = State(initialValue: RestState(id: instance.id, restSecs: 60))
     }
     
     var body: some View {
