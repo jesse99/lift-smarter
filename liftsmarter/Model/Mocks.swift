@@ -49,7 +49,7 @@ func defaultRepRanges() -> ExerciseInfo {
 }
 
 func defaultPercentage() -> ExerciseInfo {
-    let info = PercentageInfo(percent: 0.6, rest: 120, baseName: "")
+    let info = PercentageInfo(percent: 0.6, rest: 120, baseName: "none")
     return .percentage(info)
 }
 

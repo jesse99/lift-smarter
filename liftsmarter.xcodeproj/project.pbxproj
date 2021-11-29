@@ -368,9 +368,9 @@
 				37D00972273F6A7600E8966E /* ProgramsView.swift */,
 				37FC7551273E204700874917 /* RecentView.swift */,
 				373AB0D0271F2AE700F9898B /* RepsPickerView.swift */,
+				37F7520427541AD000B63C65 /* RestState.swift */,
 				37A6DC8826F1956800AC85DE /* TimerView.swift */,
 				377791BE26EE9AE700EC5028 /* WorkoutView.swift */,
-				37F7520427541AD000B63C65 /* RestState.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

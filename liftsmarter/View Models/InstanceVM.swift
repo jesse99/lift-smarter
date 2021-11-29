@@ -727,40 +727,51 @@ extension InstanceVM {
         return TimerView(title: title, duration: secs > 0 ? secs : 60)
     }
 
-    func restDuration(implicit: Bool) -> Int {
+    func restDuration(implicit: Bool, index: Int? = nil) -> Int {
         var secs = 0
 
         switch self.instance.info {
         case .durations(let info):
-            if info.current.setIndex < info.sets.count {
-                secs = info.sets[info.current.setIndex].restSecs
+            let setIndex = index ?? info.current.setIndex
+            if setIndex < info.sets.count {
+                secs = info.sets[setIndex].restSecs
             }
             if !implicit && secs == 0 {
                 secs = info.sets.max(by: {$0.restSecs < $1.restSecs})?.restSecs ?? 120
             }
 
         case .fixedReps(let info):
-            if info.current.setIndex < info.sets.count {
-                secs = info.sets[info.current.setIndex].restSecs
+            let setIndex = index ?? info.current.setIndex
+            if setIndex < info.sets.count {
+                secs = info.sets[setIndex].restSecs
             }
             if !implicit && secs == 0 {
                 secs = info.sets.max(by: {$0.restSecs < $1.restSecs})?.restSecs ?? 120
             }
 
         case .maxReps(let info):
-            if info.current.setIndex < info.restSecs.count {
-                secs = info.restSecs[info.current.setIndex]
+            let setIndex = index ?? info.current.setIndex
+            if setIndex < info.restSecs.count {
+                secs = info.restSecs[setIndex]
             }
             if !implicit && secs == 0 {
                 secs = info.restSecs.max(by: {$0 < $1}) ?? 120
             }
 
         case .percentage(let info):
-            secs = info.rest
+            let setIndex = index ?? info.current.setIndex
+            if let base = self.program.instances.first(where: {$0.name == info.baseName}) {
+                if base.restDuration(implicit: implicit, index: setIndex) > 0 {
+                    secs = info.rest
+                }
+            } else {
+                secs = info.rest
+            }
 
         case .repRanges(let info):
-            if info.current.setIndex < info.sets.count {
-                secs = info.sets[info.current.setIndex].restSecs
+            let setIndex = index ?? info.current.setIndex
+            if setIndex < info.sets.count {
+                secs = info.sets[setIndex].restSecs
             }
             if !implicit && secs == 0 {
                 secs = info.sets.max(by: {$0.restSecs < $1.restSecs})?.restSecs ?? 120
