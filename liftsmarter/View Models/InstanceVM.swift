@@ -676,57 +676,6 @@ extension InstanceVM {
     }
 
     // For rest between sets.
-    func implicitTimer(delta: Int = 0) -> TimerView {
-        switch self.instance.info {
-        case .durations(let info):
-            let title = self.getSetTimerTitle("Set", delta: delta)
-            return TimerView(title: title, duration: info.sets[self.setIndex + delta].secs, secondDuration: self.restDuration(implicit: true))
-
-        case .fixedReps(let info):
-            let title = self.getSetTimerTitle("Set", delta: delta)
-            return TimerView(title: title, duration: info.sets[self.setIndex + delta].restSecs)
-
-        case .maxReps(let info):
-            let title = self.getSetTimerTitle("Set", delta: delta)
-            return TimerView(title: title, duration: info.restSecs[self.setIndex + delta])
-
-        case .percentage(let info):
-            if let base = self.program.instances.first(where: {$0.name == info.baseName}) {
-                if case .repRanges = base.exercise.info {
-                    let title = base.getSetTimerTitle("", index: self.setIndex, delta: delta)
-                    return TimerView(title: title, duration: info.rest)
-                } else {
-                    let title = base.getSetTimerTitle("Set", index: self.setIndex, delta: delta)
-                    return TimerView(title: title, duration: info.rest)
-                }
-            }
-            let title = self.getSetTimerTitle("Set", index: self.setIndex, delta: delta)
-            return TimerView(title: title, duration: info.rest)
-
-        case .repRanges(let info):
-            let title = self.getSetTimerTitle("", delta: delta)
-            let set = info.currentSet(delta)
-            return TimerView(title: title, duration: set.restSecs)
-
-        case .repTotal(let info):
-            let title = self.getSetTimerTitle("Set", delta: delta)
-            return TimerView(title: title, duration: info.rest)
-        }
-    }
-    
-    func explicitTimer() -> TimerView {      // User pressed the Start Timer button.
-        var title: String
-        switch self.progress() {
-        case .notStarted, .started:
-            title = getSetTimerTitle("On set")
-        case .finished:
-            title = "Finished"
-        }
-
-        let secs = self.restDuration(implicit: false)
-        return TimerView(title: title, duration: secs > 0 ? secs : 60)
-    }
-
     func restDuration(implicit: Bool, index: Int? = nil) -> Int {
         var secs = 0
 
