@@ -1,14 +1,16 @@
 //  Created by Jesse Vorisek on 9/12/21.
 import SwiftUI
 
-struct WorkoutView: View {  // TODO: might want a timer here (if time advances enough can fall into a rest week)
+struct WorkoutView: View {
     let program: ProgramVM
+    let timer = RestartableTimer(every: TimeInterval.minutes(30))
     @ObservedObject var workout: WorkoutVM
     @State var editModal = false
 
     init(_ program: ProgramVM, _ workout: WorkoutVM) {
         self.program = program
         self.workout = workout
+        self.resetTimer()
     }
 
     var body: some View {
@@ -29,10 +31,9 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
                     }
                 }
             }
-            .navigationBarTitle(Text(self.workout.name + " Exercises"))
-            
-            // TODO: get rid of this validate call
-            .onAppear {self.workout.willChange(); self.program.validate()}   // something goofy is going on with changes inside the sheet that prevents this view from updating unless we have this extra willChange call
+            .navigationBarTitle(Text("\(self.workout.name) Exercises"))
+            .onAppear {self.onAppear()}
+            .onReceive(timer.timer) {_ in self.onTimer()}
 
             Divider()
             HStack {
@@ -45,6 +46,44 @@ struct WorkoutView: View {  // TODO: might want a timer here (if time advances e
         }
     }
     
+    private func onAppear() {
+        // something goofy is going on with changes inside the sheet that prevents this view
+        // from updating unless we have this extra willChange call
+        self.workout.willChange()
+        self.resetTimer()
+        self.program.validate()     // TODO: get rid of this
+    }
+    
+    private func onTimer() {
+        self.workout.willChange()
+        self.resetTimer()   // rest timer may finish
+    }
+    
+    private func resetTimer() {
+        func isResting(_ instance: InstanceVM) -> Bool {
+            if let saved = restTimers[instance.id] {
+                let elapsed = Date().timeIntervalSince(saved.saveTime)
+                if saved.remaining > elapsed {
+                    return true
+                }
+            }
+            return false
+        }
+
+        var period: TimeInterval
+        if self.workout.instances.any({isResting($0)}) {
+            // We'll update the subtitles for instances that are resting with the time.
+            period = TimeInterval.seconds(1)
+        } else {
+            // Can enter a rest week.
+            period = TimeInterval.minutes(30)
+        }
+        
+        if self.timer.every != period {
+            self.timer.restart(every: period)
+        }
+    }
+
     private func onEdit() {
         self.editModal = true
     }

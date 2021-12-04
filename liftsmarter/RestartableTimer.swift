@@ -7,7 +7,7 @@ import Foundation
 class RestartableTimer: ObservableObject {
     var timer: Publishers.Autoconnect<Timer.TimerPublisher>
     var running = true
-    private var every: TimeInterval
+    var every: TimeInterval
     private let tolerance: TimeInterval
     
     // Note that the timer won't fire until the every interval elapses.

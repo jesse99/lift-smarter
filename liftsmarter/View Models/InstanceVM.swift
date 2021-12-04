@@ -753,6 +753,12 @@ extension InstanceVM {
 
     // WorkoutView
     func workoutLabel() -> ([String], String, Int) {
+        if let saved = restTimers[self.id] {
+            let elapsed = Date().timeIntervalSince(saved.saveTime)
+            if saved.remaining > elapsed {
+                return ([secsToShortDurationName(saved.remaining - elapsed) + " left"], "", 1)
+            }
+        }
         switch self.instance.info {
         case .percentage(let info):
             if let base = self.program.instances.first(where: {$0.name == info.baseName}) {

@@ -111,7 +111,7 @@ struct RestState {
     }
 }
 
-fileprivate func secsToShortDurationName(_ interval: Double) -> String {
+func secsToShortDurationName(_ interval: Double) -> String {
     let secs = Int(round(interval))
     let mins = interval/60.0
     let hours = interval/3600.0
