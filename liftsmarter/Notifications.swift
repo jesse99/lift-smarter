@@ -15,7 +15,7 @@ class Notifications {   // note that it's awkward to fold this into App because 
                 self.enabled = true
             } else {
                 if let err = error {
-                    log(.Error, "background notifications were not authorized: \(err)")
+                    log(.Warning, "background notifications were not authorized: \(err)")
                 } else {
                     log(.Info, "background notifications were not authorized")
                 }
@@ -25,6 +25,9 @@ class Notifications {   // note that it's awkward to fold this into App because 
 
     func add(afterSecs: Double, title: String = "Timer finished", subTitle: String = "") {
         if self.enabled {
+            if !self.pendingID.isEmpty {
+                log(.Info, "removing old notification")
+            }
             self.remove()
             
             let content = UNMutableNotificationContent()
@@ -44,6 +47,7 @@ class Notifications {   // note that it's awkward to fold this into App because 
                     log(.Error, "failed to schedule notification: \(err)")
                 }
             }
+            log(.Info, "added notification after \(afterSecs) secs")
         }
     }
     
@@ -52,6 +56,7 @@ class Notifications {   // note that it's awkward to fold this into App because 
             let notifications = UNUserNotificationCenter.current()
             notifications.removePendingNotificationRequests(withIdentifiers: [self.pendingID])
             self.pendingID = ""
+            log(.Info, "removed old notification")
         }
     }
 }

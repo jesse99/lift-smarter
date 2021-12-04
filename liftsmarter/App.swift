@@ -44,9 +44,11 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
                 self.saveState()
             }
             if let secs = restTimers.map({$0.value.remaining}).min() {
+                log(.Info, "adding new notification (entering background)")
                 self.notifications.add(afterSecs: secs)
             }
         } else if newPhase == .active {
+            log(.Info, "removing any old notification (activating)")
             self.notifications.remove()
         }
     }

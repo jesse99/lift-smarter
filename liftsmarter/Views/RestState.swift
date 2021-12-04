@@ -8,7 +8,7 @@ struct SavedRestState {
     let remaining: Double
 }
 
-// Exercise instances with active timers.
+// Exercise instances with active timers. Key is an instance id.
 var restTimers: [String: SavedRestState] = [:]
 
 /// State associated with the rest timer used within exercise views.
@@ -51,9 +51,10 @@ struct RestState {
 
     mutating func stop() {
         restTimers[self.id] = nil
-        let center = UNUserNotificationCenter.current()
-        center.removeAllPendingNotificationRequests()
-        center.removeAllDeliveredNotifications()
+//        app.notifications.remove()
+//        let center = UNUserNotificationCenter.current()
+//        center.removeAllPendingNotificationRequests()
+//        center.removeAllDeliveredNotifications()
 
         if case .waiting = self.state {
             if self.restSecs > 0 {
