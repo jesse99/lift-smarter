@@ -539,7 +539,7 @@ extension InstanceVM {
             return result
         }
         
-        func subSub(_ weight: Double, _ percent: WeightPercent, _ useBelow: Bool) -> String {
+        func subSub(_ weight: Double, _ percent: WeightPercent, _ useBelow: Bool, ignoreSingle: Bool) -> String {
             let closest = useBelow ? exercise.getClosestBelow(weight*percent) : exercise.getClosest(weight*percent)
             if case .right(let weight) = closest {
                 let parts: [String] = weight.weights.map({
@@ -549,6 +549,9 @@ extension InstanceVM {
                         return friendlyWeight($0.weight) + " " + $0.label
                     }
                 })
+                if parts.count == 1 && ignoreSingle {
+                    return ""
+                }
                 return combine(parts).joined(separator: " + ")
             }
             return ""
@@ -592,16 +595,19 @@ extension InstanceVM {
         }
         
         switch self.exercise.apparatus {
+        case .bells(name: let name):
+            if let name = name, let bells = self.program.getBellsSet()[name], bells.extraAdds > 0 {
+                return subSub(weight, percent, useBelow, ignoreSingle: true)
+            }
         case .bodyWeight:
             // The sub-sub title is used to break down the weight into component parts (like plates).
             // That doesn't make sense for body-weight so we do nothing.
             return ""
-        case .bells(name: let name):
-            if let name = name, let bells = self.program.getBellsSet()[name], bells.extraAdds > 0 {
-                return subSub(weight, percent, useBelow)
-            }
-        default:
-            return subSub(weight, percent, useBelow)
+        case .dualPlates(barWeight: _, _):
+            // Sub-sub title will be half the listed weight and is usually alaos affected by the bar weight.
+            return subSub(weight, percent, useBelow, ignoreSingle: false)
+        case .singlePlates(_):
+            return subSub(weight, percent, useBelow, ignoreSingle: true)
         }
         return ""
     }
