@@ -11,12 +11,12 @@ extension ExerciseInfo {
             let d = info.sets.map({restToStr($0.secs)})
             let r = info.sets.map({restToStr($0.restSecs)})
             let t = info.targetSecs.map({restToStr($0)})
-            return ["durations": joinedX(d), "rest": joinedX(r), "target": joinedX(t)]
+            return ["durations": joinedX(d), "rest": joinedX(r, emptyOK: true), "target": joinedX(t)]
 
         case .fixedReps(let info):
             let rr = info.sets.map({$0.reps.reps.description})
             let r = info.sets.map({restToStr($0.restSecs)})
-            return ["reps": joinedX(rr), "rest": joinedX(r)]
+            return ["reps": joinedX(rr), "rest": joinedX(r, emptyOK: true)]
 
         case .maxReps(let info):
             let r = info.restSecs.map({restToStr($0)})
@@ -82,7 +82,7 @@ extension ExerciseInfo {
                     expected = []
                 }
             }
-            return (reps: joinedX(reps), percents: joinedX(percents), rest: joinedX(rest), expected: joinedX(expected))
+            return (reps: joinedX(reps), percents: joinedX(percents), rest: joinedX(rest, emptyOK: true), expected: joinedX(expected))
 
         default:
             ASSERT(false, "use the other editing method")
@@ -246,8 +246,10 @@ extension ExerciseInfo {
         }
     }
 
-    private func joinedX(_ values: [String]) -> String {
-        if values.count > 1 && values.all({$0 == values[0]}) {
+    private func joinedX(_ values: [String], emptyOK: Bool = false) -> String {
+        if emptyOK && values.all({$0 == "0s"}) {
+            return ""
+        } else if values.count > 1 && values.all({$0 == values[0]}) {
             return values[0] + " x\(values.count)"
         } else {
             return values.joined(separator: " ")
