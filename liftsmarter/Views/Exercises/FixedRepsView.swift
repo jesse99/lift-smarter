@@ -7,14 +7,14 @@ struct FixedRepsView: View {
     @ObservedObject var instance: InstanceVM
     @State var editModal = false
     @State var noteModal = false
-    @State var rest = RestState(id: "", restSecs: 60)
+    @State var rest = RestState(id: "", restSecs: 60, callback: nil)
     @State var recentModal = false
     @Environment(\.presentationMode) var presentation
 
     init(_ program: ProgramVM, _ instance: InstanceVM) {
         self.program = program
         self.instance = instance
-        self._rest = State(initialValue: RestState(id: instance.id, restSecs: 60))
+        self._rest = State(initialValue: RestState(id: instance.id, restSecs: 60, callback: nil))
     }
     
     var body: some View {

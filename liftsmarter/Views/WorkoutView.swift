@@ -60,18 +60,8 @@ struct WorkoutView: View {
     }
     
     private func resetTimer() {
-        func isResting(_ instance: InstanceVM) -> Bool {
-            if let saved = restTimers[instance.id] {
-                let elapsed = Date().timeIntervalSince(saved.saveTime)
-                if saved.remaining > elapsed {
-                    return true
-                }
-            }
-            return false
-        }
-
         var period: TimeInterval
-        if self.workout.instances.any({isResting($0)}) {
+        if self.workout.instances.any({restTime($0.id) != nil}) {
             // We'll update the subtitles for instances that are resting with the time.
             period = TimeInterval.seconds(1)
         } else {

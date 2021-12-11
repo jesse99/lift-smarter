@@ -43,7 +43,7 @@ struct liftsmarterApp: App {    // can use ScenePhase to detect when come to the
                 // TODO: Potentially this could be the only place where we save but that might be a bit annoying in the sim where we normally just kill the app.
                 self.saveState()
             }
-            if let secs = restTimers.map({$0.value.remaining}).min() {
+            if let secs = minRestTime() {
                 log(.Info, "adding new notification (entering background)")
                 self.notifications.add(afterSecs: secs)
             }

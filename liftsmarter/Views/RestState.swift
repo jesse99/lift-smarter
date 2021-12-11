@@ -11,6 +11,35 @@ struct SavedRestState {
 // Exercise instances with active timers. Key is an instance id.
 var restTimers: [String: SavedRestState] = [:]
 
+func restTime(_ id: String) -> Double? {
+    if let saved = restTimers[id] {
+        let elapsed = Date().timeIntervalSince(saved.saveTime)
+        if saved.remaining > elapsed {
+            return saved.remaining - elapsed
+        }
+    }
+    return nil
+}
+
+func minRestTime() -> Double? {
+    var deadlist: [String] = []
+    
+    var minSecs: Double? = nil
+    for id in restTimers.keys {
+        if let secs = restTime(id) {
+            minSecs = min(secs, minSecs ?? secs+1)
+        } else {
+            deadlist.append(id)
+        }
+    }
+    
+    for id in deadlist {
+        restTimers[id] = nil
+    }
+    
+    return minSecs
+}
+
 /// State associated with the rest timer used within exercise views.
 struct RestState {
     enum State {
@@ -20,14 +49,17 @@ struct RestState {
         case timing     // explicit timer used when the user presses the Start Timer button
     }
 
+    typealias StateCallback = (State, State) -> Void
+
     let id: String
+    var restSecs: Int         // amount of time to rest
+    let callback: StateCallback?
     var state = RestState.State.exercising
     var label = ""
     var color = Color.black
     let timer = RestartableTimer(every: 1, tolerance: 0.5, start: false)
     var startTime = Date()
     var timedSecs = 0         // for waiting this is the secs for a timed exercise, otherwise not used
-    var restSecs: Int         // amount of time to rest
     var expired = false
     
     mutating func restore() {
@@ -40,6 +72,9 @@ struct RestState {
     }
 
     mutating func restart(_ state: RestState.State, _ restSecs: Int, _ timedSecs: Int = 0) {
+        if let callback = self.callback {
+            callback(self.state, state)
+        }
         self.state = state
         self.startTime = Date()
         self.restSecs = restSecs
@@ -51,10 +86,6 @@ struct RestState {
 
     mutating func stop() {
         restTimers[self.id] = nil
-//        app.notifications.remove()
-//        let center = UNUserNotificationCenter.current()
-//        center.removeAllPendingNotificationRequests()
-//        center.removeAllDeliveredNotifications()
 
         if case .waiting = self.state {
             if self.restSecs > 0 {
@@ -63,6 +94,9 @@ struct RestState {
             }
         }
         UIApplication.shared.isIdleTimerDisabled = false    // TODO: shouldn't we set this to true at some point?
+        if let callback = self.callback {
+            callback(self.state, .exercising)
+        }
         self.state = .exercising
         self.timer.stop()
     }
