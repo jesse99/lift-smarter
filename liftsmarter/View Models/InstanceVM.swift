@@ -532,7 +532,11 @@ extension InstanceVM {
                     count += 1
                 } else {
                     if count > 1 {
-                        result.append("\(parts[i])x\(count)")
+                        if parts[i].contains(where: {$0 == " "}) {
+                            result.append("\(parts[i]) x\(count)")
+                        } else {
+                            result.append("\(parts[i])x\(count)")
+                        }
                     } else {
                         result.append(parts[i])
                     }
