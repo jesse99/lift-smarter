@@ -510,6 +510,11 @@ extension InstanceVM {
             if case .right(let weight) = closest {
                 let suffix = percent.value >= 0.01 && weight.total > epsilonWeight ? " @ " + friendlyUnitsWeight(weight.total) : ""
                 text += suffix
+                
+                let p = Int(100*percent.value)
+                if p != 100 {
+                    text += " (\(p)%)"
+                }
             }
         }
 
