@@ -16,7 +16,7 @@ struct EditNoteView: View {
     var body: some View {
         VStack {
             Text("Edit \(self.formalName)").font(.largeTitle)
-            TextEditor(text: self.$text).padding()
+            TextEditor(text: self.$text).font(.body).padding()
             Spacer()
             HStack {
                 Button("Cancel", action: onCancel).font(.callout)
