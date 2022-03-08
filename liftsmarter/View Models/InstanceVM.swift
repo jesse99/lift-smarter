@@ -575,9 +575,14 @@ extension InstanceVM {
         var weight = 0.0
         var percent = WeightPercent(1.0)
         var useBelow = true
+        var prefix = ""
         switch self.instance.info {
         case .durations(let info):
+            prefix = info.label
             weight = info.expectedWeight
+            if weight > 0.0 && !prefix.isEmpty {
+                prefix += " @ "
+            }
 
         case .fixedReps(let info):
             weight = info.expectedWeight
@@ -608,19 +613,19 @@ extension InstanceVM {
         switch self.exercise.apparatus {
         case .bells(name: let name):
             if let name = name, let bells = self.program.getBellsSet()[name], bells.extraAdds > 0 {
-                return subSub(weight, percent, useBelow, ignoreSingle: true)
+                return prefix + subSub(weight, percent, useBelow, ignoreSingle: true)
             }
         case .bodyWeight:
             // The sub-sub title is used to break down the weight into component parts (like plates).
             // That doesn't make sense for body-weight so we do nothing.
-            return ""
+            return prefix
         case .dualPlates(barWeight: _, _):
             // Sub-sub title will be half the listed weight and is usually alaos affected by the bar weight.
-            return subSub(weight, percent, useBelow, ignoreSingle: false)
+            return prefix + subSub(weight, percent, useBelow, ignoreSingle: false)
         case .singlePlates(_):
-            return subSub(weight, percent, useBelow, ignoreSingle: true)
+            return prefix + subSub(weight, percent, useBelow, ignoreSingle: true)
         }
-        return ""
+        return prefix
     }
 
     func notesLabel() -> String {

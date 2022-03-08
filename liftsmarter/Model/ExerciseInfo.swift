@@ -51,22 +51,25 @@ final class Current: Storable {
 final class DurationsInfo: Equatable, Storable {
     var sets: [DurationSet]
     var targetSecs: [Int]
+    var label: String
 
     var expectedWeight = 0.0
     
     var current = Current()
     var currentSecs: [Int] = []           // what the user has done so far
 
-    init(sets: [DurationSet], targetSecs: [Int] = []) {
+    init(sets: [DurationSet], targetSecs: [Int] = [], label: String = "") {
         ASSERT(!sets.isEmpty, "should not have zero sets")
         ASSERT(targetSecs.isEmpty || targetSecs.count == sets.count, "targetSecs must match sets")
         self.sets = sets
         self.targetSecs = targetSecs
+        self.label = label
     }
     
     required init(from store: Store) {
         self.sets = store.getObjArray("sets")
         self.targetSecs = store.getIntArray("targetSecs")
+        self.label = store.getStr("label", ifMissing: "")
         self.expectedWeight = store.getDbl("expectedWeight")
         self.current = store.getObj("current")
         self.currentSecs = store.getIntArray("currentSecs")
@@ -75,6 +78,7 @@ final class DurationsInfo: Equatable, Storable {
     func save(_ store: Store) {
         store.addObjArray("sets", sets)
         store.addIntArray("targetSecs", targetSecs)
+        store.addStr("label", label)
         store.addDbl("expectedWeight", expectedWeight)
         store.addObj("current", current)
         store.addIntArray("currentSecs", currentSecs)
@@ -97,7 +101,7 @@ final class DurationsInfo: Equatable, Storable {
     }
 
     static func == (lhs: DurationsInfo, rhs: DurationsInfo) -> Bool {
-        return lhs.sets == rhs.sets && lhs.targetSecs == rhs.targetSecs && sameWeight(lhs.expectedWeight, rhs.expectedWeight)
+        return lhs.sets == rhs.sets && lhs.targetSecs == rhs.targetSecs && lhs.label == rhs.label && sameWeight(lhs.expectedWeight, rhs.expectedWeight)
     }
 }
 

@@ -11,7 +11,7 @@ extension ExerciseInfo {
             let d = info.sets.map({restToStr($0.secs)})
             let r = info.sets.map({restToStr($0.restSecs)})
             let t = info.targetSecs.map({restToStr($0)})
-            return ["durations": joinedX(d), "rest": joinedX(r, emptyOK: true), "target": joinedX(t)]
+            return ["durations": joinedX(d), "rest": joinedX(r, emptyOK: true), "label": info.label, "target": joinedX(t)]
 
         case .fixedReps(let info):
             let rr = info.sets.map({$0.reps.reps.description})
@@ -114,7 +114,7 @@ extension ExerciseInfo {
                     }
                     let z = zip(d, r)
                     let s = z.map({DurationSet(secs: $0.0, restSecs: $0.1)})
-                    return .right(.durations(DurationsInfo(sets: s, targetSecs: t)))
+                    return .right(.durations(DurationsInfo(sets: s, targetSecs: t, label: table["label"]!)))
                 }
             case .left(let err):
                 return .left(err)

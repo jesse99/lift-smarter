@@ -7,6 +7,7 @@ struct EditDurationsView: View {
     let exerciseName: String
     let info: Binding<ExerciseInfo>
     @State var durations: String
+    @State var label: String
     @State var target: String
     @State var rest: String
     @State var showHelp = false
@@ -21,6 +22,7 @@ struct EditDurationsView: View {
         let table = info.wrappedValue.render()
         self._durations = State(initialValue: table["durations"]!)
         self._rest = State(initialValue: table["rest"]!)
+        self._label = State(initialValue: table["label"]!)
         self._target = State(initialValue: table["target"]!)
     }
     
@@ -31,6 +33,7 @@ struct EditDurationsView: View {
             VStack(alignment: .leading) {
                 numericishField("Durations", self.$durations, self.onEditedInfo, self.onDurationsHelp)
                 numericishField("Target", self.$target, self.onEditedInfo, self.onTargetHelp)
+                wordsField("Label", self.$label, self.onEditedInfo, onHelp: self.onLabelHelp)
                 numericishField("Rest", self.$rest, self.onEditedInfo, self.onRestHelp)
             }
             Spacer()
@@ -58,7 +61,7 @@ struct EditDurationsView: View {
     }
 
     func onOK() {
-        let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
+        let table = ["durations": self.durations, "rest": self.rest, "label": self.label, "target": self.target]
         switch info.wrappedValue.parse(table) {
         case .right(let newInfo):
             self.info.wrappedValue = newInfo
@@ -71,7 +74,7 @@ struct EditDurationsView: View {
     }
 
     private func onEditedInfo(_ text: String) {
-        let table = ["durations": self.durations, "rest": self.rest, "target": self.target]
+        let table = ["durations": self.durations, "rest": self.rest, "label": self.label, "target": self.target]
         switch info.wrappedValue.parse(table) {
         case .right(_):
             self.error = ""
@@ -87,6 +90,11 @@ struct EditDurationsView: View {
 
     private func onRestHelp() {
         self.helpText = restHelpText
+        self.showHelp = true
+    }
+
+    func onLabelHelp() {
+        self.helpText = "Arbitrary text, e.g. 'level 5'."
         self.showHelp = true
     }
 
