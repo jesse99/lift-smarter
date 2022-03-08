@@ -429,7 +429,7 @@ extension ProgramVM {
             case .reps(count: let count, percent: _):
                 return count.description
             case .duration(secs: let secs, percent: _):
-                return friendlySecs(secs)
+                return friendlyShortSecs(secs)
             }
         }
         
@@ -444,7 +444,7 @@ extension ProgramVM {
                 }
 
                 let formatter = DateFormatter()
-                formatter.dateFormat = "MMM d"
+                formatter.dateFormat = "MMM d Y"
                 let rhs = formatter.string(from: $1.completed)
                 
                 // TODO: maybe add a new line for these? possibly in italic?
@@ -776,6 +776,12 @@ extension ProgramVM {
             }
         }
         
+        for candidate in self.model.program.exerciseClipboard {
+            if candidate.name == exercise.name {
+                exercises.append(candidate)
+            }
+        }
+
         // We gather up all the exercises in case we're changing their names.
         exercises.forEach(callback)
     }

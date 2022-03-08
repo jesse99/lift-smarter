@@ -429,11 +429,13 @@ extension InstanceVM {
             weight = info.expectedWeight
             if info.current.setIndex < info.sets.count {
                 let duration = info.sets[info.current.setIndex]
+                let ds = friendlyMediumSecs(duration.secs)
                 if info.targetSecs.count > 0 {
                     let target = info.targetSecs[info.current.setIndex]
-                    text = "\(duration.secs)s (target is \(target)s)"   // TODO: might want to use some sort of shortTimeStr function
+                    let ts = friendlyMediumSecs(target)
+                    text = "\(ds) (target is \(ts))"
                 } else {
-                    text = "\(duration.secs)s"
+                    text = ds
                 }
             }
 
@@ -655,6 +657,8 @@ extension InstanceVM {
 
             if self.finished {
                 return "Completed=\(records.count)"
+            } else if count == 1 {
+                return "Same as last  Completed=\(records.count)"
             } else if count >= 1 {
                 return "Same x\(count+1)  Completed=\(records.count)"   // + 1 because current sets match previous sets
             } else {
@@ -769,7 +773,7 @@ extension InstanceVM {
     // WorkoutView
     func workoutLabel() -> ([String], String, Int) {
         if let secs = restTime(self.id) {
-            return ([secsToShortDurationName(secs) + " left"], "", 1)
+            return ([friendlyMediumSecs(Int(secs)) + " left"], "", 1)
         }
         switch self.instance.info {
         case .percentage(let info):
@@ -805,7 +809,7 @@ extension InstanceVM {
 
         switch self.instance.info {
         case .durations(let info):
-            setStrs = info.sets.map({"\($0.secs)s"})
+            setStrs = info.sets.map({friendlyMediumSecs($0.secs)})
             trailer = weightSuffix(WeightPercent(percent), info.expectedWeight)
 
         case .fixedReps(let info):

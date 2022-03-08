@@ -111,11 +111,11 @@ struct RestState {
             secs = Double(self.restSecs) - Date().timeIntervalSince(self.startTime)
         }
         if secs > 0.0 {
-            self.label = secsToShortDurationName(secs)
+            self.label = friendlyMediumSecs(Int(secs))
         } else if secs >= -2 {
             self.label = "Done!"
         } else if secs >= -2*60 {
-            self.label = "+" + secsToShortDurationName(-secs)
+            self.label = "+" + friendlyMediumSecs(Int(-secs))
         } else {
             // The timer has run for so long that we'll just kill it. The user is probably
             // not paying attention to the app so we'll do a vibrate to remind him.
@@ -142,22 +142,5 @@ struct RestState {
         if !wasExpired && self.expired {
             AudioServicesPlayAlertSound(kSystemSoundID_Vibrate)
         }
-    }
-}
-
-func secsToShortDurationName(_ interval: Double) -> String {
-    let secs = Int(round(interval))
-    let mins = interval/60.0
-    let hours = interval/3600.0
-    let days = round(hours/24.0)
-    
-    if secs < 120 {
-        return secs == 1 ? "1 sec" : "\(secs) secs"
-    } else if mins < 60.0 {
-        return String(format: "%0.1f mins", arguments: [mins])
-    } else if hours < 24.0 {
-        return String(format: "%0.1f hours", arguments: [hours])
-    } else {
-        return String(format: "%0.1f days", arguments: [days])
     }
 }

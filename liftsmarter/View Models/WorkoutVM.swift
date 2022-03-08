@@ -657,7 +657,7 @@ func friendlyUnitsWeight(_ weight: Double, plural: Bool = true) -> String {
     }
 }
 
-func friendlySecs(_ interval: Int) -> String {
+func friendlyShortSecs(_ interval: Int) -> String {
     let secs = interval
     let mins = Double(interval)/60.0
     let hours = Double(interval)/3600.0
@@ -666,11 +666,50 @@ func friendlySecs(_ interval: Int) -> String {
     if secs < 120 {
         return "\(secs)s"
     } else if mins < 60.0 {
-        return String(format: "%0.1fm", arguments: [mins])
+        var result = String(format: "%0.1f", arguments: [mins])
+        while result.hasSuffix("0") {   // minutes are often specified exactly so we'll omit decimal places where possible
+            let start = result.index(result.endIndex, offsetBy: -1)
+            let end = result.endIndex
+            result.removeSubrange(start..<end)
+        }
+        while result.hasSuffix(".") {
+            let start = result.index(result.endIndex, offsetBy: -1)
+            let end = result.endIndex
+            result.removeSubrange(start..<end)
+        }
+        return result + "m"
     } else if hours < 24.0 {
-        return String(format: "%0.1fh", arguments: [hours])
+        return String(format: "%0.1fh", arguments: [hours]) // but hours and days are pretty much never specified so we'll use decimal places there
     } else {
         return String(format: "%0.1fd", arguments: [days])
+    }
+}
+
+func friendlyMediumSecs(_ interval: Int) -> String {
+    let secs = interval
+    let mins = Double(interval)/60.0
+    let hours = Double(interval)/3600.0
+    let days = round(hours/24.0)
+    
+    if secs < 120 {
+        return "\(secs) secs"
+    } else if mins < 60.0 {
+        var result = String(format: "%0.1f", arguments: [mins])
+        while result.hasSuffix("0") {   // minutes are often specified exactly so we'll omit decimal places where possible
+            let start = result.index(result.endIndex, offsetBy: -1)
+            let end = result.endIndex
+            result.removeSubrange(start..<end)
+        }
+        while result.hasSuffix(".") {
+            let start = result.index(result.endIndex, offsetBy: -1)
+            let end = result.endIndex
+            result.removeSubrange(start..<end)
+        }
+        return result + " mins"
+    } else if hours < 24.0 {
+        return String(format: "%0.1f hours", arguments: [hours]) // but hours and days are pretty much never specified so we'll use decimal places there
+    } else {
+        return String(format: "%0.1f days", arguments: [days])
     }
 }
 
