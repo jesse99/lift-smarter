@@ -92,6 +92,10 @@ class WorkoutLabelTests: XCTestCase {
         XCTAssertEqual(label, "today")
         XCTAssertEqual(color, .orange)
 
+        (label, color) = program.subLabel(workout, now: date(day: 4, hours: 11))
+        XCTAssertEqual(label, "today")
+        XCTAssertEqual(color, .orange)
+
         (label, color) = program.subLabel(workout, now: date(day: 5))
         XCTAssertEqual(label, "overdue by 1 day")
         XCTAssertEqual(color, .red)
@@ -471,7 +475,7 @@ class WorkoutLabelTests: XCTestCase {
     // 17 18 19 20 21 22 23
     // 24 25 26 27 28 29 30
     // 31
-    private func date(year: Int = 2021, month: Int = 9, day: Int = 1, minutes: Int = 1) -> Date {
-        return self.formatter.date(from: "\(year)/\(month)/\(day) 09:\(minutes)")!
+    private func date(year: Int = 2021, month: Int = 9, day: Int = 1, hours: Int = 9, minutes: Int = 1) -> Date {
+        return self.formatter.date(from: "\(year)/\(month)/\(day) \(hours):\(minutes)")!
     }
 }

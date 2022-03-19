@@ -476,7 +476,11 @@ extension ProgramVM {
                     return .days(daysBetween(from: now, to: dueDate))
                 } else {
                     let n = daysBetween(from: dueDate, to: now)
-                    return .overdue(n)
+                    if n == 0 {
+                        return .days(0)
+                    } else {
+                        return .overdue(n)
+                    }
                 }
                 
             } else {
