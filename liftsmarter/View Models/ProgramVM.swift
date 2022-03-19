@@ -436,7 +436,7 @@ extension ProgramVM {
         let limit = 12
         if let records = self.model.history.records[exerciseName] {
             let n = records.count > limit ? records.count - limit : 0
-            return records.reversed().dropFirst(n).mapi({
+            return records.reversed().dropLast(n).mapi({
                 let sets = dedupe($1.sets.map(setToStr))
                 var lhs = sets.joined(separator: ", ")
                 if $1.weight > 0.0 {
