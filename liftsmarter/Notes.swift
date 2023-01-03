@@ -2,26 +2,12 @@
 import Foundation
 
 private func noteToMarkdown(notes: [String], links: [String: String]) -> String {
-    var text = ""
+    let ammended = notes.map {"- " + $0}
+    var text = ammended.joined(separator: "\n")
+    text += "\n\n"
 
-    if #available(iOS 15.0, *) {
-        let ammended = notes.map {"- " + $0}
-        text = ammended.joined(separator: "\n")
-        text += "\n\n"
-
-        for (name, link) in links {
-            text += "[\(name)](\(link))  "
-        }
-    } else {
-        text += "<ul>\n"
-        for note in notes {
-            text += "<li style='font-size:64px;'>\(note)</li>"
-        }
-        text += "<p style='font-size:48px;'>  </p>"
-        for (label, url) in links {
-            text += "<p><a href='\(url)' style='font-size:64px;'>\(label)</a></p>\n"
-        }
-        text += "</ul>\n"
+    for (name, link) in links {
+        text += "[\(name)](\(link))  "
     }
 
     return text
@@ -245,15 +231,14 @@ let defaultNotes: [String: String] = [
             "Eyes under the bar.",
             "Grip should be such that forearms are vertical at the bottom. Usually about 1.5-2x shoulder width.",
             "Feet should usually be between knees and hips and out as much as possible.",
-            "Lift chest, squeeze shoulder blades together, feet flat on the floor.",
             "Bar should rest on palm, near wrists.",
-            "Wrists should stay straight.",
-            "Don't watch the bar, instead look at a fixed point on the ceiling.",
-            "Arch back but keep your butt on the bench.",
-            "At the bottom elbows should be tucked in to about 75 degrees. On the way up flare elbows out to 90 degrees.",
+            "Lower shoulders, squeeze shoulders together, stay tight throughout.",
+            "Raise chest unstead of arching lower back.",
             "Squeeze the bar hard.",
+            "Bring bar down to about lower nipples. Raise back to over eyes.",
+            "Don't watch the bar, instead look at a fixed point on the ceiling.",
             "Press feet hard into the floor to help maintain tension."],
-        links: ["Strength Theory": "http://strengtheory.com/how-to-bench/", "Stronglifts": "http://stronglifts.com/bench-press/", "Thrall Video": "https://www.youtube.com/watch?v=BYKScL2sgCs"]),
+        links: ["Strength Theory": "http://strengtheory.com/how-to-bench/", "Stronglifts": "http://stronglifts.com/bench-press/", "Thrall Video": "https://www.youtube.com/watch?v=BYKScL2sgCs", "4 mistakes": "https://www.youtube.com/watch?v=TDSXgCB6KfI"]),
     
     "Bend (intro)": noteToMarkdown(
         notes: [
@@ -628,7 +613,8 @@ let defaultNotes: [String: String] = [
             "Place an elbow on your inner thigh with palm facing away from thigh.",
             "Curl the weight.",
             "Keep upper arm stationary.",
-            "At the top your pinky should be higher than your thumb."],
+            "At the top your pinky should be higher than your thumb.",
+            "At the bottom your elbow should have a slight bend."],
         links: ["Link": "http://www.bodybuilding.com/exercises/detail/view/name/concentration-curls"]),
     
     "Cossack Squat": noteToMarkdown(
@@ -675,13 +661,21 @@ let defaultNotes: [String: String] = [
             "Keep your core braced."],
         links: ["Link": "http://www.nick-e.com/deadbug/"]),
     
+    "Dead Hang": noteToMarkdown(
+        notes: [
+            "Arms should be roughly shoulder width apart.",
+            "Keep arms straight and stay relaxed.",
+            "Work your way to a 60s hang time."],
+        links: ["Link": "https://www.healthline.com/health/fitness-exercise/dead-hang#how-to"]),
+    
     "Deadlift": noteToMarkdown(
         notes: [
             "Walk to the bar and place feet so that the bar is over the middle of your feet.",
             "Feet should be pointed out ten to thirty degrees.",
             "Feet should be about as far apart as they would be for a vertical jump (hip width not shoulder width).",
             "Bend over and grab the bar keeping hips as high as possible.",
-            "When starting to grip the bar position your hands so that the calluses on your palm are just above the bar and then wrap your fingers and thumb around the bar.",
+            "When starting to grip the bar position your hands so that the calluses on your palm are just above the bar.",
+            "Place your thumb over your fingers.",
             "Pull yourself down and into the bar by engaging lats, upper back, and hip flexors.",
             "Stop once the bar touches your shins, knees touching arms.",
             "Back should be straight, hips fairly high, but seated back as much as possible.",
@@ -692,7 +686,7 @@ let defaultNotes: [String: String] = [
             "Never bend arms: all the lifting should be done with legs and back.",
             "Don't shrug or lean back too far at the top.",
             "Can help to switch to a mixed grip for the last warmup and worksets.",
-            "Can build grip strength by holding the last rep in place."],
+            "Can build grip strength by holding a set for 10-15s."],
         links: ["Stronglifts": "http://stronglifts.com/deadlift/", "Thrall Video": "https://www.youtube.com/watch?v=Y1IGeJEXpF4", "Tips": "https://www.t-nation.com/training/5-tips-to-dominate-the-deadlift", "Grip": "https://stronglifts.com/deadlift/grip/"]),
     
     "Decline Bench Press": noteToMarkdown(
@@ -936,11 +930,18 @@ let defaultNotes: [String: String] = [
     "Dumbbell Single Leg Split Squat": noteToMarkdown(
         notes: [
             "Grasp dumbbells so that palms are facing inward.",
-            "Extend leg backwards and re st foot on a bench or chair.",
+            "Extend leg backwards and rest foot on a bench or chair.",
             "Squat down until rear knee is almost in contact with the floor.",
             "Return to original standing position.",
             "Difficulty can be increased by using a box or plates to prop up your front foot 2-4 inches."],
         links: ["Link": "http://exrx.net/WeightExercises/Quadriceps/DBSingleLegSplitSquat.html", "Tougher": "https://www.t-nation.com/training/tip-make-the-bulgarian-split-squat-even-tougher"]),
+    
+    "Elliptical": noteToMarkdown(
+        notes: [
+            "Keep your feet parallel with the edges of the pedals.",
+            "Straighten your back.",
+            "Bend your knees slightly."],
+        links: ["Link": "https://www.ellipticalreviews.com/blog/how-to-use-an-elliptical-trainer/"]),
     
     "Exercise Ball Back Extension": noteToMarkdown(
         notes: [
@@ -1474,9 +1475,11 @@ let defaultNotes: [String: String] = [
         notes: [
             "Bend at the waist and use one arm to grip a support, if using a bench place one knee on the bench.",
             "Using your other arm bring a dumbbell from the floor all the way back.",
+            "At the bottom allow your shoulders to roll forward, at the top retract.",
             "Keep your shoulders higher than your hips, your back should be at a 15 degree angle to the floor.",
-            "Pull the dumbbell in a straight line from directly below your chest to the lower part of your rib cage."],
-        links: ["Link": "https://www.t-nation.com/training/kroc-rows-101", "Video": "https://www.youtube.com/watch?v=D7jAIdoORxI"]),
+            "Pull the dumbbell in a straight line from directly below your chest to the lower part of your rib cage.",
+            "It's OK to do less than the full ROM as you fatigue and to do these to failure."],
+        links: ["Link1": "https://www.setforset.com/blogs/news/kroc-rows", "Link2": "https://www.t-nation.com/training/kroc-rows-101", "Video": "https://www.youtube.com/watch?v=D7jAIdoORxI"]),
     
     "L-sit": noteToMarkdown(
         notes: [
@@ -2553,10 +2556,12 @@ let defaultNotes: [String: String] = [
         notes: [
             "Use chalk.",
             "Setup inside a power rack with the pins set above your knees.",
-            "When starting to grip the bar position your hands so that the calluses on your palm are just above the bar and then wrap your fingers and thumb around the bar.",
+            "When starting to grip the bar position your hands so that the calluses on your palm are just above the bar.",
+            "Place your thumb over your fingers.",
             "Grip the bar as tight as you can.",
-            "Lift the bar off the pins just as if you were doing a deadlift."],
-        links: ["Link": "http://jasonferruggia.com/mythbusting-improve-grip-strength-deadlifting/", "Grip": "https://stronglifts.com/deadlift/grip/"]),
+            "Lift the bar off the pins just as if you were doing a deadlift.",
+            "Hold the bar until your grip begins to loosen.",],
+        links: ["Link": "http://jasonferruggia.com/mythbusting-improve-grip-strength-deadlifting/", "Grip": "https://strengthandgain.com/increase-forearm-and-grip-strength/"]),
     
     "Step-ups (Intro)": noteToMarkdown(
         notes: [
@@ -2662,10 +2667,15 @@ let defaultNotes: [String: String] = [
     
     "Trap Bar Deadlift": noteToMarkdown(
         notes: [
-            "Load up a hex bar, stand in the middle, and grap both handles.",
-            "Lower your hips, look foreward, and keep chest up.",
-            "Drive through your heels keeping back straight."],
-        links: ["Link": "http://www.bodybuilding.com/exercises/detail/view/name/trap-bar-deadlift"]),
+            "Feet should be roughly hip-width with toes slightly pointed out.",
+            "Grip handles. Sit hips back until feel a stretch in hamstrings.",
+            "Lift chest and flatten back. Look ahead or slightly down.",
+            "While keeping arms straight rotate elbows to face behind you and pull shoulders down.",
+            "Pull on the bar to create maximum tension in your body.",
+            "Take a deep breath into stomach and contract abs.",
+            "Drive feet into the ground, push hips forward towards the top.",
+            "Repeat."],
+        links: ["Link": "https://www.chrisadamspersonaltraining.com/trap-bar-deadlift.html", "Guide": "https://www.masterclass.com/articles/hex-bar-deadlift-guide"]),
     
     "Trap-3 Raise": noteToMarkdown(
         notes: [

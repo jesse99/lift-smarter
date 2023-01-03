@@ -96,8 +96,10 @@ struct DurationsView: View {
     }
     
     private func onStateChange(_ oldState: RestState.State, _ newState: RestState.State) {
-        if case .waiting = oldState {
-            instance.appendCurrent()
+        if oldState != newState {
+            if case .waiting = oldState {
+                instance.appendCurrent()
+            }
         }
     }
     

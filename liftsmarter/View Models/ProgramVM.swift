@@ -370,14 +370,13 @@ extension ProgramVM {
         let delta = findDelta(workout, instances, schedule, adjustedNow)
         switch delta {
         case .anyDay:
-            return .days(extraDays)
+            return .days(extraDays)     // TODO: this should probably ignore extra days
         case .days(let n):
             return .days(n + extraDays)
         case .error, .notScheduled:
             return delta
-        case .overdue(_):
-            ASSERT(false, "week schedule dosn't support cyclic sub-schedule")
-            return .error
+        case .overdue(let n):
+            return .days(extraDays + (7 - n)) 
         }
     }
     

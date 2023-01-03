@@ -66,7 +66,11 @@ struct RestState {
         if let saved = restTimers[self.id] {
             let elapsed = Date().timeIntervalSince(saved.saveTime)
             if saved.remaining > elapsed {
-                self.restart(saved.state, Int(saved.remaining - elapsed))
+                if case .waiting = self.state {
+                    self.restart(saved.state, self.restSecs, Int(saved.remaining - elapsed))
+                } else {
+                    self.restart(saved.state, Int(saved.remaining - elapsed))
+                }
             }
         }
     }
