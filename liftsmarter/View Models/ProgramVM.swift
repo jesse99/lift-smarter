@@ -307,6 +307,7 @@ extension ProgramVM {
         
         let workout = workoutVM.workout(self.model)
         var delta: ScheduleDelta = .error
+        var suffix = ""
         switch workout.schedule {
         case .weeks(let defaultWeeks, let subSchedule):
             let weeks = pruneRestWeeks(workout, defaultWeeks)
@@ -327,6 +328,7 @@ extension ProgramVM {
                 if let start = startOfNonRestWeek(now) {
                     let extraDays = daysBetween(from: now, to: start)
                     delta = findAdjustedDelta(workoutVM, instances, workout.schedule, extraDays, now)
+                    suffix = " (rest week)"
                 } else {
                     delta = .notScheduled
                 }
@@ -343,7 +345,7 @@ extension ProgramVM {
             switch n {
             case 0: return ("today", .orange)
             case 1: return ("tomorrow", .blue)
-            default: return ("in \(n) days", .black)
+            default: return ("in \(n) days\(suffix)", .black)
             }
 
         case .error:
