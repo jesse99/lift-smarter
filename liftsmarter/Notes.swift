@@ -260,7 +260,8 @@ let defaultNotes: [String: String] = [
             "Lie on your back with your legs tucked into your chest and your arms spread outwards.",
             "Tuck your knees so that your upper legs are at a ninety angle to the floor.",
             "Keeping legs tucked and shoulders on the floor slowly rotate your legs from side to side.",
-            "Turn your head in the opposite direction as your legs."],
+            "Turn your head in the opposite direction as your legs.",
+            "Hold the down position for a two count."],
         links: ["Video": "https://www.youtube.com/watch?v=2HYWl009bq0", "Gallery": "https://imgur.com/gallery/iEsaS", "Notes": "https://www.bodybuilding.com/fun/limber-11-the-only-lower-body-warm-up-youll-ever-need.html"]),
     
     "Bent Over Dumbbell Row": noteToMarkdown(
@@ -619,10 +620,11 @@ let defaultNotes: [String: String] = [
     
     "Cossack Squat": noteToMarkdown(
         notes: [
-            "Take a wide squat stance with toes pointed out a bit.",
-            "Move your hips over and down so that one leg gets stretched.",
-            "The stretched out leg should have the heel on the ground and the toes pointed up.",
-            "Back should remain flat.",
+            "Take a wide squat stance with toes pointed out about 45 degrees.",
+            "Lower your hips into a deep stretch position.",
+            "Slide your hips from side to side keeping the heel you're sliding to on the floor.",
+            "The other leg should have the heel on the ground and the toes pointed up.",
+            "Back should remain flat and torso more or less upright.",
             "Difficulty can be lessened by balancing yourself with your hands on the ground.",
             "Difficulty can be increased by holding your hands over your chest."],
         links: ["Video": "https://www.youtube.com/watch?v=tpczTeSkHz0", "Gallery": "https://imgur.com/gallery/iEsaS", "Notes": "https://www.bodybuilding.com/fun/limber-11-the-only-lower-body-warm-up-youll-ever-need.html"]),
@@ -2100,9 +2102,10 @@ let defaultNotes: [String: String] = [
             "Get on your hands and knees.",
             "Spread your legs out about 3-6 inches wider than your shoulders.",
             "Turn your toes so that they are facing outwards.",
+            "Big toe and inside of knee should remain in contact with the floor.",
             "Bend your elbows and rest your torso on your forearms.",
-            "Slowly rock your body forward and backward.",
-            "When you are are as far back as you can go pause for two seconds."],
+            "Slowly rock your body back as far as it will go and hold for a two count.",
+            "Slowly rock your body forward.",],
         links: ["Video": "https://www.youtube.com/watch?v=iKugmxlcE9E&ab_channel=ConnorBrowne", "Gallery": "https://imgur.com/gallery/iEsaS", "Notes": "https://www.bodybuilding.com/fun/limber-11-the-only-lower-body-warm-up-youll-ever-need.html"]),
     
     "Roll-over into V-sit": noteToMarkdown(
@@ -2673,7 +2676,8 @@ let defaultNotes: [String: String] = [
             "While keeping arms straight rotate elbows to face behind you and pull shoulders down.",
             "Pull on the bar to create maximum tension in your body.",
             "Take a deep breath into stomach and contract abs.",
-            "Drive feet into the ground, push hips forward towards the top.",
+            "Drive heels into the ground.",
+            "As the bar approaches your knees drive forward with your hips.",
             "Repeat."],
         links: ["Link": "https://www.chrisadamspersonaltraining.com/trap-bar-deadlift.html", "Guide": "https://www.masterclass.com/articles/hex-bar-deadlift-guide"]),
     

@@ -8,9 +8,33 @@
 \deftab816
 \pard\tx816\pardeftab816\pardirnatural\partightenfactor0
 
-\f0\fs48 \cf2 \'95\'a0RestState is not restoring timedSecs\
-	- can see this by starting ellipitical, going to program, and then going back to elliptical\
-\'95 Do a backup\
+\f0\fs48 \cf2 \'95 Do a commit and push\
+\'95 Would be great to record total workout duration\
+	- maybe record time entered an exercise\
+	- also record when a set or exercise finished\
+	- reset enter time if no finish time (or it was more than 8 hours ago)\
+	- could display time at the bottom of the workout screen\
+\'95 New swift UI features:\
+	- https://www.infoq.com/news/2021/07/swiftui-3-beta/\
+		` custom left/right swipe actions can be added to list views\
+		` new searchable modifier for list views\
+	- https://www.plainconcepts.com/swiftui-4-ios-16/\
+		` 
+\f1\b charts\
+
+\f0\b0 			Could have a line for weight \
+			Then error bar for gap between expected and actual total reps\
+			Gap size could be something like 2% * gap * weight\
+			Could color interval in red and blue
+\f1\b \
+
+\f0\b0 		` multiple data picker\
+		- toggle control, customizable and combinable checks (eg for tags)\
+		- stepper with formatting\
+\'95 Should support metric units\
+	- probably via weight sets\
+\'95\'a0Figure out what is needed for a MVP\
+	- publish to the store\
 \'95\'a0Doughnnut editor has neat popdown menu widget\
 \'95 Disclosure widgets might be cool\
 	- could  use them for workout, history, and maybe notes (see foodtruck order screen)\
@@ -28,17 +52,6 @@
 \'95\'a0Bench said overdue by 0 days\
 \'95 Silly to ask whether to increase reps if the user will advance weight?\
 \'95 Make sure dark mode looks OK.\
-\'95 New swift UI features:\
-	- https://www.infoq.com/news/2021/07/swiftui-3-beta/\
-		` custom left/right swipe actions can be added to list views\
-		` new searchable modifier for list views\
-	- https://www.plainconcepts.com/swiftui-4-ios-16/\
-		` 
-\f1\b charts\
-
-\f0\b0 		` multiple data picker\
-		- toggle control, customizable and combinable checks (eg for tags)\
-		- stepper with formatting\
 \
 \'95\'a0Get history working:\
 	- switch the recently completed view to a history view\
