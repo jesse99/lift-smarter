@@ -79,6 +79,7 @@ struct PercentageView: View {
     }
 
     private func onNext() {
+        self.instance.workout.updateStarted(Date())
         if instance.finished {
             instance.resetCurrent()
             app.saveState()

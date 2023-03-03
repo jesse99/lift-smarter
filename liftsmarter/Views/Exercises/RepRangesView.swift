@@ -95,6 +95,7 @@ struct RepRangesView: View {
     }
 
     private func onNext() {
+        self.instance.workout.updateStarted(Date())
         switch self.instance.progress() {
         case .notStarted, .started:
             if let reps = self.instance.exercise.fixedRep() {

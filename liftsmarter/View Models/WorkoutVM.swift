@@ -32,6 +32,27 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         get {return self.workout.schedule}
     }
     
+    func started() -> Date? {
+        return self.workout.started
+    }
+    
+    func duration() -> String {
+        if let start = self.started() {
+            var delta = 0
+            for (_, end) in self.workout.completed {
+                let candidate = Int(end.timeIntervalSince(start))
+                if candidate > delta {
+                    delta = candidate
+                }
+            }
+            
+            if delta > 0 {
+                return friendlyMediumSecs(delta)
+            }
+        }
+        return ""
+    }
+
     func nextCyclic() -> Date? {
         return self.workout.nextCyclic
     }
@@ -77,6 +98,17 @@ extension WorkoutVM {
     func setSchedule(_ schedule: Schedule) {
         self.willChange()
         self.workout.schedule = schedule
+    }
+
+    func updateStarted(_ date: Date) {
+        if let oldStarted = self.workout.started {
+            let delta = date.hoursSinceDate(oldStarted)
+            if delta > 8 {
+                self.workout.started = date
+            }
+        } else {
+            self.workout.started = date
+        }
     }
 
     func setNextCyclic(_ date: Date) {

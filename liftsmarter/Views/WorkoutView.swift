@@ -31,6 +31,7 @@ struct WorkoutView: View {
                     }
                 }
             }
+            Text(self.workout.duration()).font(.headline)
             .navigationBarTitle(Text("\(self.workout.name) Exercises"))
             .onAppear {self.onAppear()}
             .onReceive(timer.timer) {_ in self.onTimer()}
