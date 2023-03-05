@@ -89,13 +89,19 @@ struct RepRangesView: View {
                     .sheet(isPresented: self.$editModal, onDismiss: self.onEdited) {EditExerciseView(self.program, self.instance)}
             }
             .padding()
-            .onAppear {self.resetIfNeeded(); self.timer.restart(); self.rest.restore()}
+            .onAppear {self.onAppear()}
             .onDisappear() {self.timer.stop()}
         }
     }
+    
+    private func onAppear() {
+        self.instance.workout.updateStarted(self.instance, Date())
+        self.resetIfNeeded()
+        self.timer.restart()
+        self.rest.restore()
+    }
 
     private func onNext() {
-        self.instance.workout.updateStarted(self.instance, Date())
         switch self.instance.progress() {
         case .notStarted, .started:
             if let reps = self.instance.exercise.fixedRep() {

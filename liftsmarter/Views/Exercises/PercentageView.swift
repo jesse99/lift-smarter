@@ -73,13 +73,19 @@ struct PercentageView: View {
             }
             .padding()
             .onReceive(timer.timer) {_ in self.resetIfNeeded()}
-            .onAppear {self.resetIfNeeded(); self.timer.restart(); self.rest.restore()}
+            .onAppear {self.onAppear()}
             .onDisappear() {self.timer.stop()}
         }
     }
+    
+    private func onAppear() {
+        self.instance.workout.updateStarted(self.instance, Date())
+        self.resetIfNeeded()
+        self.timer.restart()
+        self.rest.restore()
+    }
 
     private func onNext() {
-        self.instance.workout.updateStarted(self.instance, Date())
         if instance.finished {
             instance.resetCurrent()
             app.saveState()

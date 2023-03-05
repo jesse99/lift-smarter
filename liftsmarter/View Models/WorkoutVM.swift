@@ -54,12 +54,10 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
     }
 
     func duration(_ instance: InstanceVM) -> String {
-        if let began = self.workout.began[instance.name] {
-            if let end = self.workout.completed[instance.name] {
-                let delta = Int(end.timeIntervalSince(began))
-                if delta > 0 {      // may not have completed the exercise for this instance of the workout yet
-                    return friendlyMediumSecs(delta)
-                }
+        if let began = self.workout.began[instance.name], let end = self.workout.completed[instance.name] {
+            let delta = Int(end.timeIntervalSince(began))
+            if delta > 0 {      // may not have completed the exercise for this instance of the workout yet
+                return friendlyMediumSecs(delta)
             }
         }
         return ""
@@ -83,6 +81,8 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         }
     }
 }
+
+let MaxWorkoutDelta = 8.0
 
 // Mutators
 extension WorkoutVM {
@@ -115,19 +115,16 @@ extension WorkoutVM {
     func updateStarted(_ instance: InstanceVM, _ date: Date) {
         if let oldStarted = self.workout.started {
             let delta = date.hoursSinceDate(oldStarted)
-            if delta > 8 {
+            if delta > MaxWorkoutDelta {
                 self.workout.started = date
+                self.workout.began = [:]
             }
         } else {
             self.workout.started = date
+            self.workout.began = [:]
         }
-
-        if let oldBegan = self.workout.began[instance.name] {
-            let delta = date.hoursSinceDate(oldBegan)
-            if delta > 8 {
-                self.workout.began[instance.name] = date
-            }
-        } else {
+            
+        if self.workout.began[instance.name] == nil {
             self.workout.began[instance.name] = date
         }
     }
