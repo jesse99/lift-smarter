@@ -27,6 +27,7 @@ class Workout: Storable {
     var schedule: Schedule
     var nextCyclic: Date? = nil         // used if schedule is cyclic
     var started: Date? = nil            // date at which the workout was started last
+    var began: [String: Date] = [:]     // exercise.name => date last started
     var completed: [String: Date] = [:] // exercise.name => date last completed
 
     init(_ name: String, _ exercises: [Exercise], schedule: Schedule) {
@@ -45,9 +46,16 @@ class Workout: Storable {
         self.exercises = store.getObjArray("exercises")
         self.schedule = store.getObj("schedule")
         
-        let names = store.getStrArray("completed-names")
+        var names = store.getStrArray("completed-names")
         for (i, name) in names.enumerated() {
             self.completed[name] = store.getDate("completed-\(i)")
+        }
+        
+        if store.hasKey("began-names") {
+            names = store.getStrArray("began-names")
+            for (i, name) in names.enumerated() {
+                self.began[name] = store.getDate("began-\(i)")
+            }
         }
         
         if store.hasKey("started") {
@@ -69,10 +77,16 @@ class Workout: Storable {
         store.addObjArray("exercises", exercises)
         store.addObj("schedule", schedule)
         
-        let names = Array(self.completed.keys)
+        var names = Array(self.completed.keys)
         store.addStrArray("completed-names", names)
         for (i, name) in names.enumerated() {
             store.addDate("completed-\(i)", self.completed[name]!)
+        }
+        
+        names = Array(self.began.keys)
+        store.addStrArray("began-names", names)
+        for (i, name) in names.enumerated() {
+            store.addDate("began-\(i)", self.began[name]!)
         }
         
         if let d = self.started {

@@ -79,7 +79,7 @@ struct DurationsView: View {
     }
 
     private func onNext() {
-        self.instance.workout.updateStarted(Date())
+        self.instance.workout.updateStarted(self.instance, Date())
         if instance.finished {
             instance.resetCurrent()
             app.saveState()

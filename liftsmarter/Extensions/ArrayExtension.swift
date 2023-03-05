@@ -60,6 +60,13 @@ extension Array {
     }
 }
 
+extension Array where Element : Hashable {
+    func unique() -> [Element] {
+        var seen: Set<Element> = []
+        return filter { seen.insert($0).inserted }
+    }
+}
+
 func zip3<A, B, C>(_ a1: Array<A>, _ a2: Array<B>, _ a3: Array<C>) -> Array<(A, B, C)> {
     ASSERT(a1.count == a2.count && a1.count == a3.count, "counts must match")
     

@@ -25,13 +25,26 @@ struct WorkoutView: View {
 
                             let sub = self.workout.subLabel(instance)
                             if !sub.isEmpty {
-                                Text(sub).font(.subheadline).foregroundColor(color)
+                                HStack {
+                                    Text(sub).font(.subheadline).foregroundColor(color)
+                                    Spacer()
+                                    Text(self.workout.duration(instance)).font(.subheadline)
+                                }
                             }
                         }
                     }
                 }
+                if let last = self.workout.instances.last, instance.id == last.id {
+                    let duration = self.workout.totalDuration()
+                    if !duration.isEmpty {
+                        HStack {
+                            Text("").font(.subheadline)
+                            Spacer()
+                            Text(duration).font(.subheadline)
+                        }
+                    }
+                }
             }
-            Text(self.workout.duration()).font(.headline)
             .navigationBarTitle(Text("\(self.workout.name) Exercises"))
             .onAppear {self.onAppear()}
             .onReceive(timer.timer) {_ in self.onTimer()}

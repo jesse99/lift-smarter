@@ -89,7 +89,7 @@ struct RepTotalView: View {
     }
 
     private func onNext() {
-        self.instance.workout.updateStarted(Date())
+        self.instance.workout.updateStarted(self.instance, Date())
         switch self.instance.progress() {
         case .notStarted, .started:
             self.updateRepsModal = true

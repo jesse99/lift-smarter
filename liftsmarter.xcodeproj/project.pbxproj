@@ -50,6 +50,7 @@
 		37A3C5F6271252DB00BFA8CC /* EditBellsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F5271252DB00BFA8CC /* EditBellsView.swift */; };
 		37A3C5F8271259B700BFA8CC /* AddBellRangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A3C5F7271259B700BFA8CC /* AddBellRangeView.swift */; };
 		37A6DC8B26F65C0000AC85DE /* RestartableTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */; };
+		37C2BAAD29B40C6A005639EE /* RepsChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C2BAAC29B40C6A005639EE /* RepsChartView.swift */; };
 		37D00973273F6A7600E8966E /* ProgramsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00972273F6A7600E8966E /* ProgramsView.swift */; };
 		37D00975273F6B9800E8966E /* ModelVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D00974273F6B9800E8966E /* ModelVM.swift */; };
 		37D009772740770E00E8966E /* PercentageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D009762740770E00E8966E /* PercentageView.swift */; };
@@ -141,6 +142,7 @@
 		37A3C5F5271252DB00BFA8CC /* EditBellsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditBellsView.swift; sourceTree = "<group>"; };
 		37A3C5F7271259B700BFA8CC /* AddBellRangeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBellRangeView.swift; sourceTree = "<group>"; };
 		37A6DC8A26F65C0000AC85DE /* RestartableTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestartableTimer.swift; sourceTree = "<group>"; };
+		37C2BAAC29B40C6A005639EE /* RepsChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepsChartView.swift; sourceTree = "<group>"; };
 		37D00972273F6A7600E8966E /* ProgramsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramsView.swift; sourceTree = "<group>"; };
 		37D00974273F6B9800E8966E /* ModelVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelVM.swift; sourceTree = "<group>"; };
 		37D009762740770E00E8966E /* PercentageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PercentageView.swift; sourceTree = "<group>"; };
@@ -365,6 +367,7 @@
 				377791B726ED98AA00EC5028 /* ProgramView.swift */,
 				37D00972273F6A7600E8966E /* ProgramsView.swift */,
 				37FC7551273E204700874917 /* RecentView.swift */,
+				37C2BAAC29B40C6A005639EE /* RepsChartView.swift */,
 				373AB0D0271F2AE700F9898B /* RepsPickerView.swift */,
 				37F7520427541AD000B63C65 /* RestState.swift */,
 				377791BE26EE9AE700EC5028 /* WorkoutView.swift */,
@@ -475,6 +478,7 @@
 				3718978F26F81B1A00351C5A /* EditWorkoutView.swift in Sources */,
 				37A3C5F22712115000BFA8CC /* Components.swift in Sources */,
 				37ECEA2026EAD65200D0AD8E /* ContentView.swift in Sources */,
+				37C2BAAD29B40C6A005639EE /* RepsChartView.swift in Sources */,
 				37FC7552273E204700874917 /* RecentView.swift in Sources */,
 				379BAFB9272E325700642B11 /* Store.swift in Sources */,
 				37ECEA1E26EAD65200D0AD8E /* App.swift in Sources */,

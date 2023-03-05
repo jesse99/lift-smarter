@@ -58,7 +58,11 @@ func defaultRepTotal() -> ExerciseInfo {
     return .repTotal(info)
 }
 
-func mockProgram() -> Program {
+func asets(_ s1: Int, _ s2: Int, _ s3: Int) -> [ActualSet] {
+    return [ActualSet.reps(count: s1, percent: 1.0), ActualSet.reps(count: s2, percent: 1.0), ActualSet.reps(count: s3, percent: 1.0)]
+}
+
+func mockProgram() -> (Program, [String: [History.Record]]) {
     // https://www.defrancostraining.com/joe-ds-qlimber-11q-flexibility-routine/
     func foamRolling() -> Exercise {
         let work = FixedRepsSet(reps: FixedReps(15), restSecs: 30)
@@ -222,9 +226,12 @@ func mockProgram() -> Program {
         return Exercise("Triceps Press", "Standing Triceps Press", .bells(name: "Dumbbells"), info)
     }
     
+    let dead = deadlift()
+    let lightSquat = lightSquats()
+    
     let rehabExercises = [shoulderFlexion(), bicepsStretch(), externalRotation(), sleeperStretch()]
     let mobilityExercises = [foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis()]
-    let lowerExercises = [foamRolling(), splitSquats(), lightSquats(), lunge(), deadlift()]
+    let lowerExercises = [foamRolling(), splitSquats(), lightSquat, lunge(), dead]
     let upperExercises = [foamRolling(), planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
     
     let rehab = Workout("Rehab", rehabExercises, schedule: .days([.saturday, .sunday, .tuesday, .thursday, .friday]))
@@ -244,13 +251,43 @@ func mockProgram() -> Program {
         foamRolling(), ironCross(), vSit(), frog(), fireHydrant(), mountain(), cossack(), piriformis(),
         splitSquats(), lightSquats(), lunge(), deadlift(),
         planks(), pushup(), reversePlank(), curls(), latRaise(), tricepPress()]
-    return Program("Home", workouts, exercises, weeksStart: date)
-
+    
+    let history: [String: [History.Record]] = [
+        dead.name: [
+            History.Record(lower1, dead, daysAgo: 36, weight: 205, sets: asets(4, 3, 3)),
+            History.Record(lower1, dead, daysAgo: 32, weight: 205, sets: asets(4, 4, 3)),
+            History.Record(lower1, dead, daysAgo: 28, weight: 205, sets: asets(5, 4, 4)),
+            History.Record(lower1, dead, daysAgo: 24, weight: 205, sets: asets(5, 5, 5)),
+            
+            History.Record(lower1, dead, daysAgo: 20, weight: 225, sets: asets(4, 4, 3)),
+            History.Record(lower1, dead, daysAgo: 16, weight: 225, sets: asets(5, 4, 4)),
+            History.Record(lower1, dead, daysAgo: 12, weight: 225, sets: asets(5, 5, 5)),
+            
+            History.Record(lower1, dead, daysAgo: 9, weight: 245, sets: asets(4, 4, 3)),
+            History.Record(lower1, dead, daysAgo: 5, weight: 245, sets: asets(5, 4, 4)),
+            History.Record(lower1, dead, daysAgo: 1, weight: 245, sets: asets(5, 5, 5))],
+        lightSquat.name: [
+            History.Record(lower1, lightSquat, daysAgo: 61, weight: 50, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 54, weight: 50, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 47, weight: 50, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 42, weight: 50, sets: asets(5, 5, 5)),
+            
+            History.Record(lower1, lightSquat, daysAgo: 35, weight: 60, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 28, weight: 60, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 21, weight: 60, sets: asets(5, 5, 5)),
+            
+            History.Record(lower1, lightSquat, daysAgo: 15, weight: 70, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 8, weight: 70, sets: asets(5, 5, 5)),
+            History.Record(lower1, lightSquat, daysAgo: 1, weight: 70, sets: asets(5, 5, 5))],
+    ]
+    
+    return (Program("Home", workouts, exercises, weeksStart: date), history)
 }
 
 func mockModel() -> Model {
-    let program = mockProgram()
+    let (program, history) = mockProgram()
     let model = Model(program)
     model.bellsSet = ["Dumbbells": Bells([5, 10, 15, 20, 25, 30, 40, 50]), "Cable machine": Bells([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])]
+    model.history.records = history
     return model
 }

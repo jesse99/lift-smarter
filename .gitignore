@@ -91,4 +91,5 @@ fastlane/test_output
 iOSInjectionProject/
 
 *back-color.xml
+.DS_Store
 

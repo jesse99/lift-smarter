@@ -49,6 +49,15 @@ class History: Storable {
             }
         }
 
+        // For testing
+        init(_ workout: Workout, _ exercise: Exercise, daysAgo: Int, weight: Double, sets: [ActualSet]) {
+            self.completed = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!
+            self.weight = weight
+            self.sets = sets
+            self.workout = workout.name
+            self.formalName = exercise.formalName
+        }
+
         required init(from store: Store) {
             self.completed = store.getDate("completed")
             self.weight = store.getDbl("weight")

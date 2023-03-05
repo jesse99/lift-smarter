@@ -7,6 +7,10 @@ class HistoryVM: ObservableObject {
     init(_ model: Model) {
         self.model = model
     }
+    
+    func records(_ exerciseName: String) -> [History.Record] {
+        return model.history.records[exerciseName] ?? []
+    }
 }
 
 // Misc Logic

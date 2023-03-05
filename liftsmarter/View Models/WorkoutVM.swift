@@ -36,7 +36,7 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
         return self.workout.started
     }
     
-    func duration() -> String {
+    func totalDuration() -> String {
         if let start = self.started() {
             var delta = 0
             for (_, end) in self.workout.completed {
@@ -48,6 +48,18 @@ class WorkoutVM: Equatable, ObservableObject, Identifiable {
             
             if delta > 0 {
                 return friendlyMediumSecs(delta)
+            }
+        }
+        return ""
+    }
+
+    func duration(_ instance: InstanceVM) -> String {
+        if let began = self.workout.began[instance.name] {
+            if let end = self.workout.completed[instance.name] {
+                let delta = Int(end.timeIntervalSince(began))
+                if delta > 0 {      // may not have completed the exercise for this instance of the workout yet
+                    return friendlyMediumSecs(delta)
+                }
             }
         }
         return ""
@@ -100,7 +112,7 @@ extension WorkoutVM {
         self.workout.schedule = schedule
     }
 
-    func updateStarted(_ date: Date) {
+    func updateStarted(_ instance: InstanceVM, _ date: Date) {
         if let oldStarted = self.workout.started {
             let delta = date.hoursSinceDate(oldStarted)
             if delta > 8 {
@@ -108,6 +120,15 @@ extension WorkoutVM {
             }
         } else {
             self.workout.started = date
+        }
+
+        if let oldBegan = self.workout.began[instance.name] {
+            let delta = date.hoursSinceDate(oldBegan)
+            if delta > 8 {
+                self.workout.began[instance.name] = date
+            }
+        } else {
+            self.workout.began[instance.name] = date
         }
     }
 

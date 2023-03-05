@@ -26,6 +26,8 @@ struct RecentView: View {       // TODO: should turn this into a HistoryView (no
 
             Divider()
             HStack {
+                // TODO: disable chart button if less than two completed
+                // TODO: don't even show button if OS version < 16
                 Spacer()
                 Button("OK", action: {self.presentation.wrappedValue.dismiss()}).font(.callout)
             }
