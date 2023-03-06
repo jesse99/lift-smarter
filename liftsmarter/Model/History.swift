@@ -65,6 +65,10 @@ class History: Storable {
             self.workout = store.getStr("workout")
             self.formalName = store.getStr("formalName")
             self.note = store.getStr("note")
+            
+            if self.formalName == "Bench Press" && self.weight == 0 {
+                self.weight = 115.0
+            }
         }
 
         func save(_ store: Store) {

@@ -12,39 +12,33 @@ func actualToCount(_ set: ActualSet) -> Int {
 }
 
 struct RepsEntry: Identifiable {
-    let count: Int          // total reps or total duration
-    let minWeight: Double   // min and max are used with Barmark to show the rep ranges
-    let maxWeight: Double
     let weight: Double
+    let size: Double        // symvol scaling based on total reps
     let date: Date
     let id = UUID()
     
-    init(_ record: History.Record) {
-        self.count = record.sets.reduce(0, {$0 + actualToCount($1)})
-        self.minWeight = record.weight
-        self.maxWeight = record.weight
-        self.weight = record.weight
-        self.date = record.completed
-    }
-
-    init(_ record: History.Record, _ maxCount: Int) {
-        self.count = record.sets.reduce(0, {$0 + actualToCount($1)})
+    init(_ record: History.Record, _ minCount: Int, _ maxCount: Int) {
+        let count = record.sets.reduce(0, {$0 + actualToCount($1)})
         
-        let delta = 6.0*Double(count)/Double(maxCount)
-        self.minWeight = record.weight - delta
-        self.maxWeight = record.weight + delta
         self.weight = record.weight
         self.date = record.completed
+        if minCount < maxCount {
+            self.size = 20 + 60*Double(count - minCount)/Double(maxCount - minCount)
+        } else {
+            self.size = 80.0
+        }
     }
 }
 
 /// Chart for completed exercises for rep based exercises.
 @available(iOS 16, *)
-struct RepsChartView: View {
+struct RepsChartView: View {    // TODO: probably should rename this
     let program: ProgramVM
     let exerciseName: String
     let entries: [RepsEntry]
     let yValues: [Double]
+    let maxCount: Int
+    let minCount: Int
     @Environment(\.presentationMode) private var presentation
 
     init(_ program: ProgramVM, _ exerciseName: String) {
@@ -55,25 +49,26 @@ struct RepsChartView: View {
         let counts = records.map({$0.sets.reduce(0, {$0 + actualToCount($1)})})
         let maxCount = counts.reduce(Int.min, {max($0, $1)})
         let minCount = counts.reduce(Int.max, {min($0, $1)})
-        if minCount < maxCount {
-            self.entries = self.program.history().records(self.exerciseName).map({RepsEntry($0, maxCount)})
-        } else {
-            self.entries = self.program.history().records(self.exerciseName).map({RepsEntry($0)})
-        }
+        
+        self.entries = self.program.history().records(self.exerciseName).map({RepsEntry($0, minCount, maxCount)})
         self.yValues = records.map({$0.weight}).unique()
+        self.maxCount = maxCount
+        self.minCount = minCount
     }
 
     var body: some View {
         VStack {
             Text(self.exerciseName).font(.largeTitle)
             Chart(self.entries) {
-                BarMark(x: .value("Date", $0.date), yStart: .value("Weight", $0.minWeight), yEnd: .value("Weight", $0.maxWeight), width: 3)
                 PointMark(
                     x: .value("Date", $0.date),
                     y: .value("Weight", $0.weight)
                 )
+                .symbol(Circle().strokeBorder(lineWidth: 2.0))
+                .symbolSize($0.size)
             }
             .chartYAxis{AxisMarks(values: self.yValues)}
+            .chartYScale(domain: self.yValues.min()!...self.yValues.max()!)
             .padding(.leading).padding(.trailing)
 
             Divider()
@@ -92,7 +87,7 @@ struct RepsChartView_Previews: PreviewProvider {
     static let program = ProgramVM(ModelVM(model), model)
 
     static var previews: some View {
-        RepsChartView(program, "Light Squat")
-//        RepsChartView(program, "Deadlift")
+//        RepsChartView(program, "Light Squat")
+        RepsChartView(program, "Deadlift")
     }
 }

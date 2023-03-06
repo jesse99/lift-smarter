@@ -5,6 +5,7 @@ import SwiftUI
 struct RecentView: View {       // TODO: should turn this into a HistoryView (no limit and editing at least the latest)
     let program: ProgramVM
     let exerciseName: String
+    @State var chartModal = false
     @Environment(\.presentationMode) private var presentation
 
     init(_ program: ProgramVM, _ exerciseName: String) {
@@ -26,8 +27,17 @@ struct RecentView: View {       // TODO: should turn this into a HistoryView (no
 
             Divider()
             HStack {
-                // TODO: disable chart button if less than two completed
-                // TODO: don't even show button if OS version < 16
+                if #available(iOS 16, *) {
+                    // TODO: need at least one completion
+                    Button("Chart", action: {self.chartModal = true})
+                        .font(.callout)
+                        .sheet(isPresented: self.$chartModal) {RepsChartView(self.program, self.exerciseName)}
+                } else {
+                    Button("Chart", action: {})
+                        .font(.callout)
+                        .disabled(true)
+                }
+            
                 Spacer()
                 Button("OK", action: {self.presentation.wrappedValue.dismiss()}).font(.callout)
             }
