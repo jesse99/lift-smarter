@@ -6,6 +6,7 @@ struct RecentView: View {       // TODO: should turn this into a HistoryView (no
     let program: ProgramVM
     let exerciseName: String
     @State var chartModal = false
+    @State var chart1RMModal = false
     @Environment(\.presentationMode) private var presentation
 
     init(_ program: ProgramVM, _ exerciseName: String) {
@@ -32,6 +33,9 @@ struct RecentView: View {       // TODO: should turn this into a HistoryView (no
                     Button("Chart", action: {self.chartModal = true})
                         .font(.callout)
                         .sheet(isPresented: self.$chartModal) {RepsChartView(self.program, self.exerciseName)}
+                    Button("1RM", action: {self.chart1RMModal = true})
+                        .font(.callout)
+                        .sheet(isPresented: self.$chart1RMModal) {OneRepMaxChartView(self.program, self.exerciseName)}
                 } else {
                     Button("Chart", action: {})
                         .font(.callout)

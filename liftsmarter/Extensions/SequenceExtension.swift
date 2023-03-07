@@ -54,6 +54,18 @@ extension Sequence {
         
         return result
     }
+
+    func mapFilter<T>(_ mapping: (Iterator.Element) -> T?) -> [T] {
+        var result: [T] = []
+        
+        for x in self {
+            if let e = mapping(x) {
+                result.append(e)
+            }
+        }
+        
+        return result
+    }
 }
 
 extension Sequence where Iterator.Element : Comparable {

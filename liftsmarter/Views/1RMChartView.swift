@@ -1,54 +1,44 @@
-//  Created by Jesse Vorisek on 3/4/23.
+//  Created by Jesse Vorisek on 3/6/23.
 import Charts
 import SwiftUI
 
-func actualToCount(_ set: ActualSet) -> Int {
-    switch set {
-    case .reps(count: let count, percent: _):
-        return count
-    case .duration(secs: let secs, percent: _):
-        return secs
+// Table is based on Baechle TR, Earle RW, Wathen D (2000). Essentials of Strength Training and Conditioning
+// by way of https://exrx.net/Calculators/OneRepMax.
+func get1RM(_ weight: Double, _ reps: Int) -> Double? {
+    //  reps                    1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+    let percents: [Double] = [100, 95, 93, 90, 87, 85, 83, 80, 77, 75, 72, 67, 66, 66, 65]
+    if reps > 0 && reps - 1 < percents.count {
+        let percent = percents[reps - 1]/100.0
+        let max = weight*(2.0 - percent)
+        return max.rounded(.toNearestOrEven)
     }
+    return nil
 }
 
-struct RepsEntry: Identifiable {
+struct OneRepMaxEntry: Identifiable {
     let weight: Double
-    let size: Double        // symbol scaling based on total reps
+    let size = 80.0        
     let date: Date
     let id = UUID()
-    
-    init(_ record: History.Record, _ minCount: Int, _ maxCount: Int) {
-        let count = record.sets.reduce(0, {$0 + actualToCount($1)})
-        
-        self.weight = record.weight
-        self.date = record.completed
-        if minCount < maxCount {
-            self.size = 20 + 60*Double(count - minCount)/Double(maxCount - minCount)
-        } else {
-            self.size = 80.0
-        }
-    }
 }
 
-/// Chart for completed exercises for rep based exercises.
+/// Chart for completed exercises for rep based exercises showing estimated 1RM.
 @available(iOS 16, *)
-struct RepsChartView: View {    // TODO: probably should rename this
+struct OneRepMaxChartView: View {  
     let program: ProgramVM
     let exerciseName: String
     @State var subLabel = ""
     @State var afterDate = Date.distantPast
-    @State var entries: [RepsEntry] = []
+    @State var entries: [OneRepMaxEntry] = []
     @State var yValues: [Double] = []
-    @State var maxCount: Int = 1
-    @State var minCount: Int = 1
     @Environment(\.presentationMode) private var presentation
-
+    
     init(_ program: ProgramVM, _ exerciseName: String) {
         self.program = program
         self.exerciseName = exerciseName
-//        self.rebuild(afterDate: Date.distantPast)
+        //        self.rebuild(afterDate: Date.distantPast)
     }
-
+    
     var body: some View {
         VStack {
             Text(self.exerciseName).font(.largeTitle)
@@ -64,7 +54,7 @@ struct RepsChartView: View {    // TODO: probably should rename this
             .chartYAxis{AxisMarks(values: self.yValues)}
             .chartYScale(domain: (self.yValues.min() ?? 0)...(self.yValues.max() ?? 100))
             .padding(.leading).padding(.trailing)
-
+            
             Divider()
             HStack {
                 Menu("Dates") {
@@ -94,7 +84,7 @@ struct RepsChartView: View {    // TODO: probably should rename this
         if months == 12 {
             self.subLabel = "last year"
         } else if months == 1 {
-                self.subLabel = "last month"
+            self.subLabel = "last month"
         } else {
             self.subLabel = "last \(months) months"
         }
@@ -104,24 +94,38 @@ struct RepsChartView: View {    // TODO: probably should rename this
     
     private func rebuild() {
         let records = self.program.history().records(self.exerciseName).filter({$0.completed.compare(self.afterDate) == .orderedDescending})
-        let counts = records.map({$0.sets.reduce(0, {$0 + actualToCount($1)})})
-        let maxCount = counts.reduce(Int.min, {max($0, $1)})
-        let minCount = counts.reduce(Int.max, {min($0, $1)})
         
-        self.entries = records.map({RepsEntry($0, minCount, maxCount)})
-        self.yValues = records.map({$0.weight}).unique()
-        self.maxCount = maxCount
-        self.minCount = minCount
+        self.entries = records.mapFilter({
+            if let weight = self.find1RM($0) {
+                return OneRepMaxEntry(weight: weight, date: $0.completed)
+            } else {
+                return nil
+            }
+        })
+        self.yValues = self.entries.map({$0.weight}).unique()
+    }
+    
+    private func find1RM(_ record: History.Record) -> Double? {
+        if let set = record.sets.first {    // we'll use first set because the user may be fatigued on the later sets
+            switch set {
+            case .reps(count: let count, percent: let percent):
+                return get1RM(percent*record.weight, count)
+            case .duration(secs: _, percent: _):
+                return nil
+            }
+        } else {
+            return nil
+        }
     }
 }
 
 @available(iOS 16, *)
-struct RepsChartView_Previews: PreviewProvider {
+struct OneRepMaxChartView_Previews: PreviewProvider {
     static let model = mockModel()
     static let program = ProgramVM(ModelVM(model), model)
 
     static var previews: some View {
-//        RepsChartView(program, "Light Squat")
-        RepsChartView(program, "Deadlift")
+//        OneRepMaxChartView(program, "Light Squat")
+        OneRepMaxChartView(program, "Deadlift")
     }
 }
