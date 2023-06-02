@@ -60,6 +60,17 @@ let defaultNotes: [String: String] = [
             "Pull your body up as high as possible while remaining horizontal."],
         links: ["Link": "https://www.youtube.com/watch?v=cVdb8oUGKAw", "Body Weight Rows": "https://www.reddit.com/r/bodyweightfitness/wiki/exercises/row"]),
     
+    "Ant. Scalenes Stretch": noteToMarkdown(
+        notes: [
+            "This can be done either seated or standing.",
+            "Keep back straight and neck inline with spine.",
+            "Depress chest with one hand.",
+            "Tilt head so ear fingers point to leans to shoulder.",
+            "Then point chin upwards..",
+            "Hold for 30-60s and then switch sides.",
+            "Ideally do these 2-3x a day."],
+        links: ["Link": "https://www.youtube.com/watch?v=wQylqaCl8Zo"]),
+    
     "Arch Hangs": noteToMarkdown(
         notes: [
             "Hang off a pullup bar.",
@@ -538,6 +549,16 @@ let defaultNotes: [String: String] = [
             "Make the stretch more intense by looking up through the armpit that is towards the middle.",
             "Repeat for the other side."],
         links: ["Video": "https://www.youtube.com/watch?v=pJcobQf324o", "Cues": "https://www.reddit.com/r/bodyweightfitness/wiki/move/phase1"]),
+    
+    "Chin Tucks": noteToMarkdown(
+        notes: [
+            "Lie on your back with knees bent.",
+            "Tuck your chin for a second or two and repeat.",
+            "Can use two fingers on your chin to lessen difficulty.",
+            "Can increase difficulty by raising your head before tucking.",
+            "Do 15 reps.",
+            "Ideally do these 2-3x a day."],
+        links: ["Link": "https://www.youtube.com/watch?v=wQylqaCl8Zo"]),
     
     "Chinup": noteToMarkdown(
         notes: [
@@ -2228,6 +2249,17 @@ let defaultNotes: [String: String] = [
             "Difficulty can be increased by doing this in a pushup position or by using a band."],
         links: ["Video": "https://www.youtube.com/watch?v=akgQbxhrhOc", "Cues": "https://www.reddit.com/r/bodyweightfitness/wiki/move/phase1"]),
     
+    "SCM Stretch": noteToMarkdown(
+        notes: [
+            "This can be done either seated or standing.",
+            "Keep back straight and neck inline with spine.",
+            "Depress chest with one hand.",
+            "Rotate head in the direction hand is pointed.",
+            "Tilt head backwards until you feel a stretch.",
+            "Hold for 30-60s and then switch sides.",
+            "Ideally do these 2-3x a day."],
+        links: ["Link": "https://www.youtube.com/watch?v=wQylqaCl8Zo"]),
+    
     "Seated Cable Row": noteToMarkdown(
         notes: [
             "Use a V-bar (which allows palms to face each other).",
@@ -2616,6 +2648,16 @@ let defaultNotes: [String: String] = [
             "Squeeze a rubber stress ball for either 10 reps or 30s.",
             "If you're doing Wrist Extension or Flexion then use that arm position."],
         links: ["Link": "https://www.hip.fit/e/stress-ball-squeeze", "AAoS": "https://orthoinfo.aaos.org/globalassets/pdfs/a00790_therapeutic-exercise-program-for-epicondylitis_final.pdf"]),
+    
+    "Suboccipitals Release": noteToMarkdown(
+        notes: [
+            "Place a tennis ball on the upper back side of the neck.",
+            "Lie on your back with the ball on one side of your neck.",
+            "Can use one hand to hold the ball in place.",
+            "Tuck your chin up and down for 10 deep breaths.",
+            "Then do the other side.",
+            "Ideally do these 2-3x a day."],
+        links: ["Link": "https://www.youtube.com/watch?v=wQylqaCl8Zo"]),
     
     "Sumo Deadlift": noteToMarkdown(
         notes: [
